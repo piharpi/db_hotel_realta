@@ -52,7 +52,7 @@ CREATE TABLE Hotel.Facilities
   faci_id INT IDENTITY(1,1) NOT NULL CONSTRAINT faci_id_pk PRIMARY KEY, -- primary key column
   faci_description NVARCHAR(255) NULL,
   faci_max_number INT NULL,
-  faci_measure_unit VARCHAR(15) NULL CHECK(faci_measure_unit IN('people','beds')),
+  faci_measure_unit VARCHAR(15) NULL CHECK(faci_measure_unit IN('People','Beds')),
   faci_room_number NVARCHAR(6) NOT NULL,
   faci_startdate DATETIME NOT NULL,
   faci_endate DATETIME NOT NULL,

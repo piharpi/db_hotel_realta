@@ -2,8 +2,6 @@ CREATE DATABASE Hotel_Realta
 
 USE Hotel_Realta
 
-
-
 create table Master.regions(
 region_code int identity(1,1),
 region_name nvarchar(35) unique not null,
@@ -39,14 +37,14 @@ constraint fk_addr_prov_id foreign key(addr_prov_id) references Master.provinces
 
 create table master.category_group(
 cagro_id int identity(1,1),
-cagro_name nvarchar(25) unique not null check (cagro_name in ('Room','Restaurant','Meeting Room','Gym','Aula','SwimmingPool','Balroom')),
+cagro_name nvarchar(25) unique not null check (cagro_name in ('1','2','3 ','4','5','6','7')),
 cagro_description nvarchar(255),
 cagro_type nvarchar(25) not null check (cagro_type in('category','service','facility')),
 cagro_icon nvarchar(255),
 cagro_icon_url nvarchar(255),
 constraint pk_cagro_id primary key(cagro_id)
 );
---DROP TABLE master.category_group
+-- DROP TABLE master.category_group
 
 
 create table master.policy(
@@ -62,7 +60,7 @@ poca_cagro_id int not null,
 constraint fk_poca_poli_id foreign key(poca_poli_id)references Master.policy(poli_id) on delete cascade on update cascade,
 constraint fk_poca_cagro_id foreign key(poca_cagro_id)references Master.category_group(cagro_id) on delete cascade on update cascade
 );
---DROP TABLE master.policy_category_group
+-- DROP TABLE master.policy_category_group
 
 create table master.price_item(
 prit_id int identity(1,1),
@@ -73,7 +71,7 @@ prit_type nvarchar(15) not null check (prit_type in ('SNACK','FACILITY','SOFTDRI
 prit_modified_date datetime,
 constraint pk_prit_id primary key(prit_id)
 );
-DROP TABLE master.price_item
+-- DROP TABLE master.price_item
 
 create table master.service_task(
 seta_id int identity(1,1),
@@ -87,5 +85,3 @@ memb_name nvarchar(15) not null,
 memb_description nvarchar(100),
 constraint pk_memb_name primary key(memb_description)
 );
-
- 

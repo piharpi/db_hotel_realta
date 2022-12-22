@@ -2,6 +2,10 @@ CREATE DATABASE Hotel_Realta
 
 USE Hotel_Realta
 
+GO
+CREATE SCHEMA [master] ;
+GO
+
 create table Master.regions(
 region_code int identity(1,1),
 region_name nvarchar(35) unique not null,

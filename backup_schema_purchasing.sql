@@ -3,7 +3,6 @@
 -- GO;
 -- CREATE SCHEMA purchasing;
 -- CREATE SCHEMA hr;
--- GO;
 -- CREATE SCHEMA hotel;
 -- GO;
 

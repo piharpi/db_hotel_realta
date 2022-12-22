@@ -2,7 +2,7 @@ CREATE DATABASE Hotel_Realta
 GO;
 
 USE Hotel_Realta
-
+-- 
 CREATE SCHEMA purchasing;
 
 create table purchasing.stocks(

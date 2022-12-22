@@ -40,7 +40,7 @@ GO
 -- create tabel Payment.Entity
 CREATE TABLE Payment.Entity(
 	entity_id INT IDENTITY(1, 1) NOT NULL,
-	CONSTRAINT PK_PaymentEntityId PRIMARY KEY CLUSTERED (entity_id) 
+	CONSTRAINT PK_PaymentEntityId PRIMARY KEY (entity_id) 
 )
 
 -- create tabel Payment.Bank

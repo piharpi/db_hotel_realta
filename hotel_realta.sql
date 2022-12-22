@@ -1,4 +1,5 @@
 CREATE DATABASE Hotel_Realta
+GO;
 
 USE Hotel_Realta
 

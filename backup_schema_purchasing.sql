@@ -16,7 +16,7 @@
 --     CONSTRAINT pk_hofa_faci_id PRIMARY KEY (hofa_faci_id)
 -- )
 
-USE Hotel_Realta;
+-- USE Hotel_Realta;
 
 create table purchasing.stocks(
 	stock_id int identity (1,1),

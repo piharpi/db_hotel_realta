@@ -1,3 +1,7 @@
+-- Create Schema 'Hotel'
+CREATE SCHEMA Hotel;
+GO
+
 -- Create a new table called 'Hotels' in schema 'Hotel'
 -- Drop the table if it already exists
 IF OBJECT_ID('Hotel.Hotels', 'U') IS NOT NULL

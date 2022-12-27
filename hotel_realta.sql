@@ -104,11 +104,11 @@ CREATE TABLE Payment.PaymentTransaction(
 	patr_type NCHAR(3) NOT NULL,
 	patr_note NVARCHAR(255),
 	patr_modified_date DATETIME,
+	patr_order_number NVARCHAR(55),
 	patr_source_id INT,
 	patr_target_id INT,
 	patr_trx_number_ref NVARCHAR(55) UNIQUE,
 	patr_user_id INT,
-	patr_booking_id NVARCHAR(55),
 	CONSTRAINT CK_PaymentPaymentTransactionType CHECK (patr_type IN ('TP', 'TRB', 'RPY', 'RF', 'ORM')),
 	CONSTRAINT FK_PaymentPaymentTransactionUserId FOREIGN KEY (patr_user_id)
 		REFERENCES Users.Users (user_id)
@@ -122,11 +122,11 @@ CREATE TABLE Payment.PaymentTransaction(
 		REFERENCES Payment.Bank(bank_entity_id)
 		ON UPDATE NO ACTION
 		ON DELETE NO ACTION,
-	CONSTRAINT FK_PaymentPaymentBookingOrdersId FOREIGN KEY (patr_booking_id)
+	CONSTRAINT FK_PaymentPaymentBookingOrdersId FOREIGN KEY (patr_order_number)
 		REFERENCES Booking.BookingOrders(boor_order_number)
 		ON UPDATE CASCADE
 		ON DELETE CASCADE,
-	CONSTRAINT FK_PaymentPaymentRestoOrderMenus FOREIGN KEY (patr_booking_id)
+	CONSTRAINT FK_PaymentPaymentRestoOrderMenus FOREIGN KEY (patr_order_number)
 		REFERENCES Resto.OrderMenus(orme_order_number)
 		ON UPDATE CASCADE
 		ON DELETE CASCADE

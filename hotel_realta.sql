@@ -28,8 +28,11 @@ GO
 CREATE SCHEMA Booking;
 GO
 
-CREATE SCHEMA [Resto];
+CREATE SCHEMA Resto;
 
+GO
+
+CREATE SCHEMA Payment;
 GO
 
 -- MODULE MASTERS --
@@ -430,7 +433,7 @@ CREATE TABLE Booking.special_offers
     spof_modified_date DATETIME
     constraint pk_spof_id PRIMARY KEY(spof_id)
 )
-create table Booking.booking_order(
+create table Booking.booking_orders(
 	boor_id INT	IDENTITY (1,1),
 	boor_order_number nvarchar(20) NOT NULL,
 	boor_order_date DATETIME NOT NULL,
@@ -471,7 +474,7 @@ CREATE TABLE Booking.booking_order_detail(
 	borde_faci_id INTEGER,
 	CONSTRAINT pk_borde_id_boor_id PRIMARY KEY (borde_id, borde_boor_id),
 	CONSTRAINT fk_border_boor_id FOREIGN KEY(borde_boor_id)
-		REFERENCES Booking.booking_order(boor_id),
+		REFERENCES Booking.booking_orders(boor_id),
 	-- 	ON DELETE CASCADE ON UPDATE CASCADE - REMINDER FOR MAKE TRIGGER
 	CONSTRAINT fk_borde_faci_id FOREIGN KEY(borde_faci_id) 
 		REFERENCES Hotel.facilities(faci_id) 
@@ -581,3 +584,100 @@ CREATE TABLE resto.resto_menu_photos
     CONSTRAINT pk_remp_id PRIMARY KEY (remp_id),
     CONSTRAINT fk_remp_reme_id FOREIGN KEY (remp_reme_id) REFERENCES resto.resto_menus(reme_id)
 );
+
+-- MODULE PAYMENT --
+
+--create tabel Payment.Entity
+CREATE TABLE Payment.Entity(
+	entity_id INT IDENTITY(1, 1) NOT NULL,
+	CONSTRAINT PK_PaymentEntityId PRIMARY KEY (entity_id) 
+)
+
+-- create tabel Payment.Bank
+CREATE TABLE Payment.Bank(
+	bank_entity_id INT NOT NULL,
+	bank_code NVARCHAR(10) UNIQUE NOT NULL,
+	bank_name NVARCHAR(55) UNIQUE NOT NULL,
+	bank_modified_date DATETIME
+	CONSTRAINT PK_PaymentBankEntityId PRIMARY KEY(bank_entity_id),
+	CONSTRAINT FK_PaymentBankEntityId FOREIGN KEY(bank_entity_id) 
+		REFERENCES Payment.Entity (entity_id) 
+		ON UPDATE CASCADE 
+		ON DELETE CASCADE
+)
+
+-- create tabel Payment.PaymentGateway
+CREATE TABLE Payment.PaymentGateway(
+	paga_entity_id INT NOT NULL,
+	paga_code NVARCHAR(10) UNIQUE NOT NULL,
+	paga_name NVARCHAR(55) UNIQUE NOT NULL,
+	paga_modified_date DATETIME,
+	CONSTRAINT PK_PaymentGatewayEntityId PRIMARY KEY(paga_entity_id),
+	CONSTRAINT FK_PaymentGatewayEntityId FOREIGN KEY(paga_entity_id)
+		REFERENCES Payment.Entity (entity_id)
+		ON UPDATE CASCADE
+		ON DELETE CASCADE
+)
+
+-- create tabel Payment.UserAccount
+CREATE TABLE Payment.UserAccounts(
+	usac_entity_id INT NOT NULL,
+	usac_user_id INT NOT NULL,
+	usac_account_number VARCHAR(25) UNIQUE NOT NULL,
+	usac_saldo MONEY,
+	usac_type NVARCHAR(15),
+	usac_expmonth TINYINT,
+	usac_expyear SMALLINT,
+	usac_modified_date DATETIME,
+	CONSTRAINT CK_PaymentUserAccountsType CHECK (usac_type IN ('debet', 'credit card', 'payment')),
+	CONSTRAINT PK_PaymentUserAccountsEntityId PRIMARY KEY(usac_entity_id, usac_user_id),
+	CONSTRAINT FK_PaymentUserAccountsEntityBank FOREIGN KEY(usac_entity_id) 
+		REFERENCES Payment.Bank (bank_entity_id)
+		ON UPDATE CASCADE
+		ON DELETE CASCADE,
+	CONSTRAINT FK_PaymentUserAccountsEntityPayment FOREIGN KEY(usac_entity_id)
+		REFERENCES Payment.PaymentGateway(paga_entity_id)
+		ON UPDATE NO ACTION
+		ON DELETE NO ACTION,
+	CONSTRAINT FK_PaymentUserAccountsUserId FOREIGN KEY(usac_user_id)
+		REFERENCES Users.Users (user_id)
+		ON UPDATE CASCADE
+		ON DELETE CASCADE
+)
+
+-- create table Payment.PaymentTransaction
+CREATE TABLE Payment.PaymentTransaction(
+	patr_id INT IDENTITY(1,1) PRIMARY KEY,
+	patr_trx_number NVARCHAR(55) UNIQUE,
+	patr_debet MONEY,
+	patr_credit MONEY,
+	patr_type NCHAR(3) NOT NULL,
+	patr_note NVARCHAR(255),
+	patr_modified_date DATETIME,
+	patr_order_number NVARCHAR(55),
+	patr_source_id INT,
+	patr_target_id INT,
+	patr_trx_number_ref NVARCHAR(55) UNIQUE,
+	patr_user_id INT,
+	CONSTRAINT CK_PaymentPaymentTransactionType CHECK (patr_type IN ('TP', 'TRB', 'RPY', 'RF', 'ORM')),
+	CONSTRAINT FK_PaymentPaymentTransactionUserId FOREIGN KEY (patr_user_id)
+		REFERENCES Users.Users (user_id)
+		ON UPDATE CASCADE
+		ON DELETE CASCADE,
+	CONSTRAINT FK_PaymentPaymentTransactionSourceId FOREIGN KEY (patr_source_id)
+		REFERENCES Payment.Bank(bank_entity_id)
+		ON UPDATE CASCADE
+		ON DELETE CASCADE,
+	CONSTRAINT FK_PaymentPaymentTransactionTargetId FOREIGN KEY (patr_target_id)
+		REFERENCES Payment.Bank(bank_entity_id)
+		ON UPDATE NO ACTION
+		ON DELETE NO ACTION,
+	CONSTRAINT FK_PaymentPaymentBookingOrdersId FOREIGN KEY (patr_order_number)
+		REFERENCES Booking.Booking_Orders(boor_order_number)
+		ON UPDATE CASCADE
+		ON DELETE CASCADE,
+	CONSTRAINT FK_PaymentPaymentRestoOrderMenus FOREIGN KEY (patr_order_number)
+		REFERENCES Resto.OrderMenus(orme_order_number)
+		ON UPDATE CASCADE
+		ON DELETE CASCADE
+)

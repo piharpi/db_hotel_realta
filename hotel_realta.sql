@@ -15,6 +15,31 @@ GO
 CREATE SCHEMA Booking;
 GO
 
+-- dummy table untuk users, hotels, facilities, 
+
+--dari table Users
+CREATE TABLE Users.users(
+	user_id INTEGER
+	CONSTRAINT pk_user_id PRIMARY KEY(user_id)
+)
+
+-- dari tabel hotel
+CREATE TABLE Hotel.hotels(
+	hotel_id INT IDENTITY(1,1)
+	CONSTRAINT pk_hotel_id PRIMARY KEY(hotel_id)
+)
+
+-- dari tabel hotel
+CREATE TABLE Hotel.facilities(
+	faci_id INT IDENTITY(1,1)
+	CONSTRAINT pk_faci_id PRIMARY KEY(faci_id)
+)
+
+--dari tabel Master
+CREATE TABLE Master.price_items(
+	prit_id INTEGER
+	CONSTRAINT pk_prit_id PRIMARY KEY(prit_id)
+)
 
 CREATE TABLE Booking.special_offers
 (

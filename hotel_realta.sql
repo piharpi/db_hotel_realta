@@ -1,4 +1,3 @@
--- membuat database
 USE tempdb;
 GO
 
@@ -7,7 +6,6 @@ GO
 
 CREATE DATABASE Hotel_Realta;
 GO
-
 
 -- menggunakan db hotel_realta
 USE Hotel_Realta;
@@ -28,8 +26,14 @@ GO
 CREATE SCHEMA Booking;
 GO
 
-CREATE SCHEMA [Resto];
+CREATE SCHEMA Resto;
 
+GO
+
+CREATE SCHEMA Payment;
+GO
+
+CREATE SCHEMA purchasing;
 GO
 
 -- MODULE MASTERS --
@@ -430,7 +434,7 @@ CREATE TABLE Booking.special_offers
     spof_modified_date DATETIME
     constraint pk_spof_id PRIMARY KEY(spof_id)
 )
-create table Booking.booking_order(
+create table Booking.booking_orders(
 	boor_id INT	IDENTITY (1,1),
 	boor_order_number nvarchar(20) NOT NULL,
 	boor_order_date DATETIME NOT NULL,
@@ -471,7 +475,7 @@ CREATE TABLE Booking.booking_order_detail(
 	borde_faci_id INTEGER,
 	CONSTRAINT pk_borde_id_boor_id PRIMARY KEY (borde_id, borde_boor_id),
 	CONSTRAINT fk_border_boor_id FOREIGN KEY(borde_boor_id)
-		REFERENCES Booking.booking_order(boor_id),
+		REFERENCES Booking.booking_orders(boor_id),
 	-- 	ON DELETE CASCADE ON UPDATE CASCADE - REMINDER FOR MAKE TRIGGER
 	CONSTRAINT fk_borde_faci_id FOREIGN KEY(borde_faci_id) 
 		REFERENCES Hotel.facilities(faci_id) 
@@ -580,4 +584,192 @@ CREATE TABLE resto.resto_menu_photos
     remp_reme_id INT,
     CONSTRAINT pk_remp_id PRIMARY KEY (remp_id),
     CONSTRAINT fk_remp_reme_id FOREIGN KEY (remp_reme_id) REFERENCES resto.resto_menus(reme_id)
+);
+
+-- MODULE PAYMENT --
+
+--create tabel Payment.Entity
+CREATE TABLE Payment.Entity(
+	entity_id INT IDENTITY(1, 1) NOT NULL,
+	CONSTRAINT PK_PaymentEntityId PRIMARY KEY (entity_id) 
+)
+
+-- create tabel Payment.Bank
+CREATE TABLE Payment.Bank(
+	bank_entity_id INT NOT NULL,
+	bank_code NVARCHAR(10) UNIQUE NOT NULL,
+	bank_name NVARCHAR(55) UNIQUE NOT NULL,
+	bank_modified_date DATETIME
+	CONSTRAINT PK_PaymentBankEntityId PRIMARY KEY(bank_entity_id),
+	CONSTRAINT FK_PaymentBankEntityId FOREIGN KEY(bank_entity_id) 
+		REFERENCES Payment.Entity (entity_id) 
+		ON UPDATE CASCADE 
+		ON DELETE CASCADE
+)
+
+-- create tabel Payment.PaymentGateway
+CREATE TABLE Payment.PaymentGateway(
+	paga_entity_id INT NOT NULL,
+	paga_code NVARCHAR(10) UNIQUE NOT NULL,
+	paga_name NVARCHAR(55) UNIQUE NOT NULL,
+	paga_modified_date DATETIME,
+	CONSTRAINT PK_PaymentGatewayEntityId PRIMARY KEY(paga_entity_id),
+	CONSTRAINT FK_PaymentGatewayEntityId FOREIGN KEY(paga_entity_id)
+		REFERENCES Payment.Entity (entity_id)
+		ON UPDATE CASCADE
+		ON DELETE CASCADE
+)
+
+-- create tabel Payment.UserAccount
+CREATE TABLE Payment.UserAccounts(
+	usac_entity_id INT NOT NULL,
+	usac_user_id INT NOT NULL,
+	usac_account_number VARCHAR(25) UNIQUE NOT NULL,
+	usac_saldo MONEY,
+	usac_type NVARCHAR(15),
+	usac_expmonth TINYINT,
+	usac_expyear SMALLINT,
+	usac_modified_date DATETIME,
+	CONSTRAINT CK_PaymentUserAccountsType CHECK (usac_type IN ('debet', 'credit card', 'payment')),
+	CONSTRAINT PK_PaymentUserAccountsEntityId PRIMARY KEY(usac_entity_id, usac_user_id),
+	CONSTRAINT FK_PaymentUserAccountsEntityBank FOREIGN KEY(usac_entity_id) 
+		REFERENCES Payment.Bank (bank_entity_id)
+		ON UPDATE CASCADE
+		ON DELETE CASCADE,
+	CONSTRAINT FK_PaymentUserAccountsEntityPayment FOREIGN KEY(usac_entity_id)
+		REFERENCES Payment.PaymentGateway(paga_entity_id)
+		ON UPDATE NO ACTION
+		ON DELETE NO ACTION,
+	CONSTRAINT FK_PaymentUserAccountsUserId FOREIGN KEY(usac_user_id)
+		REFERENCES Users.Users (user_id)
+		ON UPDATE CASCADE
+		ON DELETE CASCADE
+)
+
+-- create table Payment.PaymentTransaction
+CREATE TABLE Payment.PaymentTransaction(
+	patr_id INT IDENTITY(1,1) PRIMARY KEY,
+	patr_trx_number NVARCHAR(55) UNIQUE,
+	patr_debet MONEY,
+	patr_credit MONEY,
+	patr_type NCHAR(3) NOT NULL,
+	patr_note NVARCHAR(255),
+	patr_modified_date DATETIME,
+	patr_order_number NVARCHAR(55),
+	patr_source_id INT,
+	patr_target_id INT,
+	patr_trx_number_ref NVARCHAR(55) UNIQUE,
+	patr_user_id INT,
+	CONSTRAINT CK_PaymentPaymentTransactionType CHECK (patr_type IN ('TP', 'TRB', 'RPY', 'RF', 'ORM')),
+	CONSTRAINT FK_PaymentPaymentTransactionUserId FOREIGN KEY (patr_user_id)
+		REFERENCES Users.Users (user_id)
+		ON UPDATE CASCADE
+		ON DELETE CASCADE,
+	CONSTRAINT FK_PaymentPaymentTransactionSourceId FOREIGN KEY (patr_source_id)
+		REFERENCES Payment.Bank(bank_entity_id)
+		ON UPDATE CASCADE
+		ON DELETE CASCADE,
+	CONSTRAINT FK_PaymentPaymentTransactionTargetId FOREIGN KEY (patr_target_id)
+		REFERENCES Payment.Bank(bank_entity_id)
+		ON UPDATE NO ACTION
+		ON DELETE NO ACTION,
+	CONSTRAINT FK_PaymentPaymentBookingOrdersId FOREIGN KEY (patr_order_number)
+		REFERENCES Booking.Booking_Orders(boor_order_number)
+		ON UPDATE CASCADE
+		ON DELETE CASCADE,
+	CONSTRAINT FK_PaymentPaymentRestoOrderMenus FOREIGN KEY (patr_order_number)
+		REFERENCES Resto.OrderMenus(orme_order_number)
+		ON UPDATE CASCADE
+		ON DELETE CASCADE
+)
+
+-- MODULE PURCHASING --
+
+create table purchasing.stocks(
+	stock_id int identity (1,1),
+	stock_name nvarchar(255) NOT NULL,
+	stock_description nvarchar(255),
+	stock_quantity smallint not null,
+	stock_reorder_point smallint not null,
+	stock_used smallint,
+	stock_scrap smallint,
+	stock_price money not null,
+	stock_standar_cost money not null,
+	stock_size nvarchar (25),
+	stock_color nvarchar (15),
+	stock_modified_date datetime,
+	constraint pk_department_id primary key (stock_id)
+);
+
+create table purchasing.stock_photo(
+	spho_id int identity (1,1),
+	spho_thumbnail_filename nvarchar (50),
+	spho_photo_filename nvarchar (50),
+	spho_primary bit DEFAULT 0 CHECK (spho_primary IN (0,1)),
+	spho_url nvarchar(355),
+	spho_stock_id int,
+	constraint pk_spho_id primary key (spho_id),
+	constraint fk_spho_stock_id foreign key (spho_stock_id) references purchasing.stocks(stock_id) ON DELETE CASCADE on UPDATE CASCADE
+);
+
+create table purchasing.vendor(
+	vendor_id int identity (1,1),
+	vendor_name nvarchar(55) not null,
+	vendor_active bit default 1 CHECK (vendor_active in (0,1)),
+	vendor_priority bit default 0 CHECK (vendor_priority in (0,1)),
+	vendor_register_date datetime not null,
+	vendor_weburl nvarchar(1025),
+	vendor_modifier_date datetime,
+	constraint pk_vendor_id primary key (vendor_id)
+);
+
+CREATE TABLE purchasing.purchase_order_header(
+    pohe_id INT IDENTITY(1,1) NOT NULL,
+    pohe_number NVARCHAR(20),
+    pohe_status TINYINT DEFAULT 1 CHECK (pohe_status IN(1, 2, 3, 4)),
+    pohe_order_date DATETIME,
+    pohe_subtotal MONEY,
+    pohe_tax MONEY,
+    pohe_total_amount MONEY,
+    pohe_refund MONEY,
+    pohe_arrival_date DATETIME,
+    pohe_pay_type NCHAR(2) NOT NULL CHECK (pohe_pay_type IN('TR', 'CA')),
+    pohe_emp_id INT,
+    pohe_vendor_id INT,
+    CONSTRAINT pk_pohe_id PRIMARY KEY(pohe_id),
+    CONSTRAINT fk_pohe_emp_id FOREIGN KEY (pohe_emp_id) REFERENCES hr.employee(emp_id) ON DELETE CASCADE ON UPDATE CASCADE,
+    CONSTRAINT fk_pohe_vendor_id FOREIGN KEY (pohe_vendor_id) REFERENCES purchasing.vendor(vendor_id) ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+create TABLE purchasing.stock_detail (
+    stod_stock_id int,
+    stod_id int identity,
+    stod_barcode_number nvarchar (255),
+    stod_status nchar(2) default 1,
+    stod_notes nvarchar(1024),
+    stod_faci_id int,
+    stod_pohe_id int,
+
+    CONSTRAINT pk_stod_id primary key (stod_id),
+    CONSTRAINT fk_stod_stock_id foreign key (stod_stock_id) references purchasing.stocks(stock_id) ON DELETE CASCADE ON UPDATE CASCADE,
+    CONSTRAINT fk_stod_pohe_id foreign key (stod_pohe_id) references purchasing.purchase_order_header(pohe_id) ON DELETE CASCADE ON UPDATE CASCADE,
+    CONSTRAINT fk_stod_faci_id foreign key (stod_faci_id) references hotel.facilities(hofa_faci_id) ON DELETE CASCADE ON UPDATE CASCADE,
+    CONSTRAINT uq_stod_barcode_number unique (stod_barcode_number)
+);
+
+CREATE TABLE purchasing.purchase_order_detail(
+    pode_pohe_id INT,
+    pode_id int IDENTITY (1,1),
+    pode_order_qty smallint not NULL,
+    pode_price money not null,
+    pode_line_total money not null,
+    pode_received_qty decimal(8,2),
+    pode_rejected_qty decimal (8,2),
+    pode_stocked_qty decimal (9,2),
+    pode_modified_date datetime,
+    pode_stock_id int,
+
+    CONSTRAINT pk_pode_id PRIMARY KEY (pode_id),
+    CONSTRAINT fk_pode_pohe_id FOREIGN KEY (pode_pohe_id) REFERENCES purchasing.purchase_order_header(pohe_id) ON DELETE CASCADE ON UPDATE CASCADE, 
+    CONSTRAINT fk_pode_stock_id FOREIGN KEY (pode_stock_id) REFERENCES purchasing.stocks(stock_id) ON DELETE CASCADE ON UPDATE CASCADE 
 );

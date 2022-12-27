@@ -1,5 +1,3 @@
--- File insert 
-
 -- use this if you want create table without relation first and comment alter
 -- alter table hr.work_order_detail add constraint fk_wode_emp_id foreign key(wode_emp_id) references hr.employee(emp_id);
 -- alter table hr.work_order_detail add constraint fk_wode_seta_id foreign key(wode_seta_id) references master.service_task(seta_id);

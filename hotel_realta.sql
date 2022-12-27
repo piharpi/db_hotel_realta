@@ -1,8 +1,8 @@
 -- membuat database
-USE tempdb
+USE tempdb;
 GO
 
-DROP DATABASE IF EXISTS Hotel_Realta
+DROP DATABASE IF EXISTS Hotel_Realta;
 CREATE DATABASE Hotel_Realta;
 -- menggunakan db hotel_realta
 GO

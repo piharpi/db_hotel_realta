@@ -1,3 +1,17 @@
+-- membuat database
+USE tempdb;
+GO
+
+DROP DATABASE IF EXISTS Hotel_Realta;
+GO
+
+CREATE DATABASE Hotel_Realta;
+GO
+
+-- menggunakan db hotel_realta
+USE Hotel_Realta;
+GO
+
 CREATE SCHEMA Booking;
 GO
 

@@ -18,6 +18,9 @@ GO
 CREATE SCHEMA Master;
 GO
 
+
+-- MODULE MASTER
+
 CREATE TABLE Master.regions (
   region_code int IDENTITY(1, 1),
   region_name nvarchar(35) UNIQUE NOT NULL,
@@ -94,7 +97,6 @@ CREATE TABLE Master.price_item (
   CONSTRAINT pk_prit_id PRIMARY KEY(prit_id)
 );
 
--- DROP TABLE master.price_item
 CREATE TABLE Master.service_task (
   seta_id int IDENTITY(1, 1),
   seta_name nvarchar(85) UNIQUE NOT NULL,
@@ -104,8 +106,10 @@ CREATE TABLE Master.service_task (
 CREATE TABLE Master.members (
   memb_name nvarchar(15) NOT NULL,
   memb_description nvarchar(100),
-  CONSTRAINT pk_memb_name PRIMARY KEY(memb_description)
+  CONSTRAINT pk_memb_name PRIMARY KEY(memb_name)
 );
+
+-- MODULE USERS
 
 CREATE TABLE users.users (
     user_id INT IDENTITY(1,1) NOT NULL,
@@ -125,9 +129,10 @@ CREATE TABLE users.user_members (
     usme_points SMALLINT,
     usme_type NVARCHAR(15) DEFAULT 'Expired',
 	CONSTRAINT pk_usme_user_id PRIMARY KEY(usme_user_id),
-	CONSTRAINT fk_usme_user_id FOREIGN KEY (usme_user_id) REFERENCES users.users (user_id)
-	ON DELETE CASCADE ON UPDATE CASCADE,
-	CONSTRAINT fk_usme_memb_name FOREIGN KEY (usme_memb_name) REFERENCES master.members (memb_name)
+	CONSTRAINT fk_usme_user_id FOREIGN KEY(usme_user_id) REFERENCES users.users (user_id)
+		ON DELETE CASCADE 
+		ON UPDATE CASCADE,
+	CONSTRAINT fk_usme_memb_name FOREIGN KEY (usme_memb_name) REFERENCES master.members(memb_name)
 	ON DELETE CASCADE ON UPDATE CASCADE
 );
 

@@ -443,7 +443,7 @@ create table Booking.booking_order(
 	boor_cardnumber NVARCHAR(25),
 	boor_member_type NVARCHAR(15),
 	boor_status NVARCHAR(15) check (boor_status in ('BOOKING','CHECKIN','CHECKOUT','CLEANING','CANCELED')),
-	boor_user_id INTEGER,
+	boor_user_id INT,
 	boor_hotel_id INT
 	CONSTRAINT pk_boor_id PRIMARY KEY (boor_id),
 	CONSTRAINT unique_boor_order_number UNIQUE (boor_order_number),
@@ -454,7 +454,7 @@ create table Booking.booking_order(
 
 CREATE TABLE Booking.booking_order_detail(
 	borde_boor_id INTEGER,
-	borde_id Int IDENTITY (1,1),
+	borde_id Int IDENTITY (1,1) UNIQUE NOT NULL,
 	borde_checkin DATETIME NOT NULL,
 	borde_checkout DATETIME NOT NULL,
 	borde_adults INTEGER,
@@ -464,11 +464,15 @@ CREATE TABLE Booking.booking_order_detail(
 	borde_discount SMALLMONEY,
 	borde_tax SMALLMONEY,
 	borde_subtotal MONEY,
-	borde_faci_id INTEGER
-	CONSTRAINT pk_borde_id_boor_id PRIMARY KEY (borde_id),
-	CONSTRAINT fk_borde_boor_id Foreign key (borde_boor_id) REFERENCES Booking.booking_order(boor_id)  ON DELETE CASCADE ON UPDATE CASCADE,
-	CONSTRAINT fk_borde_faci_id FOREIGN KEY (borde_faci_id) REFERENCES Hotel.facilities(faci_id) ON DELETE CASCADE ON UPDATE CASCADE
-)
+	borde_faci_id INTEGER,
+	CONSTRAINT pk_borde_id_boor_id PRIMARY KEY (borde_id, borde_boor_id),
+	CONSTRAINT fk_border_boor_id FOREIGN KEY(borde_boor_id)
+		REFERENCES Booking.booking_order(boor_id),
+	-- 	ON DELETE CASCADE ON UPDATE CASCADE - REMINDER FOR MAKE TRIGGER
+	CONSTRAINT fk_borde_faci_id FOREIGN KEY(borde_faci_id) 
+		REFERENCES Hotel.facilities(faci_id) 
+		ON DELETE CASCADE ON UPDATE CASCADE 
+);
 
 CREATE TABLE Booking.booking_order_detail_extra(
 	boex_id Int IDENTITY (1,1),
@@ -479,8 +483,12 @@ CREATE TABLE Booking.booking_order_detail_extra(
 	boex_borde_id int,
 	boex_prit_id int
 	CONSTRAINT pk_boex_id PRIMARY KEY (boex_id),
-	CONSTRAINT fk_boex_borde_id FOREIGN KEY (boex_borde_id) REFERENCES Booking.booking_order_detail (borde_id) ON DELETE CASCADE ON UPDATE CASCADE,
-	CONSTRAINT fk_boex_prit_id FOREIGN KEY (boex_prit_id) REFERENCES Master.price_items (prit_id) ON DELETE CASCADE ON UPDATE CASCADE
+	CONSTRAINT fk_boex_borde_id FOREIGN KEY (boex_borde_id) 
+		REFERENCES Booking.booking_order_detail (borde_id) 
+		ON DELETE CASCADE ON UPDATE CASCADE,
+	CONSTRAINT fk_boex_prit_id FOREIGN KEY (boex_prit_id) 
+		REFERENCES Master.price_item(prit_id) 
+		ON DELETE CASCADE ON UPDATE CASCADE
 )
 
 
@@ -490,14 +498,21 @@ CREATE TABLE Booking.special_offer_coupons
     soco_borde_id INT,
     soco_spof_id INT,
     CONSTRAINT pk_soco_id PRIMARY KEY(soco_id),
-    CONSTRAINT fk_soco_borde_id FOREIGN KEY(soco_borde_id) REFERENCES Booking.booking_order_detail(borde_id) on DELETE CASCADE on UPDATE CASCADE,
-    CONSTRAINT fk_soco_spof_id FOREIGN KEY(soco_spof_id) REFERENCES Booking.special_offers(spof_id) on DELETE CASCADE on UPDATE CASCADE
+    CONSTRAINT fk_soco_borde_id FOREIGN KEY(soco_borde_id) 
+		REFERENCES Booking.booking_order_detail(borde_id) 
+		on DELETE CASCADE on UPDATE CASCADE,
+    CONSTRAINT fk_soco_spof_id FOREIGN KEY(soco_spof_id) 
+		REFERENCES Booking.special_offers(spof_id) 
+		on DELETE CASCADE on UPDATE CASCADE
 )
+
 create table Booking.user_breakfast
 (
     usbr_borde_id INT,
     usbr_modified_date DATETIME,
     usbr_total_vacant SMALLINT NOT NULL,
     CONSTRAINT pk_usbr_borde_id_usbr_modified_date PRIMARY KEY(usbr_borde_id,usbr_modified_date),
-    CONSTRAINT fk_usbr_borde_id FOREIGN KEY(usbr_borde_id) REFERENCES Booking.booking_order_detail(borde_id) ON DELETE CASCADE ON UPDATE CASCADE
+    CONSTRAINT fk_usbr_borde_id FOREIGN KEY(usbr_borde_id) 
+		REFERENCES Booking.booking_order_detail(borde_id) 
+		ON DELETE CASCADE ON UPDATE CASCADE
 )

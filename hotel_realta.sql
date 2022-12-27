@@ -18,8 +18,11 @@ GO
 CREATE SCHEMA Master;
 GO
 
+CREATE SCHEMA Hotel;
+GO 
 
--- MODULE MASTER
+
+-- MODULE MASTERS --
 
 CREATE TABLE Master.regions (
   region_code int IDENTITY(1, 1),
@@ -109,7 +112,7 @@ CREATE TABLE Master.members (
   CONSTRAINT pk_memb_name PRIMARY KEY(memb_name)
 );
 
--- MODULE USERS
+-- MODULE USERS	--
 
 CREATE TABLE users.users (
     user_id INT IDENTITY(1,1) NOT NULL,
@@ -187,13 +190,7 @@ CREATE TABLE users.user_password (
 	CONSTRAINT fk_uspa_user_id FOREIGN KEY (uspa_user_id) REFERENCES users.users (user_id) 
 );
 
---MODULE HOTEL
-USE Hotel_Realta
-GO
-
--- Create Schema 'Hotel'
-CREATE SCHEMA Hotel;
-GO 
+--MODULE HOTELS --
 
 -- Create a new table called 'hotels' in schema 'Hotel'
 -- Drop the table if it already exists
@@ -304,3 +301,4 @@ CREATE TABLE Hotel.facility_photos (
   fapho_faci_id INT NOT NULL,
   CONSTRAINT pk_fapho_faci_id FOREIGN KEY (fapho_faci_id) REFERENCES Hotel.facilities(faci_id) 
     ON DELETE CASCADE ON UPDATE CASCADE
+)

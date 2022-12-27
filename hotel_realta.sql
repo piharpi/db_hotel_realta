@@ -436,7 +436,7 @@ CREATE TABLE Booking.special_offers
 )
 create table Booking.booking_orders(
 	boor_id INT	IDENTITY (1,1),
-	boor_order_number nvarchar(20) NOT NULL,
+	boor_order_number nvarchar(55) NOT NULL,
 	boor_order_date DATETIME NOT NULL,
 	boor_arrival_date DATETIME,
 	boor_total_room SMALLINT,
@@ -544,7 +544,7 @@ CREATE TABLE resto.resto_menus
 CREATE TABLE resto.order_menus
 (
     orme_id INT IDENTITY,
-    orme_order_number NVARCHAR (20) NOT NULL,
+    orme_order_number NVARCHAR (55) UNIQUE NOT NULL,
     orme_order_date DATETIME NOT NULL,
     orme_total_item SMALLINT,
     orme_total_discount SMALLMONEY,
@@ -675,12 +675,12 @@ CREATE TABLE Payment.PaymentTransaction(
 		ON DELETE NO ACTION,
 	CONSTRAINT FK_PaymentPaymentBookingOrdersId FOREIGN KEY (patr_order_number)
 		REFERENCES Booking.Booking_Orders(boor_order_number)
-		ON UPDATE CASCADE
-		ON DELETE CASCADE,
+		ON UPDATE NO ACTION
+		ON DELETE NO ACTION,
 	CONSTRAINT FK_PaymentPaymentRestoOrderMenus FOREIGN KEY (patr_order_number)
-		REFERENCES Resto.OrderMenus(orme_order_number)
-		ON UPDATE CASCADE
-		ON DELETE CASCADE
+		REFERENCES Resto.order_menus(orme_order_number)
+		ON UPDATE NO ACTION
+		ON DELETE NO ACTION
 )
 
 -- MODULE PURCHASING --
@@ -753,7 +753,7 @@ create TABLE purchasing.stock_detail (
     CONSTRAINT pk_stod_id primary key (stod_id),
     CONSTRAINT fk_stod_stock_id foreign key (stod_stock_id) references purchasing.stocks(stock_id) ON DELETE CASCADE ON UPDATE CASCADE,
     CONSTRAINT fk_stod_pohe_id foreign key (stod_pohe_id) references purchasing.purchase_order_header(pohe_id) ON DELETE CASCADE ON UPDATE CASCADE,
-    CONSTRAINT fk_stod_faci_id foreign key (stod_faci_id) references hotel.facilities(hofa_faci_id) ON DELETE CASCADE ON UPDATE CASCADE,
+    CONSTRAINT fk_stod_faci_id foreign key (stod_faci_id) references hotel.facilities(faci_id) ON DELETE CASCADE ON UPDATE CASCADE,
     CONSTRAINT uq_stod_barcode_number unique (stod_barcode_number)
 );
 

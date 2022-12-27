@@ -404,5 +404,5 @@ create table hr.work_order_detail (
 	constraint fk_woro_wode_id foreign key(wode_woro_id) references hr.work_orders(woro_id),
 	constraint fk_wode_emp_id foreign key(wode_emp_id) references hr.employee(emp_id), -- comment alter
 	constraint fk_wode_seta_id foreign key(wode_seta_id) references master.service_task(seta_id), -- comment alter
-	constraint fk_faci_id foreign key(wode_faci_id) references hotel.facilites(faci_id)-- comment alter
+	constraint fk_faci_id foreign key(wode_faci_id) references hotel.facilities(faci_id)-- comment alter
 );

@@ -1,11 +1,29 @@
-CREATE DATABASE Hotel_Realta
-
-USE Hotel_Realta
-
-GO
-CREATE SCHEMA [users] ;
+-- membuat database
+USE tempdb;
 GO
 
+DROP DATABASE IF EXISTS Hotel_Realta;
+GO
+
+CREATE DATABASE Hotel_Realta;
+GO
+
+-- menggunakan db hotel_realta
+USE Hotel_Realta;
+GO
+
+CREATE SCHEMA Users;
+GO
+
+-- dummy schema master
+CREATE SCHEMA Master;
+GO
+
+-- dummy table master.members
+CREATE TABLE master.members (
+	memb_name NVARCHAR(15) NOT NULL,
+	CONSTRAINT pk_memb_name PRIMARY KEY(memb_name)
+);
 
 CREATE TABLE users.users (
     user_id INT IDENTITY(1,1) NOT NULL,
@@ -16,11 +34,6 @@ CREATE TABLE users.users (
     user_phone_number NVARCHAR (25) UNIQUE NOT NULL,
     user_modified_date DATETIME,
 	CONSTRAINT pk_user_id PRIMARY KEY(user_id)
-);
-
-CREATE TABLE master.members (
-	memb_name NVARCHAR(15) NOT NULL,
-	CONSTRAINT pk_memb_name PRIMARY KEY(memb_name)
 );
 
 CREATE TABLE users.user_members (
@@ -52,6 +65,7 @@ CREATE TABLE users.user_roles (
 	ON DELETE CASCADE ON UPDATE CASCADE
 );
 
+--- dummy table master.address
 CREATE TABLE master.address (
 	addr_id INT IDENTITY(1,1),
 	CONSTRAINT pk_addr_id PRIMARY KEY(addr_id)

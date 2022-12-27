@@ -1,6 +1,19 @@
-CREATE DATABASE Hotel_Realta
+-- membuat database
+USE tempdb;
+GO
 
-USE Hotel_Realta
+DROP DATABASE IF EXISTS Hotel_Realta;
+GO
+
+CREATE DATABASE Hotel_Realta;
+GO
+
+-- menggunakan db hotel_realta
+USE Hotel_Realta;
+GO
+
+CREATE SCHEMA HR;
+GO
 
 -- create table
 create table hr.job_role (

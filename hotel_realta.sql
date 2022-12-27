@@ -533,7 +533,7 @@ CREATE TABLE resto.resto_menus
     reme_status NVARCHAR(15) NOT NULL,
     reme_modified_date DATETIME,
     CONSTRAINT pk_reme_faci_id PRIMARY KEY (reme_id),
-    CONSTRAINT reme_faci_id FOREIGN KEY (reme_faci_id) REFERENCES resto.facilities(faci_id) ON DELETE CASCADE ON UPDATE CASCADE
+    CONSTRAINT reme_faci_id FOREIGN KEY (reme_faci_id) REFERENCES hotel.facilities(faci_id) ON DELETE CASCADE ON UPDATE CASCADE
 
 );
 
@@ -551,7 +551,7 @@ CREATE TABLE resto.order_menus
     orme_modified_date DATETIME,
     orme_user_id INTEGER,
     CONSTRAINT pk_orme_id PRIMARY KEY (orme_id),
-    CONSTRAINT fk_orme_user_id FOREIGN KEY (orme_user_id) REFERENCES resto.users(user_id) ON DELETE CASCADE ON UPDATE CASCADE
+    CONSTRAINT fk_orme_user_id FOREIGN KEY (orme_user_id) REFERENCES users.users(user_id) ON DELETE CASCADE ON UPDATE CASCADE
 
 );
 

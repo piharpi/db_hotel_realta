@@ -25,41 +25,46 @@ create table purchasing.stock_photo(
 	spho_id int identity (1,1),
 	spho_thumbnail_filename nvarchar (50),
 	spho_photo_filename nvarchar (50),
-	spho_primary bit DEFAULT 0 CHECK (spho_primary IN (0,1)),
+	spho_primary bit DEFAULT 0,
 	spho_url nvarchar(355),
 	spho_stock_id int,
-	constraint pk_spho_id primary key (spho_id),
-	constraint fk_spho_stock_id foreign key (spho_stock_id) references purchasing.stocks(stock_id) ON DELETE CASCADE on UPDATE CASCADE
+	CONSTRAINT pk_spho_id primary key (spho_id),
+	CONSTRAINT fk_spho_stock_id foreign KEY (spho_stock_id) references purchasing.stocks(stock_id) ON DELETE CASCADE on UPDATE CASCADE,
+    CONSTRAINT ck_spho_primary CHECK (spho_primary IN (0,1))
 );
 
 create table purchasing.vendor(
 	vendor_id int identity (1,1),
 	vendor_name nvarchar(55) not null,
-	vendor_active bit default 1 CHECK (vendor_active in (0,1)),
-	vendor_priority bit default 0 CHECK (vendor_priority in (0,1)),
+	vendor_active bit default 1,
+	vendor_priority bit default 0,
 	vendor_register_date datetime not null,
 	vendor_weburl nvarchar(1025),
 	vendor_modifier_date datetime,
-	constraint pk_vendor_id primary key (vendor_id)
+	constraint pk_vendor_id primary key (vendor_id),
+    CONSTRAINT ck_vendor_priority  CHECK (vendor_priority in (0,1)),
+    CONSTRAINT ck_vendor_active CHECK (vendor_active in (0,1))
 );
 
 CREATE TABLE purchasing.purchase_order_header(
     pohe_id INT IDENTITY(1,1) NOT NULL,
     pohe_number NVARCHAR(20),
-    pohe_status TINYINT DEFAULT 1 CHECK (pohe_status IN(1, 2, 3, 4)),
+    pohe_status TINYINT DEFAULT 1,
     pohe_order_date DATETIME,
     pohe_subtotal MONEY,
     pohe_tax MONEY,
     pohe_total_amount MONEY,
     pohe_refund MONEY,
     pohe_arrival_date DATETIME,
-    pohe_pay_type NCHAR(2) NOT NULL CHECK (pohe_pay_type IN('TR', 'CA')),
+    pohe_pay_type NCHAR(2) NOT NULL,
     pohe_emp_id INT,
     pohe_vendor_id INT
 
     CONSTRAINT pk_pohe_id PRIMARY KEY(pohe_id),
     CONSTRAINT fk_pohe_emp_id FOREIGN KEY (pohe_emp_id) REFERENCES hr.employee(emp_id) ON DELETE CASCADE ON UPDATE CASCADE,
-    CONSTRAINT fk_pohe_vendor_id FOREIGN KEY (pohe_vendor_id) REFERENCES purchasing.vendor(vendor_id) ON DELETE CASCADE ON UPDATE CASCADE
+    CONSTRAINT fk_pohe_vendor_id FOREIGN KEY (pohe_vendor_id) REFERENCES purchasing.vendor(vendor_id) ON DELETE CASCADE ON UPDATE CASCADE,
+    CONSTRAINT ck_pohe_pay_type CHECK (pohe_pay_type IN('TR', 'CA')),
+    CONSTRAINT ck_pohe_status CHECK (pohe_status IN(1, 2, 3, 4)),
 );
 
 create TABLE purchasing.stock_detail (

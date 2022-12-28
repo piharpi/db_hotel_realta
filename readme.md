@@ -1,7 +1,6 @@
 # PURCHASING MODULE
 
-go to 
-[table structure] (/purchasing_module.jpeg)
+go to [table structure] (https://github.com/piharpi/db_hotel_realta/blob/purchasing/purchasing_module.jpeg)
 
 ## Daftar Tabel
 - stocks

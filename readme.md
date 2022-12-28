@@ -1,7 +1,7 @@
 # PURCHASING MODULE
 
 go to 
-[table structure] (purchasing_module.sql)
+[table structure] (purchasing_module.jpeg)
 
 ## Daftar Tabel
 - stocks

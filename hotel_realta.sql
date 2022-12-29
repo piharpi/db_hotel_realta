@@ -43,6 +43,7 @@ IF OBJECT_ID('Hotel.facilities', 'U') IS NOT NULL DROP TABLE Hotel.facilities GO
 CREATE TABLE Hotel.facilities (
   faci_id INT IDENTITY(1, 1) NOT NULL CONSTRAINT pk_faci_id PRIMARY KEY,
   -- primary key column
+  faci_name NVARCHAR(125) NOT NULL,
   faci_description NVARCHAR(255) NULL,
   faci_max_number INT NULL,
   faci_measure_unit VARCHAR(15) NULL CHECK(faci_measure_unit IN('People', 'Beds')),

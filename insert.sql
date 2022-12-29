@@ -103,5 +103,21 @@ values
 
 
 --MEMBER
+insert into master.members (memb_name, memb_description)
+values
+('SILVER', 'Kategori keanggotaan Silver dengan beragam keuntungan dan manfaat yang bisa dinikmati oleh member, seperti diskon 10% pada setiap pembelian di toko kami, akses ke kelas olahraga dan fitness gratis setiap minggu, serta gratis menonton pertandingan olahraga di stadium kami'),
+('GOLD', 'Kategori keanggotaan Gold dengan beragam keuntungan dan manfaat yang lebih lengkap dibandingkan dengan kategori Silver, seperti diskon 15% pada setiap pembelian di toko kami, akses ke kelas olahraga dan fitness gratis setiap hari, serta gratis menonton pertandingan olahraga di stadium kami dan menikmati fasilitas VIP lounge'),
+('VIP', 'Kategori keanggotaan VIP dengan beragam keuntungan dan manfaat yang lebih lengkap dibandingkan dengan kategori Gold, seperti diskon 20% pada setiap pembelian di toko kami, akses ke kelas olahraga dan fitness gratis setiap hari, serta gratis menonton pertandingan olahraga di stadium kami dan menikmati fasilitas VIP lounge dan fasilitas makan di restoran VIP'),
+('WIZARD', 'Kategori keanggotaan Wizard dengan beragam keuntungan dan manfaat yang lebih lengkap dibandingkan dengan kategori VIP, serta fasilitas yang lebih eksklusif dan terbatas hanya untuk member Wizard, seperti diskon 25% pada setiap pembelian di toko kami, akses ke kelas olahraga dan fitness gratis setiap hari, serta gratis menonton pertandingan olahraga di stadium kami dan menikmati fasilitas VIP lounge dan fasilitas makan di restoran VIP');
 
 
+--SERVICE_TASK
+insert into master.service_task (seta_name, seta_seq)
+values
+('Receptionist', 1),
+('Housekeeping', 2),
+('Maintenance', 3),
+('Security', 4),
+('Food and Beverage Staff', 5),
+('Fitness Trainer', 6),
+('Spa Therapist', 7);

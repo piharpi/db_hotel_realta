@@ -16,7 +16,7 @@
 
 ## Trigger 
 - [x] :check: ph_subtotal: Kolom ini harus dihitung secara otomatis berdasarkan jumlah total harga produk yang dipesan.
-- [ ] ph_tax: Kolom ini harus dihitung secara otomatis berdasarkan tarif pajak yang berlaku.
+- [] ph_tax: Kolom ini harus dihitung secara otomatis berdasarkan tarif pajak yang berlaku.
 
 ## Computed
 - [x] ph_total_amount: Kolom ini harus dihitung secara otomatis berdasarkan ph_subtotal ditambah ph_tax.

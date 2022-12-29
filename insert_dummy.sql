@@ -1,10 +1,19 @@
--- ALTER TABLE hotel.facilities RENAME COLUMN hofa_faci_id TO faci_id;
+-- EXEC sp_rename 'hotel.facilities.hofa_faci_id', 'faci_id', 'COLUMN';
 
-insert into hotel.facilities (hofa_faci_id) values (1),(2),(3),(4),(5);
+select * from information_schema.columns where table_name = 'facilities';
+
+insert into hotel.facilities (faci_id) values (1),(2),(3),(4),(5);
 insert into hr.employee (emp_id) values (1),(2),(3),(4),(5);
 
 
-select * from information_schema.columns where table_name = 'employee';
+INSERT INTO purchasing.vendor (vendor_name, vendor_active, vendor_priority, vendor_register_date, vendor_weburl, vendor_modifier_date)
+VALUES
+  ('Vendor A', 1, 1, GETDATE(), 'https://vendor-a.com', GETDATE()),
+  ('Vendor B', 1, 0, GETDATE(), 'https://vendor-b.com', GETDATE()),
+  ('Vendor C', 1, 1, GETDATE(), 'https://vendor-c.com', GETDATE()),
+  ('Vendor D', 1, 0, GETDATE(), 'https://vendor-d.com', GETDATE()),
+  ('Vendor E', 1, 1, GETDATE(), 'https://vendor-e.com', GETDATE());
+
 
 INSERT INTO purchasing.purchase_order_header (pohe_number, pohe_status, pohe_order_date, pohe_tax, pohe_refund, pohe_arrival_date, pohe_pay_type, pohe_emp_id, pohe_vendor_id)
 VALUES

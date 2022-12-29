@@ -124,10 +124,10 @@ CREATE TABLE users.users (
 
 CREATE TABLE users.user_members (
     usme_user_id INT,
-    usme_memb_name NVARCHAR (15) CHECK(usme_memb_name IN('Silver','Gold','VIP','Wizard')),
+    usme_memb_name nvarchar (15) CHECK(usme_memb_name IN('Silver','Gold','VIP','Wizard')),
     usme_promote_date DATETIME,
     usme_points SMALLINT,
-    usme_type NVARCHAR(15) DEFAULT 'Expired',
+    usme_type nvarchar(15) DEFAULT 'Expired',
 	CONSTRAINT pk_usme_user_id PRIMARY KEY(usme_user_id),
 	CONSTRAINT fk_usme_user_id FOREIGN KEY(usme_user_id) REFERENCES users.users (user_id)
 		ON DELETE CASCADE 
@@ -138,7 +138,7 @@ CREATE TABLE users.user_members (
 
 CREATE TABLE users.roles (
     role_id INT IDENTITY(1,1),
-    role_name NVARCHAR (35) NOT NULL,
+    role_name nvarchar (35) NOT NULL,
 	CONSTRAINT pk_role_id PRIMARY KEY(role_id)
 );
 
@@ -154,9 +154,9 @@ CREATE TABLE users.user_roles (
 
 CREATE TABLE users.user_profiles (
     uspro_id INT IDENTITY(1,1),
-    uspro_national_id NVARCHAR (20) NOT NULL,
+    uspro_national_id nvarchar (20) NOT NULL,
     uspro_birth_date DATE NOT NULL,
-    uspro_job_title NVARCHAR (50),
+    uspro_job_title nvarchar (50),
     uspro_marital_status NCHAR(1) CHECK(uspro_marital_status IN('M','S')),
     uspro_gender NCHAR(1) CHECK(uspro_gender IN('M','F')),
     uspro_addr_id INT,
@@ -201,10 +201,10 @@ IF OBJECT_ID('Hotel.hotels', 'U') IS NOT NULL DROP TABLE Hotel.hotels -- Create 
 CREATE TABLE Hotel.hotels (
   hotel_id INT IDENTITY(1, 1) NOT NULL CONSTRAINT pk_hotel_id PRIMARY KEY,
   -- primary key column
-  hotel_name NVARCHAR(85) NOT NULL,
-  hotel_description NVARCHAR(500) NULL,
+  hotel_name nvarchar(85) NOT NULL,
+  hotel_description nvarchar(500) NULL,
   hotel_rating_star SMALLINT NULL,
-  hotel_phonenumber NVARCHAR(25) NOT NULL,
+  hotel_phonenumber nvarchar(25) NOT NULL,
   hotel_modified_date DATETIME NULL,
   -- Primary Key
   hotel_addr_id INT NOT NULL,
@@ -218,7 +218,7 @@ IF OBJECT_ID('Hotel.hotel_reviews', 'U') IS NOT NULL DROP TABLE Hotel.hotel_revi
 CREATE TABLE Hotel.hotel_reviews (
   hore_id INT IDENTITY(1, 1) NOT NULL CONSTRAINT pk_hore_id PRIMARY KEY,
   -- primary key column
-  hore_user_review NVARCHAR(125) NOT NULL,
+  hore_user_review nvarchar(125) NOT NULL,
   hore_rating BIT NOT NULL CHECK(hore_rating IN(1, 2, 3, 4, 5)) DEFAULT 5,
   hore_created_on DATETIME NULL,
   -- FOREIGN KEY
@@ -237,11 +237,11 @@ IF OBJECT_ID('Hotel.facilities', 'U') IS NOT NULL DROP TABLE Hotel.facilities --
 CREATE TABLE Hotel.facilities (
   faci_id INT IDENTITY(1, 1) NOT NULL CONSTRAINT pk_faci_id PRIMARY KEY,
   -- primary key column
-  faci_name NVARCHAR(125) NOT NULL,
-  faci_description NVARCHAR(255) NULL,
+  faci_name nvarchar(125) NOT NULL,
+  faci_description nvarchar(255) NULL,
   faci_max_number INT NULL,
   faci_measure_unit VARCHAR(15) NULL CHECK(faci_measure_unit IN('People', 'Beds')),
-  faci_room_number NVARCHAR(6) NOT NULL,
+  faci_room_number nvarchar(6) NOT NULL,
   faci_startdate DATETIME NOT NULL,
   faci_endate DATETIME NOT NULL,
   faci_low_price MONEY NOT NULL,
@@ -296,12 +296,13 @@ IF OBJECT_ID('Hotel.facility_photos', 'U') IS NOT NULL DROP TABLE Hotel.facility
 CREATE TABLE Hotel.facility_photos (
   fapho_id INT IDENTITY(1, 1) NOT NULL CONSTRAINT pk_fapho_id PRIMARY KEY,
   -- primary key column
-  fapho_thumbnail_filename NVARCHAR(50) NULL,
-  fapho_photo_filename NVARCHAR(50) NULL,
+  fapho_thumbnail_filename nvarchar(50) NULL,
+  fapho_photo_filename nvarchar(50) NULL,
   fapho_primary BIT NULL CHECK(fapho_primary IN(0, 1)),
-  fapho_url NVARCHAR(255) NULL,
+  fapho_url nvarchar(255) NULL,
   fapho_modified_date DATETIME,
   -- FOREIGN KEY
   fapho_faci_id INT NOT NULL,
   CONSTRAINT pk_fapho_faci_id FOREIGN KEY (fapho_faci_id) REFERENCES Hotel.facilities(faci_id) 
     ON DELETE CASCADE ON UPDATE CASCADE
+)

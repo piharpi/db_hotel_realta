@@ -7,7 +7,7 @@ CREATE DATABASE Hotel_Realta;
 -- menggunakan db hotel_realta
 GO
 
-USE Hotel_Realta;
+USE Hotel_Realta;	
 GO
 
 CREATE SCHEMA Payment;
@@ -28,12 +28,14 @@ CREATE TABLE Users.Users(
 
 -- create dummy table Booking.BookingsOrders
 CREATE TABLE Booking.BookingOrders(
-	boor_order_number NVARCHAR(55) PRIMARY KEY NOT NULL
+	boor_id INT IDENTITY(1,1) PRIMARY KEY NOT NULL,
+	boor_order_number NVARCHAR(55) UNIQUE NOT NULL
 );
 
 -- create dummy table Resto.OrderMenus
 CREATE TABLE Resto.OrderMenus(
-	orme_order_number NVARCHAR(55) PRIMARY KEY NOT NULL
+	orme_id INT IDENTITY(1,1) PRIMARY KEY NOT NULL,
+	orme_order_number NVARCHAR(55) UNIQUE NOT NULL
 );
 GO
 
@@ -81,14 +83,10 @@ CREATE TABLE Payment.UserAccounts(
 	usac_modified_date DATETIME,
 	CONSTRAINT CK_PaymentUserAccountsType CHECK (usac_type IN ('debet', 'credit card', 'payment')),
 	CONSTRAINT PK_PaymentUserAccountsEntityId PRIMARY KEY(usac_entity_id, usac_user_id),
-	CONSTRAINT FK_PaymentUserAccountsEntityBank FOREIGN KEY(usac_entity_id) 
-		REFERENCES Payment.Bank (bank_entity_id)
+	CONSTRAINT FK_PaymentUserAccountsEntityPaymentGateway_Bank FOREIGN KEY(usac_entity_id) 
+		REFERENCES Payment.Entity(entity_id)
 		ON UPDATE CASCADE
 		ON DELETE CASCADE,
-	CONSTRAINT FK_PaymentUserAccountsEntityPayment FOREIGN KEY(usac_entity_id)
-		REFERENCES Payment.PaymentGateway(paga_entity_id)
-		ON UPDATE NO ACTION
-		ON DELETE NO ACTION,
 	CONSTRAINT FK_PaymentUserAccountsUserId FOREIGN KEY(usac_user_id)
 		REFERENCES Users.Users (user_id)
 		ON UPDATE CASCADE
@@ -121,15 +119,7 @@ CREATE TABLE Payment.PaymentTransaction(
 	CONSTRAINT FK_PaymentPaymentTransactionTargetId FOREIGN KEY (patr_target_id)
 		REFERENCES Payment.Bank(bank_entity_id)
 		ON UPDATE NO ACTION
-		ON DELETE NO ACTION,
-	CONSTRAINT FK_PaymentPaymentBookingOrdersId FOREIGN KEY (patr_order_number)
-		REFERENCES Booking.BookingOrders(boor_order_number)
-		ON UPDATE CASCADE
-		ON DELETE CASCADE,
-	CONSTRAINT FK_PaymentPaymentRestoOrderMenus FOREIGN KEY (patr_order_number)
-		REFERENCES Resto.OrderMenus(orme_order_number)
-		ON UPDATE CASCADE
-		ON DELETE CASCADE
+		ON DELETE NO ACTION
 )
 
 

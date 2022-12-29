@@ -97,13 +97,13 @@ ORDER BY poli_id ASC
 
 --PRICE_ITEM
 SET IDENTITY_INSERT Master.price_item ON;
-insert into master.price_item (prit_id, prit_name, prit_price, prit_description, prit_type, prit_modified_date)
+insert into master.price_item ( prit_name, prit_price, prit_description, prit_type, prit_modified_date)
 values
-(1, 'Kue Kering', 12000, 'Kue kering dengan beragam rasa yang enak dan lezat', 'SNACK', '2022-01-01'),
-(2, 'Kamar Standar', 500000, 'Kamar standar dengan fasilitas yang cukup lengkap', 'FACILITY', '2022-01-01'),
-(3, 'Aqua', 10000, 'Minuman bersoda dengan rasa jeruk yang segar', 'SOFTDRINK', '2022-01-01'),
-(4, 'Nasi Goreng', 35000, 'Nasi goreng dengan bahan-bahan yang berkualitas dan rasa yang nikmat', 'FOOD', '2022-01-01'),
-(5, 'Massage', 80000, 'Layanan massage yang dapat membantu mengurangi stres dan merelaksasi tubuh', 'SERVICE', '2022-01-01');
+('Kue Kering', 12000, 'Kue kering dengan beragam rasa yang enak dan lezat', 'SNACK', '2022-01-01'),
+('Kamar Standar', 500000, 'Kamar standar dengan fasilitas yang cukup lengkap', 'FACILITY', '2022-01-01'),
+('Aqua', 10000, 'Minuman bersoda dengan rasa jeruk yang segar', 'SOFTDRINK', '2022-01-01'),
+('Nasi Goreng', 35000, 'Nasi goreng dengan bahan-bahan yang berkualitas dan rasa yang nikmat', 'FOOD', '2022-01-01'),
+('Massage', 80000, 'Layanan massage yang dapat membantu mengurangi stres dan merelaksasi tubuh', 'SERVICE', '2022-01-01');
 SET IDENTITY_INSERT Master.price_item OFF;
 SELECT*FROM Master.price_item
 ORDER BY prit_id ASC

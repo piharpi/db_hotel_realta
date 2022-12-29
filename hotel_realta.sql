@@ -53,14 +53,14 @@ CREATE TABLE Master.address (
     ON UPDATE CASCADE
 );
 
-CREATE TABLE Master.category_group (
-  cagro_id int IDENTITY(1, 1),
-  cagro_name nvarchar(25) UNIQUE NOT NULL CHECK (cagro_name IN ('1', '2', '3 ', '4', '5', '6', '7')),
-  cagro_description nvarchar(255),
-  cagro_type nvarchar(25) NOT NULL CHECK (cagro_type IN('category', 'service', 'facility')),
-  cagro_icon nvarchar(255),
-  cagro_icon_url nvarchar(255),
-  CONSTRAINT pk_cagro_id PRIMARY KEY(cagro_id)
+CREATE TABLE master.price_item(
+  prit_id int IDENTITY(1,1),
+  prit_name nvarchar(55) unique NOT NULL,
+  prit_price money NOT NULL,
+  prit_description nvarchar(255),
+  prit_type nvarchar(15) NOT NULL CHECK (prit_type in ('SNACK','FACILITY','SOFTDRINK','FOOD','SERVICE')),
+  prit_modified_date datetime,
+CONSTRAINT pk_prit_id PRIMARY KEY(prit_id)
 );
 
 -- DROP TABLE master.category_group
@@ -81,8 +81,8 @@ CREATE TABLE Master.policy_category_group (
     ON DELETE CASCADE 
     ON UPDATE CASCADE
 );
-
 -- DROP TABLE master.policy_category_group
+
 CREATE TABLE Master.price_item (
   prit_id int IDENTITY(1, 1),
   prit_name nvarchar(55) UNIQUE NOT NULL,
@@ -102,6 +102,6 @@ CREATE TABLE Master.service_task (
 
 CREATE TABLE Master.members (
   memb_name nvarchar(15) NOT NULL,
-  memb_description nvarchar(100),
+  memb_description nvarchar(200),
   CONSTRAINT pk_memb_name PRIMARY KEY(memb_description)
 );

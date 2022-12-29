@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Halaman Produk</title>
+  <style>
+    /* Menentukan gaya untuk elemen div dengan class "product" */
+    .product {
+      border: 1px solid #ddd;
+      box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.1);
+      margin-bottom: 20px;
+      overflow: hidden;
+    }
+
+    /* Menentukan gaya untuk elemen img dengan class "product-image" */
+    .product-image {
+      width: 100%;
+      height: 200px;
+      object-fit: cover;
+    }
+
+    /* Menentukan gaya untuk elemen div dengan class "product-details" */
+    .product-details {
+      padding: 20px;
+    }
+
+    /* Menentukan gaya untuk elemen h3 dengan class "product-name" */
+    .product-name {
+      font-size: 18px;
+      font-weight: bold;
+      margin-top: 0;
+      margin-bottom: 10px;
+    }
+
+    /* Menentukan gaya untuk elemen span dengan class "product-price" */
+    .product-price {
+      color: #f44336;
+      font-size: 24px;
+      font-weight: bold;
+      margin-right: 20px;
+    }
+
+    /* Menentukan gaya untuk elemen button dengan class "add-to-cart" */
+    .add-to-cart {
+      background-color: #4caf50;
+      border: none;
+      color: white;
+      cursor: pointer;
+      font-size: 14px;
+      padding: 10px 20px;
+    }
+  </style>
+</head>
+<body>
+  <div class="product">
+    <img src="image-url" alt="Nama Produk" class="product-image">
+    <div class="product-details">
+      <h3 class="product-name">Nama Produk</h3>
+      <span class="product-price">Rp 100.000</span>
+      <button class="add-to-cart">Tambahkan ke Keranjang</button>
+    </div>
+  </div>
+</body>
+
+<script>
+    // Mendefinisikan array produk
+    const products = [
+      {
+        name: 'Nama Produk 1',
+        price: 100000,
+        image: 'image-url-1'
+      },
+      {
+        name: 'Nama Produk 2',
+        price: 200000,
+        image: 'image-url-2'
+      },
+      {
+        name: 'Nama Produk 3',
+        price: 300000,
+        image: 'image-url-3'
+      }
+    ];
+
+    // Menampilkan produk menggunakan looping
+    for (const product of products) {
+      // Membuat elemen div dengan class "product"
+      const productElement = document.createElement('div');
+      productElement.classList.add('product');
+
+      // Membuat elemen img dengan class "product-image"
+      const productImage = document.createElement('img');
+      productImage.src = product.image;
+      productImage.alt = product.name;
+      productImage.classList.add('product-image');
+
+      // Membuat elemen div dengan class "product-details"
+      const productDetails = document.createElement('div');
+      productDetails.classList.add('product-details');
+
+      // Membuat elemen h3 dengan class "product-name"
+      const productName = document.createElement('h3');
+      productName.textContent = product.name;
+      productName.classList.add('product-name');
+
+      // Membuat elemen span dengan class "product-price"
+      const productPrice = document.createElement('span');
+      productPrice.textContent = `Rp ${product.price.toLocaleString()}`;
+      productPrice.classList.add('product-price');
+
+      // Membuat elemen button dengan class "add-to-cart"
+      const addToCartButton = document.createElement('button');
+      addToCartButton.textContent = 'Tambahkan ke Keranjang';
+      addToCartButton.classList.add('add-to-cart');
+
+      // Menambahkan elemen-elemen tersebut ke dalam elemen "product-details"
+      productDetails.appendChild(productName);
+      productDetails.appendChild(productPrice);
+      productDetails.appendChild(addToCartButton);
+
+      // Menambahkan elemen "product-image" dan "product-details" ke dalam elemen "product"
+      productElement.appendChild(productImage);
+      productElement.appendChild(productDetails);
+
+      // Menambahkan elemen "product" ke dalam elemen body
+      document.body.appendChild(productElement);
+    }
+</script>
+</html>

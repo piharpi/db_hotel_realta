@@ -1,22 +1,34 @@
+-- ALTER TABLE hotel.facilities RENAME COLUMN hofa_faci_id TO faci_id;
+
 insert into hotel.facilities (hofa_faci_id) values (1),(2),(3),(4),(5);
+insert into hr.employee (emp_id) values (1),(2),(3),(4),(5);
 
-select * from information_schema.columns where table_name = 'facilities';
 
-INSERT INTO purchasing.purchase_order_header (pohe_number, pohe_order_date, pohe_tax, pohe_pay_type)
-VALUES 
-('PO00001', '2021-01-01', 10, 'TR'),
-('PO00002', '2021-02-01', 20, 'CA'),
-('PO00003', '2021-03-01', 30, 'TR'),
-('PO00004', '2021-04-01', 40, 'CA'),
-('PO00005', '2021-05-01', 50, 'TR');
+select * from information_schema.columns where table_name = 'employee';
 
-INSERT INTO purchasing.purchase_order_detail (pode_pohe_id, pode_order_qty, pode_price, pode_received_qty, pode_rejected_qty, pode_modified_date)
-VALUES 
-(1, 10, 10, 8, 2, '2021-01-01'),
-(2, 20, 20, 15, 5, '2021-02-01'),
-(3, 30, 30, 25, 5, '2021-03-01'),
-(4, 40, 40, 35, 5, '2021-04-01'),
-(5, 50, 50, 45, 5, '2021-05-01');
+INSERT INTO purchasing.purchase_order_header (pohe_number, pohe_status, pohe_order_date, pohe_tax, pohe_refund, pohe_arrival_date, pohe_pay_type, pohe_emp_id, pohe_vendor_id)
+VALUES
+  ('PO-001', 1, GETDATE(), 150000, 0, GETDATE() + 10, 'CA', 1, 1),
+  ('PO-002', 1, GETDATE(), 300000, 0, GETDATE() + 15, 'CA', 1, 2),
+  ('PO-003', 1, GETDATE(), 450000, 0, GETDATE() + 20, 'TR', 1, 3),
+  ('PO-004', 1, GETDATE(), 600000, 0, GETDATE() + 25, 'TR', 1, 4),
+  ('PO-005', 1, GETDATE(), 750000, 0, GETDATE() + 30, 'CA', 1, 5);
+
+INSERT INTO purchasing.purchase_order_detail (pode_pohe_id, pode_order_qty, pode_price, pode_received_qty, pode_rejected_qty, pode_modified_date, pode_stock_id)
+VALUES
+  (1, 10, 100000, 9, 1, GETDATE(), 1),
+  (1, 20, 150000, 18, 2, GETDATE(), 2),
+  (2, 30, 200000, 28, 2, GETDATE(), 3),
+  (2, 40, 250000, 38, 2, GETDATE(), 4),
+  (2, 50, 300000, 48, 2, GETDATE(), 5),
+  (3, 60, 350000, 57, 3, GETDATE(), 1),
+  (3, 70, 400000, 67, 3, GETDATE(), 2),
+  (3, 80, 450000, 77, 3, GETDATE(), 3),
+  (4, 90, 500000, 87, 3, GETDATE(), 4),
+  (4, 100, 550000, 97, 3, GETDATE(), 5),
+  (5, 110, 600000, 107, 3, GETDATE(), 1),
+  (5, 120, 650000, 117, 3, GETDATE(), 2),
+  (5, 130, 700000, 127, 3, GETDATE(), 3);
 
 INSERT INTO purchasing.stocks (stock_name, stock_description, stock_quantity, stock_reorder_point, stock_price, stock_standar_cost, stock_size, stock_color, stock_modified_date)
 VALUES

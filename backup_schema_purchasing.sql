@@ -6,6 +6,8 @@
 -- CREATE SCHEMA hotel;
 -- GO;
 
+drop table purchasing.stock_detail, purchasing.purchase_order_detail, purchasing.purchase_order_header, purchasing.stock_photo, purchasing.stocks
+
 -- create table hr.employee(
 --     emp_id int,
 --     CONSTRAINT pk_emp_id PRIMARY KEY (emp_id)
@@ -19,6 +21,21 @@
 -- USE Hotel_Realta;
 
 -- MODULE PURCHASING --
+
+
+CREATE TABLE purchasing.vendor(
+  vendor_id INT IDENTITY(1,1),
+  vendor_name NVARCHAR(55) NOT NULL,
+  vendor_active BIT DEFAULT 1,
+  vendor_priority BIT DEFAULT 0,
+  vendor_register_date DATETIME NOT NULL,
+  vendor_weburl NVARCHAR(1025),
+  vendor_modifier_date DATETIME,
+
+  CONSTRAINT pk_vendor_id PRIMARY KEY (vendor_id),
+  CONSTRAINT ck_vendor_priority CHECK (vendor_priority IN (0,1)),
+  CONSTRAINT ck_vendor_active CHECK (vendor_active IN (0,1))
+);
 
 CREATE TABLE purchasing.stocks(
   stock_id INT IDENTITY(1,1),
@@ -53,20 +70,6 @@ CREATE TABLE purchasing.stock_photo(
   CONSTRAINT ck_spho_primary CHECK (spho_primary IN (0,1))
 );
 
-CREATE TABLE purchasing.vendor(
-  vendor_id INT IDENTITY(1,1),
-  vendor_name NVARCHAR(55) NOT NULL,
-  vendor_active BIT DEFAULT 1,
-  vendor_priority BIT DEFAULT 0,
-  vendor_register_date DATETIME NOT NULL,
-  vendor_weburl NVARCHAR(1025),
-  vendor_modifier_date DATETIME,
-
-  CONSTRAINT pk_vendor_id PRIMARY KEY (vendor_id),
-  CONSTRAINT ck_vendor_priority CHECK (vendor_priority IN (0,1)),
-  CONSTRAINT ck_vendor_active CHECK (vendor_active IN (0,1))
-);
-
 CREATE TABLE purchasing.purchase_order_header(
     pohe_id INT IDENTITY(1,1) NOT NULL,
     pohe_number NVARCHAR(20),
@@ -93,6 +96,27 @@ CREATE TABLE purchasing.purchase_order_header(
     CONSTRAINT ck_pohe_status CHECK (pohe_status IN(1, 2, 3, 4)),
 );
 
+CREATE TABLE purchasing.purchase_order_detail (
+  pode_pohe_id INT,
+  pode_id INT IDENTITY(1,1),
+  pode_order_qty SMALLINT NOT NULL,
+  pode_price MONEY NOT NULL,
+  pode_line_total AS ISNULL(pode_order_qty*pode_price, 0.00),
+  pode_received_qty DECIMAL(8,2),
+  pode_rejected_qty DECIMAL(8,2),
+  pode_stocked_qty AS pode_received_qty - pode_rejected_qty,
+  pode_modified_date DATETIME,
+  pode_stock_id INT,
+
+  CONSTRAINT pk_pode_id PRIMARY KEY (pode_id),
+  CONSTRAINT fk_pode_pohe_id FOREIGN KEY (pode_pohe_id) 
+    REFERENCES purchasing.purchase_order_header(pohe_id) 
+    ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT fk_pode_stock_id FOREIGN KEY (pode_stock_id) 
+    REFERENCES purchasing.stocks(stock_id) 
+    ON DELETE CASCADE ON UPDATE CASCADE
+);
+
 CREATE TABLE purchasing.stock_detail (
   stod_stock_id INT,
   stod_id INT IDENTITY,
@@ -114,27 +138,6 @@ CREATE TABLE purchasing.stock_detail (
     REFERENCES hotel.facilities(hofa_faci_id) 
     ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT ck_stod_status CHECK (stod_status IN(1, 2, 3, 4))
-);
-
-CREATE TABLE purchasing.purchase_order_detail (
-  pode_pohe_id INT,
-  pode_id INT IDENTITY(1,1),
-  pode_order_qty SMALLINT NOT NULL,
-  pode_price MONEY NOT NULL,
-  pode_line_total AS ISNULL(pode_order_qty*pode_price, 0.00),
-  pode_received_qty DECIMAL(8,2),
-  pode_rejected_qty DECIMAL(8,2),
-  pode_stocked_qty AS pode_received_qty - pode_rejected_qty,
-  pode_modified_date DATETIME,
-  pode_stock_id INT,
-
-  CONSTRAINT pk_pode_id PRIMARY KEY (pode_id),
-  CONSTRAINT fk_pode_pohe_id FOREIGN KEY (pode_pohe_id) 
-    REFERENCES purchasing.purchase_order_header(pohe_id) 
-    ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT fk_pode_stock_id FOREIGN KEY (pode_stock_id) 
-    REFERENCES purchasing.stocks(stock_id) 
-    ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 -- TRIGGER TRIGGER TRIGGER TRIGGER TRIGGER
@@ -257,3 +260,19 @@ WHERE pd_id = 1;
 
 select ph_id, ph_subtotal, ph_tax, ph_total_amount, pd_id, pd_ph_id, pd_order_qty, pd_price, pd_line_total, pd_received_qty, pd_rejected_qty, pd_stocked_qty from purchasing.header h
 join purchasing.detail d on d.pd_ph_id = h.ph_id;
+
+CREATE TRIGGER tr_update_stock_scrap
+ON purchasing.stock_detail
+AFTER INSERT, UPDATE
+AS
+BEGIN
+  UPDATE s
+  SET s.stock_scrap = (
+    SELECT COUNT(*)
+    FROM purchasing.stock_detail AS d
+    WHERE s.stock_id = d.stod_stock_id AND d.stod_status IN (2, 3)
+  )
+  FROM purchasing.stocks AS s
+  INNER JOIN inserted AS d
+  ON s.stock_id = d.stod_stock_id
+END;

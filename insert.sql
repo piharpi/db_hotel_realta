@@ -1,4 +1,6 @@
 -- File insert 
+
+--REGION
 SET IDENTITY_INSERT Master.Regions ON;
 INSERT INTO Master.Regions (region_code, region_name)
 VALUES ('1', 'Region 1'), ('2', 'Region 2'), ('3', 'Region 3'),
@@ -64,3 +66,42 @@ VALUES (1, '123 Main Street', '', 'A1AA1', geography::Point(43.65, -79.38, 4326)
 SET IDENTITY_INSERT Master.Address OFF;
 SELECT*FROM Master.Address
 ORDER BY addr_id ASC
+
+
+--CATEGORY_GROUP
+insert into master.category_group (cagro_name, cagro_description, cagro_type, cagro_icon, cagro_icon_url)
+values
+('room', 'Kamar', 'category', 'icon-kamar', 'http://localhost/icon-kamar.png'),
+('restaurant', 'Restoran', 'category', 'icon-restoran', 'http://localhost/icon-restoran.png'),
+('meeting room', 'Ruang rapat', 'category', 'icon-ruang-rapat', 'http://localhost/icon-ruang-rapat.png'),
+('gym', 'Gym', 'category', 'icon-gym', 'http://localhost/icon-gym.png'),
+('aula', 'Aula', 'category', 'icon-aula', 'http://localhost/icon-aula.png'),
+('swimming pool', 'Kolam renang', 'category', 'icon-kolam-renang', 'http://localhost/icon-kolam-renang.png'),
+('balroom', 'Balroom', 'category', 'icon-balroom', 'http://localhost/icon-balroom.png');
+
+--POLICY
+insert into master.policy (poli_name, poli_description)
+values
+('Kebijakan pembatalan', 'Pembatalan tiket dapat dilakukan dengan mengirimkan permintaan pembatalan ke alamat email kami dalam jangka waktu tertentu sebelum tanggal keberangkatan.'),
+('Kebijakan pengembalian uang', 'Pengembalian uang hanya dapat dilakukan dalam jangka waktu tertentu setelah tanggal keberangkatan, dengan potongan biaya administrasi sebesar 10% dari harga tiket.'),
+('Kebijakan penukaran tiket', 'Penukaran tiket hanya dapat dilakukan dengan mengirimkan permintaan penukaran ke alamat email kami dalam jangka waktu tertentu sebelum tanggal keberangkatan. Biaya penukaran akan dikenakan sesuai dengan perbedaan harga tiket.');
+
+
+--PRICE_ITEM
+insert into master.price_item (prit_name, prit_price, prit_description, prit_type, prit_modified_date)
+values
+('Mie goreng', 12000, 'Mie goreng dengan bahan-bahan berkualitas', 'FOOD', '2022-01-01'),
+('Es teh', 4000, 'Es teh dingin dengan rasa yang enak', 'SOFTDRINK', '2022-01-01'),
+('Facial', 75000, 'Perawatan wajah dengan bahan-bahan alami', 'SERVICE', '2022-01-01'),
+('Basket sepakbola', 250000, 'Basket sepakbola untuk olahraga bersama teman', 'FACILITY', '2022-01-01'),
+('Kripik singkong', 5000, 'Kripik singkong dengan rasa original', 'SNACK', '2022-01-01'),
+('Nasi goreng', 15000, 'Nasi goreng dengan bahan-bahan berkualitas', 'FOOD', '2022-01-01'),
+('Es jeruk', 5000, 'Es jeruk dingin dengan rasa yang segar', 'SOFTDRINK', '2022-01-01'),
+('Perawatan rambut', 100000, 'Perawatan rambut dengan produk-produk berkualitas', 'SERVICE', '2022-01-01'),
+('Lapangan futsal', 500000, 'Lapangan futsal untuk olahraga bersama teman', 'FACILITY', '2022-01-01'),
+('Kripik kentang', 7000, 'Kripik kentang dengan rasa original', 'SNACK', '2022-01-01');
+
+
+--MEMBER
+
+

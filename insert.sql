@@ -69,55 +69,63 @@ ORDER BY addr_id ASC
 
 
 --CATEGORY_GROUP
-insert into master.category_group (cagro_name, cagro_description, cagro_type, cagro_icon, cagro_icon_url)
-values
-('room', 'Kamar', 'category', 'icon-kamar', 'http://localhost/icon-kamar.png'),
-('restaurant', 'Restoran', 'category', 'icon-restoran', 'http://localhost/icon-restoran.png'),
-('meeting room', 'Ruang rapat', 'category', 'icon-ruang-rapat', 'http://localhost/icon-ruang-rapat.png'),
-('gym', 'Gym', 'category', 'icon-gym', 'http://localhost/icon-gym.png'),
-('aula', 'Aula', 'category', 'icon-aula', 'http://localhost/icon-aula.png'),
-('swimming pool', 'Kolam renang', 'category', 'icon-kolam-renang', 'http://localhost/icon-kolam-renang.png'),
-('balroom', 'Balroom', 'category', 'icon-balroom', 'http://localhost/icon-balroom.png');
+SET IDENTITY_INSERT Master.category_group ON;
+INSERT INTO master.category_group (cagro_id, cagro_name, cagro_description, cagro_type, cagro_icon, cagro_icon_url)
+VALUES
+  (1, 'ROOM', 'Rooms for guests to stay in', 'category', 'room.png', 'https://example.com/room.png'),
+  (2, 'RESTAURANT', 'On-site restaurant for guests to dine in', 'service', 'restaurant.png', 'https://example.com/restaurant.png'),
+  (3, 'MEETING ROOM', 'Rooms for meetings and events', 'facility', 'meeting_room.png', 'https://example.com/meeting_room.png'),
+  (4, 'GYM', 'Fitness center for guests to use', 'facility', 'gym.png', 'https://example.com/gym.png'),
+  (5, 'AULA', 'Multipurpose room for events', 'facility', 'aula.png', 'https://example.com/aula.png'),
+  (6, 'SWIMMING POOL', 'Outdoor swimming pool for guests to use', 'facility', 'swimming_pool.png', 'https://example.com/swimming_pool.png'),
+  (7, 'BALROOM', 'Ballroom for events and parties', 'facility', 'balroom.png', 'https://example.com/balroom.png');
+SET IDENTITY_INSERT Master.category_group OFF;
+SELECT*FROM Master.category_group
+ORDER BY cagro_id ASC
 
 --POLICY
+SET IDENTITY_INSERT Master.policy ON;
 insert into master.policy (poli_name, poli_description)
 values
-('Kebijakan pembatalan', 'Pembatalan tiket dapat dilakukan dengan mengirimkan permintaan pembatalan ke alamat email kami dalam jangka waktu tertentu sebelum tanggal keberangkatan.'),
-('Kebijakan pengembalian uang', 'Pengembalian uang hanya dapat dilakukan dalam jangka waktu tertentu setelah tanggal keberangkatan, dengan potongan biaya administrasi sebesar 10% dari harga tiket.'),
-('Kebijakan penukaran tiket', 'Penukaran tiket hanya dapat dilakukan dengan mengirimkan permintaan penukaran ke alamat email kami dalam jangka waktu tertentu sebelum tanggal keberangkatan. Biaya penukaran akan dikenakan sesuai dengan perbedaan harga tiket.');
-
+('Pembatalan Gratis', 'Kebijakan pembatalan gratis yang memberikan kemudahan bagi tamu untuk membatalkan reservasi mereka hingga 24 jam sebelum tanggal check-in tanpa dikenakan biaya apapun'),
+('Check-in Awal', 'Kebijakan check-in awal yang memberikan kemudahan bagi tamu untuk melakukan check-in lebih awal dari waktu yang ditentukan, dengan biaya tambahan yang telah ditentukan'),
+('Check-out Terlambat', 'Kebijakan check-out terlambat yang memberikan kemudahan bagi tamu untuk melakukan check-out lebih lambat dari waktu yang ditentukan, dengan biaya tambahan yang telah ditentukan'),
+('Fasilitas Anak-anak', 'Kebijakan fasilitas anak-anak yang memberikan kemudahan bagi tamu yang membawa anak-anak dengan fasilitas yang disesuaikan dengan kebutuhan anak-anak, seperti kamar yang lebih luas dan fasilitas bermain');
+SET IDENTITY_INSERT Master.policy OFF;
+SELECT*FROM Master.policy
+ORDER BY poli_id ASC
 
 --PRICE_ITEM
-insert into master.price_item (prit_name, prit_price, prit_description, prit_type, prit_modified_date)
+SET IDENTITY_INSERT Master.price_item ON;
+insert into master.price_item (prit_id, prit_name, prit_price, prit_description, prit_type, prit_modified_date)
 values
-('Mie goreng', 12000, 'Mie goreng dengan bahan-bahan berkualitas', 'FOOD', '2022-01-01'),
-('Es teh', 4000, 'Es teh dingin dengan rasa yang enak', 'SOFTDRINK', '2022-01-01'),
-('Facial', 75000, 'Perawatan wajah dengan bahan-bahan alami', 'SERVICE', '2022-01-01'),
-('Basket sepakbola', 250000, 'Basket sepakbola untuk olahraga bersama teman', 'FACILITY', '2022-01-01'),
-('Kripik singkong', 5000, 'Kripik singkong dengan rasa original', 'SNACK', '2022-01-01'),
-('Nasi goreng', 15000, 'Nasi goreng dengan bahan-bahan berkualitas', 'FOOD', '2022-01-01'),
-('Es jeruk', 5000, 'Es jeruk dingin dengan rasa yang segar', 'SOFTDRINK', '2022-01-01'),
-('Perawatan rambut', 100000, 'Perawatan rambut dengan produk-produk berkualitas', 'SERVICE', '2022-01-01'),
-('Lapangan futsal', 500000, 'Lapangan futsal untuk olahraga bersama teman', 'FACILITY', '2022-01-01'),
-('Kripik kentang', 7000, 'Kripik kentang dengan rasa original', 'SNACK', '2022-01-01');
-
+(1, 'Kue Kering', 12000, 'Kue kering dengan beragam rasa yang enak dan lezat', 'SNACK', '2022-01-01'),
+(2, 'Kamar Standar', 500000, 'Kamar standar dengan fasilitas yang cukup lengkap', 'FACILITY', '2022-01-01'),
+(3, 'Aqua', 10000, 'Minuman bersoda dengan rasa jeruk yang segar', 'SOFTDRINK', '2022-01-01'),
+(4, 'Nasi Goreng', 35000, 'Nasi goreng dengan bahan-bahan yang berkualitas dan rasa yang nikmat', 'FOOD', '2022-01-01'),
+(5, 'Massage', 80000, 'Layanan massage yang dapat membantu mengurangi stres dan merelaksasi tubuh', 'SERVICE', '2022-01-01');
+SET IDENTITY_INSERT Master.price_item OFF;
+SELECT*FROM Master.price_item
+ORDER BY prit_id ASC
 
 --MEMBER
 insert into master.members (memb_name, memb_description)
 values
-('SILVER', 'Kategori keanggotaan Silver dengan beragam keuntungan dan manfaat yang bisa dinikmati oleh member, seperti diskon 10% pada setiap pembelian di toko kami, akses ke kelas olahraga dan fitness gratis setiap minggu, serta gratis menonton pertandingan olahraga di stadium kami'),
-('GOLD', 'Kategori keanggotaan Gold dengan beragam keuntungan dan manfaat yang lebih lengkap dibandingkan dengan kategori Silver, seperti diskon 15% pada setiap pembelian di toko kami, akses ke kelas olahraga dan fitness gratis setiap hari, serta gratis menonton pertandingan olahraga di stadium kami dan menikmati fasilitas VIP lounge'),
-('VIP', 'Kategori keanggotaan VIP dengan beragam keuntungan dan manfaat yang lebih lengkap dibandingkan dengan kategori Gold, seperti diskon 20% pada setiap pembelian di toko kami, akses ke kelas olahraga dan fitness gratis setiap hari, serta gratis menonton pertandingan olahraga di stadium kami dan menikmati fasilitas VIP lounge dan fasilitas makan di restoran VIP'),
-('WIZARD', 'Kategori keanggotaan Wizard dengan beragam keuntungan dan manfaat yang lebih lengkap dibandingkan dengan kategori VIP, serta fasilitas yang lebih eksklusif dan terbatas hanya untuk member Wizard, seperti diskon 25% pada setiap pembelian di toko kami, akses ke kelas olahraga dan fitness gratis setiap hari, serta gratis menonton pertandingan olahraga di stadium kami dan menikmati fasilitas VIP lounge dan fasilitas makan di restoran VIP');
-
+('SILVER', 'Keanggotaan SILVER memberikan diskon 10% pada semua layanan hotel'),
+('GOLD', 'Keanggotaan GOLD memberikan diskon 20% pada semua layanan hotel dan fasilitas gratis late check-out hingga pukul 12 siang'),
+('VIP', 'Keanggotaan VIP memberikan diskon 30% pada semua layanan hotel, fasilitas gratis late check-out hingga pukul 12 siang, dan akses ke VIP lounge'),
+('WIZARD', 'Keanggotaan WIZARD memberikan diskon 50% pada semua layanan hotel, fasilitas gratis late check-out hingga pukul 12 siang, akses ke VIP lounge, dan fasilitas gratis upgrade kamar');
+SELECT*FROM Master.members
 
 --SERVICE_TASK
-insert into master.service_task (seta_name, seta_seq)
+SET IDENTITY_INSERT Master.service_task ON;
+insert into master.service_task (seta_id, seta_name, seta_seq)
 values
-('Receptionist', 1),
-('Housekeeping', 2),
-('Maintenance', 3),
-('Security', 4),
-('Food and Beverage Staff', 5),
-('Fitness Trainer', 6),
-('Spa Therapist', 7);
+(1, 'Receptionist', 1),
+(2, 'Housekeeping', 2),
+(3, 'Chef', 3),
+(4, 'Security', 4),
+(5, 'Manager', 5);
+SET IDENTITY_INSERT Master.service_task OFF;
+SELECT*FROM Master.service_task
+ORDER BY seta_id ASC

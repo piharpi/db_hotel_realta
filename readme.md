@@ -15,7 +15,9 @@
 - purchase_order_detail : pode_pohe_id
 
 ## Trigger 
-- [*] ph_subtotal: Kolom ini harus dihitung secara otomatis berdasarkan jumlah total harga produk yang dipesan.
+- [x] ph_subtotal: Kolom ini harus dihitung secara otomatis berdasarkan jumlah total harga produk yang dipesan.
 - [ ] ph_tax: Kolom ini harus dihitung secara otomatis berdasarkan tarif pajak yang berlaku.
-- [-] ph_total_amount: Kolom ini harus dihitung secara otomatis berdasarkan ph_subtotal ditambah ph_tax.
-- [v] pd_line_total: Kolom ini harus dihitung secara otomatis berdasarkan pd_order_qty dikali pd_price. 
+
+## Computed
+- [x] ph_total_amount: Kolom ini harus dihitung secara otomatis berdasarkan ph_subtotal ditambah ph_tax.
+- [x] pd_line_total: Kolom ini harus dihitung secara otomatis berdasarkan pd_order_qty dikali pd_price. 

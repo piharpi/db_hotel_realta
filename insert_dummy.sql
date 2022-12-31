@@ -135,10 +135,12 @@ VALUES
 -- -- test trigger STOCK
 -- update purchasing.stock_detail set stod_status = 4 where stod_id = 1;
 -- update purchasing.stock_detail set stod_status = 3 where stod_id = 2;
+UPDATE purchasing.purchase_order_header set pohe_status = 4 WHERE pohe_id = 1;
 -- delete from purchasing.stock_detail where stod_id = 1 
 select * from purchasing.stocks as s 
 -- join purchasing.stock_detail as d on d.stod_stock_id = s.stock_id
-join purchasing.purchase_order_detail as h on h.pode_stock_id = s.stock_id
+join purchasing.purchase_order_detail as d on d.pode_stock_id = s.stock_id
+join purchasing.purchase_order_header as h on h.pohe_id = d.pode_pohe_id
 
 -- select * from purchasing.purchase_order_header;
 -- select * from purchasing.purchase_order_detail;

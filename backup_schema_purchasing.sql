@@ -90,7 +90,7 @@ CREATE TABLE purchasing.purchase_order_header(
     pohe_subtotal MONEY,
     pohe_tax MONEY,
     pohe_total_amount AS pohe_subtotal+pohe_tax,
-    pohe_refund MONEY,
+    pohe_refund MONEY DEFAULT NULL,
     pohe_arrival_date DATETIME,
     pohe_pay_type NCHAR(2) NOT NULL,
     pohe_emp_id INT,
@@ -213,7 +213,7 @@ GO
 -- DROP TRIGGER purchasing.tr_update_stock_quantity;
 
 CREATE TRIGGER tr_update_stock_quantity
-ON purchasing.purchase_order_detail
+ON purchasing.purchase_order_header
 AFTER INSERT, UPDATE, DELETE
 AS
 BEGIN
@@ -222,11 +222,17 @@ BEGIN
   SET s.stock_quantity = 
     (SELECT SUM(pod.pode_stocked_qty)
      FROM purchasing.purchase_order_detail pod
-     WHERE s.stock_id = pod.pode_stock_id)
+     JOIN purchasing.purchase_order_header poh ON poh.pohe_id = pod.pode_pohe_id
+     WHERE s.stock_id = pod.pode_stock_id and poh.pohe_status = 4)
   FROM purchasing.stocks s;
 END;
 GO
 
+-- SELECT SUM(pod.pode_stocked_qty)
+--      FROM purchasing.purchase_order_detail pod
+--      join purchasing.stocks s on s.stock_id = pod.pode_stock_id
+--      JOIN purchasing.purchase_order_header poh ON poh.pohe_id = pod.pode_pohe_id
+--      WHERE s.stock_id = pod.pode_stock_id and poh.pohe_status = 4
 
 --== TESTER
 

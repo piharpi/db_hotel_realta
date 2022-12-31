@@ -6,7 +6,12 @@
 -- CREATE SCHEMA hotel;
 -- GO;
 
-drop table purchasing.stock_detail, purchasing.purchase_order_detail, purchasing.purchase_order_header, purchasing.stock_photo, purchasing.stocks
+drop table purchasing.vendor, 
+           purchasing.stock_detail, 
+           purchasing.purchase_order_detail, 
+           purchasing.purchase_order_header, 
+           purchasing.stock_photo, 
+           purchasing.stocks;
 
 -- create table hr.employee(
 --     emp_id int,
@@ -14,9 +19,16 @@ drop table purchasing.stock_detail, purchasing.purchase_order_detail, purchasing
 -- )
 
 -- create table hotel.facilities(
---     hofa_faci_id int,
---     CONSTRAINT pk_hofa_faci_id PRIMARY KEY (hofa_faci_id)
+--     faci_id int,
+--     CONSTRAINT pk_faci_id PRIMARY KEY (faci_id)
 -- )
+
+-- alter table purchasing.stock_detail drop CONSTRAINT fk_stod_faci_id;
+-- alter table hotel.facilities drop CONSTRAINT pk_hofa_faci_id;
+-- alter table purchasing.stock_detail add CONSTRAINT fk_stod_faci_id FOREIGN KEY (stod_faci_id) 
+--     REFERENCES hotel.facilities(faci_id) 
+--     ON DELETE CASCADE ON UPDATE CASCADE;
+
 
 -- USE Hotel_Realta;
 
@@ -41,12 +53,12 @@ CREATE TABLE purchasing.stocks(
   stock_id INT IDENTITY(1,1),
   stock_name NVARCHAR(255) NOT NULL,
   stock_description NVARCHAR(255),
-  stock_quantity SMALLINT NOT NULL,
-  stock_reorder_point SMALLINT NOT NULL,
-  stock_used SMALLINT,
-  stock_scrap SMALLINT,
-  stock_price MONEY NOT NULL,
-  stock_standar_cost MONEY NOT NULL,
+  stock_quantity SMALLINT DEFAULT 0,
+  stock_reorder_point SMALLINT DEFAULT 0,
+  stock_used SMALLINT DEFAULT 0,
+  stock_scrap SMALLINT DEFAULT 0,
+  stock_price MONEY DEFAULT 0,
+  stock_standar_cost MONEY DEFAULT 0,
   stock_size NVARCHAR(25),
   stock_color NVARCHAR(15),
   stock_modified_date DATETIME,
@@ -135,144 +147,172 @@ CREATE TABLE purchasing.stock_detail (
     REFERENCES purchasing.purchase_order_header(pohe_id) 
     ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT fk_stod_faci_id FOREIGN KEY (stod_faci_id) 
-    REFERENCES hotel.facilities(hofa_faci_id) 
+    REFERENCES hotel.facilities(faci_id) 
     ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT ck_stod_status CHECK (stod_status IN(1, 2, 3, 4))
 );
 
 -- TRIGGER TRIGGER TRIGGER TRIGGER TRIGGER
+
+-- DROP TRIGGER purchasing.tr_purchase_order_detail;
 GO
 
-CREATE TRIGGER ipurchase_order_detail
+CREATE TRIGGER tr_purchase_order_detail
 ON purchasing.purchase_order_detail
-AFTER INSERT
+AFTER INSERT, UPDATE, DELETE
 AS
 BEGIN
+  SET NOCOUNT ON;
+
   UPDATE purchasing.purchase_order_header
     SET pohe_subtotal = 
       (SELECT SUM(pode_line_total) 
         FROM purchasing.purchase_order_detail 
-        WHERE pode_pohe_id = inserted.pode_pohe_id)
-    FROM inserted
-    WHERE purchasing.purchase_order_header.pohe_id = inserted.pode_pohe_id;
+        WHERE pode_pohe_id = pohe_id)
+    WHERE pohe_id IN 
+      (SELECT pode_pohe_id FROM inserted) 
+    OR pohe_id IN (SELECT pode_pohe_id FROM deleted);
 END;
 GO
 
-CREATE TRIGGER upurchase_order_detail
-ON purchasing.purchase_order_detail
-AFTER UPDATE
-AS
-BEGIN
-  UPDATE purchasing.purchase_order_header
-    SET pohe_subtotal = 
-      (SELECT SUM(pode_line_total) 
-        FROM purchasing.purchase_order_detail 
-        WHERE pode_pohe_id = inserted.pode_pohe_id)
-    FROM inserted
-    WHERE purchasing.purchase_order_header.pohe_id = inserted.pode_pohe_id;
-END;
-GO
---== TESTER
-
-DROP TABLE purchasing.detail;
-DROP TABLE purchasing.header;
-
-CREATE TABLE purchasing.header(
-    ph_id INT IDENTITY(1,1) NOT NULL PRIMARY KEY,
-    ph_number NVARCHAR(20),
-    ph_status TINYINT DEFAULT 1 CHECK (ph_status IN(1, 2, 3, 4)),
-    ph_order_date DATETIME,
-    ph_subtotal MONEY,
-    ph_tax MONEY,
-    ph_total_amount AS ph_subtotal+ph_tax,
-    ph_refund MONEY,
-    ph_arrival_date DATETIME,
-    ph_pay_type NCHAR(2) NOT NULL CHECK (ph_pay_type IN('TR', 'CA'))
-);
-
-CREATE TABLE purchasing.detail(
-    pd_ph_id INT FOREIGN KEY (pd_ph_id) REFERENCES purchasing.header(ph_id),
-    pd_id int IDENTITY (1,1) PRIMARY KEY,
-    pd_order_qty smallint not NULL,
-    pd_price money not null,
-    pd_line_total AS ISNULL(pd_order_qty*pd_price, 0.00),
-    pd_received_qty decimal(8,2),
-    pd_rejected_qty decimal (8,2),
-    pd_stocked_qty as pd_received_qty - pd_rejected_qty,
-    pd_modified_date datetime
-);
-
-GO
-DROP TRIGGER iDetail;
-DROP TRIGGER uDetail;
-GO
-
-GO
-CREATE TRIGGER iDetail
-ON purchasing.detail
-AFTER INSERT
-AS
-BEGIN
-  UPDATE purchasing.header
-  SET ph_subtotal = (SELECT SUM(pd_line_total) FROM purchasing.detail WHERE pd_ph_id = inserted.pd_ph_id)
-  FROM inserted
-  WHERE purchasing.header.ph_id = inserted.pd_ph_id;
-END;
-
-GO
-
-CREATE TRIGGER uDetail
-ON purchasing.detail
-AFTER UPDATE
-AS
-BEGIN
-  UPDATE purchasing.header
-  SET ph_subtotal = (SELECT SUM(pd_line_total) FROM purchasing.detail WHERE pd_ph_id = inserted.pd_ph_id)
-  FROM inserted
-  WHERE purchasing.header.ph_id = inserted.pd_ph_id;
-END;
-
-GO
-
--- DUMMY DATA
-
-INSERT INTO purchasing.header (ph_number, ph_order_date, ph_tax, ph_pay_type)
-VALUES 
-('PO00001', '2021-01-01', 10, 'TR'),
-('PO00002', '2021-02-01', 20, 'CA'),
-('PO00003', '2021-03-01', 30, 'TR'),
-('PO00004', '2021-04-01', 40, 'CA'),
-('PO00005', '2021-05-01', 50, 'TR');
-
-
-INSERT INTO purchasing.detail (pd_ph_id, pd_order_qty, pd_price, pd_received_qty, pd_rejected_qty, pd_modified_date)
-VALUES 
-(1, 10, 10, 8, 2, '2021-01-01'),
-(2, 20, 20, 15, 5, '2021-02-01'),
-(3, 30, 30, 25, 5, '2021-03-01'),
-(4, 40, 40, 35, 5, '2021-04-01'),
-(5, 50, 50, 45, 5, '2021-05-01');
-
-
-UPDATE purchasing.detail
-SET pd_order_qty = 30
-WHERE pd_id = 1;
-
-select ph_id, ph_subtotal, ph_tax, ph_total_amount, pd_id, pd_ph_id, pd_order_qty, pd_price, pd_line_total, pd_received_qty, pd_rejected_qty, pd_stocked_qty from purchasing.header h
-join purchasing.detail d on d.pd_ph_id = h.ph_id;
+-- TRIGGER STOCKS
+-- DROP TRIGGER purchasing.tr_update_stock_scrap;
 
 CREATE TRIGGER tr_update_stock_scrap
 ON purchasing.stock_detail
-AFTER INSERT, UPDATE
+AFTER INSERT, UPDATE, DELETE
 AS
 BEGIN
+  -- Update data di tabel stocks
   UPDATE s
-  SET s.stock_scrap = (
-    SELECT COUNT(*)
-    FROM purchasing.stock_detail AS d
-    WHERE s.stock_id = d.stod_stock_id AND d.stod_status IN (2, 3)
-  )
-  FROM purchasing.stocks AS s
-  INNER JOIN inserted AS d
-  ON s.stock_id = d.stod_stock_id
+  SET s.stock_scrap = 
+    (SELECT COUNT(*)
+     FROM purchasing.stock_detail sd
+     WHERE sd.stod_status IN (2, 3) AND s.stock_id = sd.stod_stock_id)
+  FROM purchasing.stocks s;
 END;
+GO
+
+-- DROP TRIGGER purchasing.tr_update_stock_used;
+
+CREATE TRIGGER tr_update_stock_used
+ON purchasing.stock_detail
+AFTER INSERT, UPDATE, DELETE
+AS
+BEGIN
+  -- Update data di tabel stocks
+  UPDATE s
+  SET s.stock_used = 
+    (SELECT COUNT(*)
+     FROM purchasing.stock_detail sd
+     WHERE sd.stod_status = 4 AND s.stock_id = sd.stod_stock_id)
+  FROM purchasing.stocks s;
+END;
+GO
+
+-- DROP TRIGGER purchasing.tr_update_stock_quantity;
+
+CREATE TRIGGER tr_update_stock_quantity
+ON purchasing.purchase_order_detail
+AFTER INSERT, UPDATE, DELETE
+AS
+BEGIN
+  -- Update data di tabel stocks
+  UPDATE s
+  SET s.stock_quantity = 
+    (SELECT SUM(pod.pode_stocked_qty)
+     FROM purchasing.purchase_order_detail pod
+     WHERE s.stock_id = pod.pode_stock_id)
+  FROM purchasing.stocks s;
+END;
+GO
+
+
+--== TESTER
+
+-- DROP TABLE purchasing.detail;
+-- DROP TABLE purchasing.header;
+
+-- CREATE TABLE purchasing.header(
+--     ph_id INT IDENTITY(1,1) NOT NULL PRIMARY KEY,
+--     ph_number NVARCHAR(20),
+--     ph_status TINYINT DEFAULT 1 CHECK (ph_status IN(1, 2, 3, 4)),
+--     ph_order_date DATETIME,
+--     ph_subtotal MONEY,
+--     ph_tax MONEY,
+--     ph_total_amount AS ph_subtotal+ph_tax,
+--     ph_refund MONEY,
+--     ph_arrival_date DATETIME,
+--     ph_pay_type NCHAR(2) NOT NULL CHECK (ph_pay_type IN('TR', 'CA'))
+-- );
+
+-- CREATE TABLE purchasing.detail(
+--     pd_ph_id INT FOREIGN KEY (pd_ph_id) REFERENCES purchasing.header(ph_id),
+--     pd_id int IDENTITY (1,1) PRIMARY KEY,
+--     pd_order_qty smallint not NULL,
+--     pd_price money not null,
+--     pd_line_total AS ISNULL(pd_order_qty*pd_price, 0.00),
+--     pd_received_qty decimal(8,2),
+--     pd_rejected_qty decimal (8,2),
+--     pd_stocked_qty as pd_received_qty - pd_rejected_qty,
+--     pd_modified_date datetime
+-- );
+
+-- GO
+-- DROP TRIGGER iDetail;
+-- DROP TRIGGER uDetail;
+-- GO
+
+-- GO
+-- CREATE TRIGGER iDetail
+-- ON purchasing.detail
+-- AFTER INSERT
+-- AS
+-- BEGIN
+--   UPDATE purchasing.header
+--   SET ph_subtotal = (SELECT SUM(pd_line_total) FROM purchasing.detail WHERE pd_ph_id = inserted.pd_ph_id)
+--   FROM inserted
+--   WHERE purchasing.header.ph_id = inserted.pd_ph_id;
+-- END;
+
+-- GO
+
+-- CREATE TRIGGER uDetail
+-- ON purchasing.detail
+-- AFTER UPDATE
+-- AS
+-- BEGIN
+--   UPDATE purchasing.header
+--   SET ph_subtotal = (SELECT SUM(pd_line_total) FROM purchasing.detail WHERE pd_ph_id = inserted.pd_ph_id)
+--   FROM inserted
+--   WHERE purchasing.header.ph_id = inserted.pd_ph_id;
+-- END;
+
+-- GO
+
+-- -- DUMMY DATA
+
+-- INSERT INTO purchasing.header (ph_number, ph_order_date, ph_tax, ph_pay_type)
+-- VALUES 
+-- ('PO00001', '2021-01-01', 10, 'TR'),
+-- ('PO00002', '2021-02-01', 20, 'CA'),
+-- ('PO00003', '2021-03-01', 30, 'TR'),
+-- ('PO00004', '2021-04-01', 40, 'CA'),
+-- ('PO00005', '2021-05-01', 50, 'TR');
+
+
+-- INSERT INTO purchasing.detail (pd_ph_id, pd_order_qty, pd_price, pd_received_qty, pd_rejected_qty, pd_modified_date)
+-- VALUES 
+-- (1, 10, 10, 8, 2, '2021-01-01'),
+-- (2, 20, 20, 15, 5, '2021-02-01'),
+-- (3, 30, 30, 25, 5, '2021-03-01'),
+-- (4, 40, 40, 35, 5, '2021-04-01'),
+-- (5, 50, 50, 45, 5, '2021-05-01');
+
+
+-- UPDATE purchasing.detail
+-- SET pd_order_qty = 30
+-- WHERE pd_id = 1;
+
+-- select ph_id, ph_subtotal, ph_tax, ph_total_amount, pd_id, pd_ph_id, pd_order_qty, pd_price, pd_line_total, pd_received_qty, pd_rejected_qty, pd_stocked_qty from purchasing.header h
+-- join purchasing.detail d on d.pd_ph_id = h.ph_id;

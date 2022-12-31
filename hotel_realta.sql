@@ -53,6 +53,7 @@ CREATE TABLE Master.address (
     ON UPDATE CASCADE
 );
 
+
 CREATE TABLE Master.category_group (
   cagro_id int IDENTITY(1, 1),
   cagro_name nvarchar(25) UNIQUE NOT NULL CHECK (cagro_name IN ('Room', 'Restaurant', 'Meeting Room', 'Gym', 'Aula', 'Swimming Pool', '')),
@@ -81,8 +82,8 @@ CREATE TABLE Master.policy_category_group (
     ON DELETE CASCADE 
     ON UPDATE CASCADE
 );
-
 -- DROP TABLE master.policy_category_group
+
 CREATE TABLE Master.price_item (
   prit_id int IDENTITY(1, 1),
   prit_name nvarchar(55) UNIQUE NOT NULL,
@@ -102,6 +103,6 @@ CREATE TABLE Master.service_task (
 
 CREATE TABLE Master.members (
   memb_name nvarchar(15) NOT NULL,
-  memb_description nvarchar(100),
+  memb_description nvarchar(200),
   CONSTRAINT pk_memb_name PRIMARY KEY(memb_description)
 );

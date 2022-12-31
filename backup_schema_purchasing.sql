@@ -157,7 +157,7 @@ CREATE TABLE purchasing.stock_detail (
 -- DROP TRIGGER purchasing.tr_purchase_order_detail;
 GO
 
-CREATE TRIGGER tr_purchase_order_detail
+CREATE TRIGGER tr_update_sub_total
 ON purchasing.purchase_order_detail
 AFTER INSERT, UPDATE, DELETE
 AS

@@ -122,7 +122,7 @@ VALUES
 -- SELECT s.*, sp.*, poh.*, pod.*, v.*
 -- FROM purchasing.stocks s
 -- full JOIN purchasing.stock_detail sd ON s.stock_id = sd.stod_stock_id
--- full JOIN purchasing.stock_photo sp ON s.stock_id = sp.spho_stock_id
+-- full JOIN purchasing.stock_photo sp ON s.stock_id   = sp.spho_stock_id
 -- full JOIN purchasing.purchase_order_header poh ON s.stock_id = poh.pohe_id
 -- full JOIN purchasing.purchase_order_detail pod ON poh.pohe_id = pod.pode_pohe_id
 -- full JOIN purchasing.vendor v ON poh.pohe_vendor_id = v.vendor_id
@@ -137,7 +137,7 @@ VALUES
 -- update purchasing.stock_detail set stod_status = 3 where stod_id = 2;
 -- delete from purchasing.stock_detail where stod_id = 1 
 select * from purchasing.stocks as s 
-join purchasing.stock_detail as d on d.stod_stock_id = s.stock_id
+-- join purchasing.stock_detail as d on d.stod_stock_id = s.stock_id
 join purchasing.purchase_order_detail as h on h.pode_stock_id = s.stock_id
 
 -- select * from purchasing.purchase_order_header;

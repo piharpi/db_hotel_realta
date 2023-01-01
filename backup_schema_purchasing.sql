@@ -34,7 +34,6 @@ drop table purchasing.vendor,
 
 -- MODULE PURCHASING --
 
-
 CREATE TABLE purchasing.vendor(
   vendor_id INT IDENTITY(1,1),
   vendor_name NVARCHAR(55) NOT NULL,

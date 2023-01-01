@@ -685,16 +685,30 @@ CREATE TABLE Payment.PaymentTransaction(
 
 -- MODULE PURCHASING --
 
+CREATE TABLE purchasing.vendor(
+  vendor_id INT IDENTITY(1,1),
+  vendor_name NVARCHAR(55) NOT NULL,
+  vendor_active BIT DEFAULT 1,
+  vendor_priority BIT DEFAULT 0,
+  vendor_register_date DATETIME NOT NULL,
+  vendor_weburl NVARCHAR(1025),
+  vendor_modifier_date DATETIME,
+
+  CONSTRAINT pk_vendor_id PRIMARY KEY (vendor_id),
+  CONSTRAINT ck_vendor_priority CHECK (vendor_priority IN (0,1)),
+  CONSTRAINT ck_vendor_active CHECK (vendor_active IN (0,1))
+);
+
 CREATE TABLE purchasing.stocks(
   stock_id INT IDENTITY(1,1),
   stock_name NVARCHAR(255) NOT NULL,
   stock_description NVARCHAR(255),
-  stock_quantity SMALLINT NOT NULL,
-  stock_reorder_point SMALLINT NOT NULL,
-  stock_used SMALLINT,
-  stock_scrap SMALLINT,
-  stock_price MONEY NOT NULL,
-  stock_standar_cost MONEY NOT NULL,
+  stock_quantity SMALLINT,
+  stock_reorder_point SMALLINT DEFAULT 0,
+  stock_used SMALLINT DEFAULT 0,
+  stock_scrap SMALLINT DEFAULT 0,
+  stock_price MONEY DEFAULT 0,
+  stock_standar_cost MONEY DEFAULT 0,
   stock_size NVARCHAR(25),
   stock_color NVARCHAR(15),
   stock_modified_date DATETIME,
@@ -718,20 +732,6 @@ CREATE TABLE purchasing.stock_photo(
   CONSTRAINT ck_spho_primary CHECK (spho_primary IN (0,1))
 );
 
-CREATE TABLE purchasing.vendor(
-  vendor_id INT IDENTITY(1,1),
-  vendor_name NVARCHAR(55) NOT NULL,
-  vendor_active BIT DEFAULT 1,
-  vendor_priority BIT DEFAULT 0,
-  vendor_register_date DATETIME NOT NULL,
-  vendor_weburl NVARCHAR(1025),
-  vendor_modifier_date DATETIME,
-
-  CONSTRAINT pk_vendor_id PRIMARY KEY (vendor_id),
-  CONSTRAINT ck_vendor_priority CHECK (vendor_priority IN (0,1)),
-  CONSTRAINT ck_vendor_active CHECK (vendor_active IN (0,1))
-);
-
 CREATE TABLE purchasing.purchase_order_header(
     pohe_id INT IDENTITY(1,1) NOT NULL,
     pohe_number NVARCHAR(20),
@@ -740,7 +740,7 @@ CREATE TABLE purchasing.purchase_order_header(
     pohe_subtotal MONEY,
     pohe_tax MONEY,
     pohe_total_amount AS pohe_subtotal+pohe_tax,
-    pohe_refund MONEY,
+    pohe_refund MONEY DEFAULT NULL,
     pohe_arrival_date DATETIME,
     pohe_pay_type NCHAR(2) NOT NULL,
     pohe_emp_id INT,
@@ -756,29 +756,6 @@ CREATE TABLE purchasing.purchase_order_header(
       ON DELETE CASCADE ON UPDATE CASCADE,
     CONSTRAINT ck_pohe_pay_type CHECK (pohe_pay_type IN('TR', 'CA')),
     CONSTRAINT ck_pohe_status CHECK (pohe_status IN(1, 2, 3, 4)),
-);
-
-CREATE TABLE purchasing.stock_detail (
-  stod_stock_id INT,
-  stod_id INT IDENTITY,
-  stod_barcode_number NVARCHAR(255),
-  stod_status NCHAR(2) DEFAULT 1,
-  stod_notes NVARCHAR(1024),
-  stod_faci_id INT,
-  stod_pohe_id INT,
-
-  CONSTRAINT pk_stod_id PRIMARY KEY (stod_id),
-  CONSTRAINT uq_stod_barcode_number UNIQUE (stod_barcode_number),
-  CONSTRAINT fk_stod_stock_id FOREIGN KEY (stod_stock_id) 
-    REFERENCES purchasing.stocks(stock_id) 
-    ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT fk_stod_pohe_id FOREIGN KEY (stod_pohe_id) 
-    REFERENCES purchasing.purchase_order_header(pohe_id) 
-    ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT fk_stod_faci_id FOREIGN KEY (stod_faci_id) 
-    REFERENCES hotel.facilities(hofa_faci_id) 
-    ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT ck_stod_status CHECK (stod_status IN(1, 2, 3, 4))
 );
 
 CREATE TABLE purchasing.purchase_order_detail (
@@ -802,36 +779,102 @@ CREATE TABLE purchasing.purchase_order_detail (
     ON DELETE CASCADE ON UPDATE CASCADE
 );
 
+CREATE TABLE purchasing.stock_detail (
+  stod_stock_id INT,
+  stod_id INT IDENTITY,
+  stod_barcode_number NVARCHAR(255),
+  stod_status NCHAR(2) DEFAULT 1,
+  stod_notes NVARCHAR(1024),
+  stod_faci_id INT,
+  stod_pohe_id INT,
+
+  CONSTRAINT pk_stod_id PRIMARY KEY (stod_id),
+  CONSTRAINT uq_stod_barcode_number UNIQUE (stod_barcode_number),
+  CONSTRAINT fk_stod_stock_id FOREIGN KEY (stod_stock_id) 
+    REFERENCES purchasing.stocks(stock_id) 
+    ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT fk_stod_pohe_id FOREIGN KEY (stod_pohe_id) 
+    REFERENCES purchasing.purchase_order_header(pohe_id) 
+    ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT fk_stod_faci_id FOREIGN KEY (stod_faci_id) 
+    REFERENCES hotel.facilities(faci_id) 
+    ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT ck_stod_status CHECK (stod_status IN(1, 2, 3, 4))
+);
+
 -- TRIGGER TRIGGER TRIGGER TRIGGER TRIGGER
+
+-- DROP TRIGGER purchasing.tr_purchase_order_detail;
 GO
 
-CREATE TRIGGER ipurchase_order_detail
+CREATE TRIGGER tr_update_sub_total
 ON purchasing.purchase_order_detail
-AFTER INSERT
+AFTER INSERT, UPDATE, DELETE
 AS
 BEGIN
+  SET NOCOUNT ON;
+
   UPDATE purchasing.purchase_order_header
     SET pohe_subtotal = 
       (SELECT SUM(pode_line_total) 
         FROM purchasing.purchase_order_detail 
-        WHERE pode_pohe_id = inserted.pode_pohe_id)
-    FROM inserted
-    WHERE purchasing.purchase_order_header.pohe_id = inserted.pode_pohe_id;
+        WHERE pode_pohe_id = pohe_id)
+    WHERE pohe_id IN 
+      (SELECT pode_pohe_id FROM inserted) 
+    OR pohe_id IN (SELECT pode_pohe_id FROM deleted);
 END;
 GO
 
-CREATE TRIGGER upurchase_order_detail
-ON purchasing.purchase_order_detail
-AFTER UPDATE
+-- TRIGGER STOCKS
+-- DROP TRIGGER purchasing.tr_update_stock_scrap;
+
+CREATE TRIGGER tr_update_stock_scrap
+ON purchasing.stock_detail
+AFTER INSERT, UPDATE, DELETE
 AS
 BEGIN
-  UPDATE purchasing.purchase_order_header
-    SET pohe_subtotal = 
-      (SELECT SUM(pode_line_total) 
-        FROM purchasing.purchase_order_detail 
-        WHERE pode_pohe_id = inserted.pode_pohe_id)
-    FROM inserted
-    WHERE purchasing.purchase_order_header.pohe_id = inserted.pode_pohe_id;
+  -- Update data di tabel stocks
+  UPDATE s
+  SET s.stock_scrap = 
+    (SELECT COUNT(*)
+     FROM purchasing.stock_detail sd
+     WHERE sd.stod_status IN (2, 3) AND s.stock_id = sd.stod_stock_id)
+  FROM purchasing.stocks s;
+END;
+GO
+
+-- DROP TRIGGER purchasing.tr_update_stock_used;
+
+CREATE TRIGGER tr_update_stock_used
+ON purchasing.stock_detail
+AFTER INSERT, UPDATE, DELETE
+AS
+BEGIN
+  -- Update data di tabel stocks
+  UPDATE s
+  SET s.stock_used = 
+    (SELECT COUNT(*)
+     FROM purchasing.stock_detail sd
+     WHERE sd.stod_status = 4 AND s.stock_id = sd.stod_stock_id)
+  FROM purchasing.stocks s;
+END;
+GO
+
+-- DROP TRIGGER purchasing.tr_update_stock_quantity;
+
+CREATE TRIGGER tr_update_stock_quantity
+ON purchasing.purchase_order_header
+AFTER INSERT, UPDATE, DELETE
+AS
+BEGIN
+  -- Update data di tabel stocks
+  UPDATE s
+  SET s.stock_quantity = 
+    (SELECT SUM(pod.pode_stocked_qty)
+     FROM purchasing.purchase_order_detail pod
+     JOIN purchasing.purchase_order_header poh ON poh.pohe_id = pod.pode_pohe_id
+     WHERE s.stock_id = pod.pode_stock_id and poh.pohe_status = 4)
+  FROM purchasing.stocks s;
 END;
 GO
 

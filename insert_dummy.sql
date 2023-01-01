@@ -3,30 +3,30 @@
 -- select * from information_schema.columns where table_name = 'facilities' and column_name = 'faci_id';
 -- select * from information_schema.tables where table_name = 'facilities' and column_name = 'faci_id';
 
-DELETE FROM purchasing.purchase_order_detail;
-DBCC CHECKIDENT ('purchasing.purchase_order_detail', RESEED, 0)
-GO
-DELETE FROM purchasing.stock_detail;
-DBCC CHECKIDENT ('purchasing.stock_detail', RESEED, 0)
-GO
-DELETE FROM purchasing.stock_photo;
-DBCC CHECKIDENT ('purchasing.stock_photo', RESEED, 0)
-GO
-DELETE FROM purchasing.stocks;
-DBCC CHECKIDENT ('purchasing.stocks', RESEED, 0)
-GO
-DELETE FROM purchasing.purchase_order_header;
-DBCC CHECKIDENT ('purchasing.purchase_order_header', RESEED, 0)
-GO
-DELETE FROM purchasing.vendor;
-DBCC CHECKIDENT ('purchasing.vendor', RESEED, 0)
-GO
-DELETE FROM hotel.facilities;
-DELETE FROM hr.employee;
+-- DELETE FROM purchasing.purchase_order_detail;
+-- DBCC CHECKIDENT ('purchasing.purchase_order_detail', RESEED, 0)
+-- GO
+-- DELETE FROM purchasing.stock_detail;
+-- DBCC CHECKIDENT ('purchasing.stock_detail', RESEED, 0)
+-- GO
+-- DELETE FROM purchasing.stock_photo;
+-- DBCC CHECKIDENT ('purchasing.stock_photo', RESEED, 0)
+-- GO
+-- DELETE FROM purchasing.stocks;
+-- DBCC CHECKIDENT ('purchasing.stocks', RESEED, 0)
+-- GO
+-- DELETE FROM purchasing.purchase_order_header;
+-- DBCC CHECKIDENT ('purchasing.purchase_order_header', RESEED, 0)
+-- GO
+-- DELETE FROM purchasing.vendor;
+-- DBCC CHECKIDENT ('purchasing.vendor', RESEED, 0)
+-- GO
+-- DELETE FROM hotel.facilities;
+-- DELETE FROM hr.employee;
 
 
-insert into hotel.facilities (faci_id) values (1),(2),(3),(4),(5);
-insert into hr.employee (emp_id) values (1),(2),(3),(4),(5);
+-- insert into hotel.facilities (faci_id) values (1),(2),(3),(4),(5);
+-- insert into hr.employee (emp_id) values (1),(2),(3),(4),(5);
 
 INSERT INTO purchasing.vendor (vendor_name, vendor_active, vendor_priority, vendor_register_date, vendor_weburl, vendor_modifier_date)
 VALUES ('Global Equipment Co.', 1, 0, '2022-01-01', 'www.globalequipment.com', '2022-01-02'),
@@ -39,16 +39,6 @@ VALUES ('Global Equipment Co.', 1, 0, '2022-01-01', 'www.globalequipment.com', '
        ('Advanced Materials Inc.', 1, 1, '2022-08-01', 'www.advancedmaterials.com', '2022-08-02'),
        ('Bright Ideas Inc.', 1, 0, '2022-09-01', 'www.brightideas.com', '2022-09-02'),
        ('Progressive Solutions Inc.', 0, 1, '2022-10-01', 'www.progressivesolutions.com', '2022-10-02');
--- delete from purchasing.vendor where vendor_id in (21,22,23,24,25);
-
--- INSERT INTO purchasing.vendor (vendor_name, vendor_active, vendor_priority, vendor_register_date, vendor_weburl, vendor_modifier_date)
--- VALUES
---   ('Vendor A', 1, 1, GETDATE(), 'https://vendor-a.com', GETDATE()),
---   ('Vendor B', 1, 0, GETDATE(), 'https://vendor-b.com', GETDATE()),
---   ('Vendor C', 1, 1, GETDATE(), 'https://vendor-c.com', GETDATE()),
---   ('Vendor D', 1, 0, GETDATE(), 'https://vendor-d.com', GETDATE()),
---   ('Vendor E', 1, 1, GETDATE(), 'https://vendor-e.com', GETDATE());
--- GO
 
 INSERT INTO purchasing.purchase_order_header (pohe_number, pohe_status, pohe_order_date, pohe_tax, pohe_refund, pohe_arrival_date, pohe_pay_type, pohe_emp_id, pohe_vendor_id)
 VALUES
@@ -102,7 +92,6 @@ VALUES
   ('thumbnail-4.jpg', 'photo-4.jpg', 1, 'https://stock-photos.com/thumbnail-4.jpg', 4),
   ('thumbnail-5.jpg', 'photo-5.jpg', 0, 'https://stock-photos.com/thumbnail-5.jpg', 5);
 
-  
 INSERT INTO purchasing.purchase_order_detail (pode_pohe_id, pode_order_qty, pode_price, pode_received_qty, pode_rejected_qty, pode_modified_date, pode_stock_id)
 VALUES
   (1, 10, 100000, 9, 1, GETDATE(), 1),

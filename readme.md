@@ -20,7 +20,6 @@
 - [x] stock_quantity: Kolom ini harus dihitung secara otomatis berdasarkan total stod_stocked_qty dimana stod_stock_id = stock_id
 - [x] stock_used: Kolom ini harus dihitung secara otomatis berdasarkan total item dengan stod_status = 4 (used)
 - [x] stock_scrap: Kolom ini harus dihitung secara otomatis berdasarkan total item dengan stod_status = 2 (expired) | 3 (broken)
-- [ ] 
 
 ### Computed
 - [x] pohe_total_amount: Kolom ini harus dihitung secara otomatis berdasarkan pohe_subtotal ditambah pohe_tax.

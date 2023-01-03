@@ -1,4 +1,4 @@
--- File insert 
+-- INSERT MASTER MODULE
 
 --REGION
 SET IDENTITY_INSERT Master.Regions ON;

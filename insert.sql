@@ -209,3 +209,155 @@ VALUES
   (5, 110, 600000, 107, 3, GETDATE(), 1),
   (5, 120, 650000, 117, 3, GETDATE(), 2),
   (5, 130, 700000, 127, 3, GETDATE(), 3);
+
+--- INSERT MODULE USERS
+-- Insert 15 rows into the users.users table
+INSERT INTO users.users (user_full_name, user_type, user_company_name, user_email, user_phone_number, user_modified_date)
+VALUES ('John Smith', 'T', 'Acme Inc.', 'john.smith@acme.com', '123-456-7890', GETDATE()),
+       ('Jane Doe', 'C', 'XYZ Corp.', 'jane.doe@xyz.com', '123-456-7891', GETDATE()),
+       ('Bob Johnson', 'I', 'ABC Inc.', 'bob.johnson@abc.com', '123-456-7892', GETDATE()),
+       ('Samantha Williams', 'T', 'Def Corp.', 'samantha.williams@def.com', '123-456-7893', GETDATE()),
+       ('Michael Brown', 'C', 'Ghi Inc.', 'michael.brown@ghi.com', '123-456-7894', GETDATE()),
+       ('Emily Davis', 'I', 'Jkl Ltd.', 'emily.davis@jkl.com', '123-456-7895', GETDATE()),
+       ('William Thompson', 'T', 'Mno Inc.', 'william.thompson@mno.com', '123-456-7896', GETDATE()),
+       ('Ashley Johnson', 'C', 'Pqr Corp.', 'ashley.johnson@pqr.com', '123-456-7897', GETDATE()),
+       ('David Anderson', 'I', 'Stu Inc.', 'david.anderson@stu.com', '123-456-7898', GETDATE()),
+       ('Jessica Smith', 'T', 'Vwx Corp.', 'jessica.smith@vwx.com', '123-456-7899', GETDATE()),
+	   ('David Brown', 'T', 'Example Co', 'david.brown@example.com', '555-555-1222', GETDATE()),
+	   ('Jessica Smith', 'C', 'Test Inc', 'jessica.smith@test.com', '555-555-1223', GETDATE()),
+	   ('James Johnson', 'I', 'Acme Inc', 'james.johnson@acme.com', '555-555-1224', GETDATE()),
+	   ('Samantha Williams', 'C', 'XYZ Corp', 'samantha.williams@xyz.com', '555-555-1225', GETDATE()),
+	   ('Robert Davis', 'T', 'Example Co', 'robert.davis@example.com', '555-555-1226', GETDATE());
+
+-- Insert 4 rows into the master.members table
+INSERT INTO master.members (memb_name)
+VALUES ('Silver'),
+       ('Gold'),
+       ('VIP'),
+       ('Wizard')
+
+-- Insert 15 rows into the users.user_members table
+INSERT INTO users.user_members (usme_user_id, usme_memb_name, usme_promote_date, usme_points, usme_type)
+VALUES (1, 'Silver', '2022-01-01', 100, 'Active'),
+       (2, 'Gold', '2022-02-01', 200, 'Active'),
+       (3, 'VIP', '2022-03-01', 300, 'Active'),
+       (4, 'Wizard', '2022-04-01', 400, 'Active'),
+       (5, 'Silver', '2022-05-01', 500, 'Active'),
+       (6, 'Gold', '2022-06-01', 600, 'Active'),
+       (7, 'VIP', '2022-07-01', 700, 'Active'),
+       (8, 'Wizard', '2022-08-01', 800, 'Active'),
+       (9, 'Silver', '2022-09-01', 900, 'Active'),
+       (10, 'Gold', '2022-10-01', 1000, 'Active'),
+	   (11, 'Silver', '2022-11-01', 1000, 'Expired'),
+	   (12, 'Gold', '2022-12-01', 1000, 'Expired'),
+	   (13, 'VIP', '2022-01-01', 1000, 'Expired'),
+	   (14, 'Wizard', '2022-02-01', 1000, 'Expired'),
+	   (15, 'Gold', '2022-03-01', 1000, 'Expired');
+
+-- Insert 5 rows into the users.roles table
+SET IDENTITY_INSERT users.roles ON;
+
+INSERT INTO users.roles (role_id, role_name)
+VALUES 
+(1, 'Guest'),
+(2, 'Manager'),
+(3, 'OfficeBoy'),
+(4, 'Admin'),
+(5, 'User')
+
+SET IDENTITY_INSERT users.roles OFF;
+
+-- Insert 15 rows into the users.user_roles table
+INSERT INTO users.user_roles (usro_user_id, usro_role_id)
+VALUES 
+(1, 1),
+(2, 2),
+(3, 3),
+(4, 4),
+(5, 5),
+(6, 1),
+(7, 2),
+(8, 3),
+(9, 4),
+(10, 5),
+(11, 1),
+(12, 2),
+(13, 3),
+(14, 4),
+(15, 5);
+
+-- Insert 15 dummy rows into the master.address table
+SET IDENTITY_INSERT master.address ON;
+
+INSERT INTO master.address (addr_id)
+VALUES (1), (2), (3), (4), (5), (6), (7), (8), (9), (10), (11), (12), (13), (14), (15);
+
+SET IDENTITY_INSERT master.address OFF;
+
+-- Insert 15 dummy rows into the users.user_profiles table
+SET IDENTITY_INSERT users.user_profiles ON;
+
+INSERT INTO users.user_profiles (uspro_id, uspro_national_id, uspro_birth_date, uspro_job_title, uspro_marital_status, uspro_gender, uspro_addr_id, uspro_user_id)
+VALUES (1, '123-45-6789', '1980-01-01', 'Manager', 'S', 'M', 1, 1),
+       (2, '234-56-7890', '1985-02-02', 'Developer', 'M', 'F', 2, 2),
+       (3, '345-67-8901', '1990-03-03', 'Designer', 'S', 'M', 3, 3),
+       (4, '456-78-9012', '1995-04-04', 'Tester', 'M', 'F', 4, 4),
+       (5, '567-89-0123', '2000-05-05', 'Analyst', 'S', 'M', 5, 5),
+       (6, '678-90-1234', '2005-06-06', 'Consultant', 'M', 'F', 6, 6),
+       (7, '789-01-2345', '2010-07-07', 'Salesperson', 'S', 'M', 7, 7),
+       (8, '890-12-3456', '2015-08-08', 'HR Manager', 'M', 'F', 8, 8),
+       (9, '901-23-4567', '2020-09-09', 'Project Manager', 'S', 'M', 9, 9),
+       (10, '012-34-5678', '2025-10-10', 'Marketing Manager', 'M', 'F', 10, 10),
+	   (11, '123-45-6789', '1985-01-01', 'Engineer', 'S', 'M', 11, 11),
+	   (12, '234-56-7890', '1990-01-01', 'Designer', 'S', 'F', 12, 12),
+	   (13, '345-67-8901', '1995-01-01', 'Journalist', 'S', 'M', 13, 13),
+	   (14, '456-78-9012', '1980-01-01', 'Teacher', 'M', 'F', 14, 14),
+	   (15, '567-89-0123', '1985-01-01', 'Writer', 'S', 'M', 15, 15);
+
+SET IDENTITY_INSERT users.user_profiles OFF;
+
+-- Insert 15 dummy rows into the users.user_password table
+SET IDENTITY_INSERT users.user_password ON;
+
+INSERT INTO users.user_password (uspa_user_id, uspa_passwordHash, uspa_passwordSalt)
+VALUES
+(1, '123456', 'abcdef'),
+(2, 'password', 'ghijkl'),
+(3, 'qwerty', 'mnopqr'),
+(4, 'letmein', 'stuvwx'),
+(5, 'trustno1', 'yzabcd'),
+(6, 'sunshine', 'efghij'),
+(7, 'iloveyou', 'klmnop'),
+(8, 'monkey', 'qrstuv'),
+(9, 'starwars', 'wxyzab'),
+(10, 'master', 'cdefgh'),
+(11, 'abc123', 'ijklmn'),
+(12, '123abc', 'opqrst'),
+(13, 'welcome', 'uvwxyz'),
+(14, 'monkey1', 'abcdefg'),
+(15, 'password1', 'hijklmn');
+
+
+SET IDENTITY_INSERT users.user_password OFF;
+
+-- Insert 15 dummy rows into the users.bonus_points table
+SET IDENTITY_INSERT users.bonus_points ON;
+
+INSERT INTO users.bonus_points (ubpo_id, ubpo_user_id, ubpo_total_points, ubpo_bonus_type, ubpo_created_on)
+VALUES (1, 1, 1000, 'R', '2022-01-01'),
+       (2, 2, 2000, 'P', '2022-02-02'),
+       (3, 3, 3000, 'P', '2022-03-03'),
+       (4, 4, 4000, 'R', '2022-04-04'),
+       (5, 5, 5000, 'P', '2022-05-05'),
+       (6, 6, 6000, 'P', '2022-06-06'),
+       (7, 7, 7000, 'R', '2022-07-07'),
+       (8, 8, 8000, 'P', '2022-08-08'),
+       (9, 9, 9000, 'P', '2022-09-09'),
+       (10, 10, 10000, 'R', '2022-10-10'),
+	   (11, 11, 10000, 'P', '2022-11-11'),
+	   (12, 12, 10000, 'R', '2022-12-12'),
+	   (13, 13, 10000, 'P', '2022-01-01'),
+	   (14, 14, 10000, 'R', '2022-02-02'),
+	   (15, 15, 10000, 'P', '2022-03-03');
+
+SET IDENTITY_INSERT users.bonus_points OFF;

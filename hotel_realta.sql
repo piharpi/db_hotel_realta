@@ -77,7 +77,7 @@ CREATE TABLE Master.address (
 
 CREATE TABLE Master.category_group (
   cagro_id int IDENTITY(1, 1),
-  cagro_name nvarchar(25) UNIQUE NOT NULL CHECK (cagro_name IN ('Room', 'Restaurant', 'Meeting Room', 'Gym', 'Aula', 'Swimming Pool', '')),
+  cagro_name nvarchar(25) UNIQUE NOT NULL,
   cagro_description nvarchar(255),
   cagro_type nvarchar(25) NOT NULL CHECK (cagro_type IN('category', 'service', 'facility')),
   cagro_icon nvarchar(255),

@@ -60,7 +60,7 @@ VALUES ('MENUS#2022-01-01-00001', '2022-01-01', 2, 0, 40000, 'CA', NULL, 'P', GE
 
 --resto order menu detail
 
-Berikut adalah contoh isian data dummy untuk tabel order_menu_detail:
+-- Berikut adalah contoh isian data dummy untuk tabel order_menu_detail:
 
 INSERT INTO resto.order_menu_detail (orme_price, orme_qty, orme_subtotal, orme_discount, omde_orme_id, omde_reme_id)
 VALUES

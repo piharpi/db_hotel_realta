@@ -50,47 +50,41 @@ VALUES
     (2, 'Cap Cay', 'Cap cay dengan bahan dasar sayuran yang dicampur dengan daging sapi dan kuah kaldu', 20000, 'Available', GETDATE());
 
 --resto.order_menu
-INSERT INTO resto.order_menus (orme_order_number, orme_order_date, orme_total_item, orme_total_discount, orme_total_amount, orme_pay_type, orme_cardnumber, orme_is_paid, orme_modified_date)
-VALUES 
-    ('INV001', GETDATE(), 2, 0, 30000, 'C', NULL, 'P', GETDATE()),
-    ('INV002', GETDATE(), 3, 5000, 45000, 'PG', NULL, 'P', GETDATE()),
-    ('INV003', GETDATE(), 1, 0, 15000, 'CR', '4111-1111-1111-1111', 'P', GETDATE()),
-    ('INV004', GETDATE(), 4, 10000, 60000, 'D', '5111-1111-1111-1111', 'P', GETDATE()),
-    ('INV005', GETDATE(), 3, 8000, 42000, 'BO', NULL, 'P', GETDATE()),
-    ('INV006', GETDATE(), 2, 4000, 30000, 'C', NULL, 'P', GETDATE()),
-    ('INV007', GETDATE(), 1, 0, 15000, 'CR', '4111-1111-1111-1111', 'P', GETDATE()),
-    ('INV008', GETDATE(), 3, 9000, 45000, 'PG', NULL, 'P', GETDATE()),
-    ('INV009', GETDATE(), 2, 2000, 30000, 'D', '5111-1111-1111-1111', 'P', GETDATE());
-
-SELECT * FROM resto.order_menu_detail;
+INSERT INTO resto.order_menus (orme_order_number, orme_order_date, orme_total_item, orme_total_discount, orme_total_amount, orme_pay_type, orme_cardnumber, orme_is_paid, orme_modified_date, orme_user_id)
+VALUES ('MENUS#2022-01-01-00001', '2022-01-01', 2, 0, 40000, 'CA', NULL, 'P', GETDATE(), 1),
+('MENUS#2022-01-01-00002', '2022-01-01', 3, 5000, 75000, 'CR', '1234567890123456', 'P', GETDATE(), 2),
+('MENUS#2022-01-01-00003', '2022-01-01', 4, 0, 80000, 'D', '9876543210987654', 'B', GETDATE(), 3),
+('MENUS#2022-01-01-00004', '2022-01-01', 5, 0, 100000, 'CA', NULL, 'P', GETDATE(), 4),
+('MENUS#2022-01-01-00005', '2022-01-01', 6, 0, 120000, 'CR', '1234567890123456', 'P', GETDATE(), 5),
+('MENUS#2022-01-01-00006', '2022-01-01', 7, 0, 140000, 'D', '9876543210987654', 'B', GETDATE(), 6);
 
 --resto order menu detail
 
-INSERT INTO resto.order_menu_detail (orme_price, orme_qty, orme_subtotal, orme_discount)
-VALUES 
-    (15000, 2, 30000, 0),
-    (20000, 1, 20000, 0),
-    (25000, 2, 50000, 0),
-    (15000, 3, 45000, 0),
-    (20000, 2, 40000, 0),
-    (25000, 1, 25000, 0),
-    (15000, 1, 15000, 0),
-    (20000, 2, 40000, 0),
-    (25000, 3, 75000, 0),
-    (20000, 1, 20000, 0);
+Berikut adalah contoh isian data dummy untuk tabel order_menu_detail:
 
+INSERT INTO resto.order_menu_detail (orme_price, orme_qty, orme_subtotal, orme_discount, omde_orme_id, omde_reme_id)
+VALUES
+(10000, 2, 20000, 0, 1, 1),
+(12000, 3, 36000, 0, 1, 2),
+(15000, 2, 30000, 0, 2, 3),
+(20000, 4, 80000, 0, 2, 4),
+(10000, 3, 30000, 0, 3, 5),
+(15000, 1, 15000, 0, 3, 6),
+(20000, 3, 60000, 0, 4, 7),
+(12000, 2, 24000, 0, 4, 8),
+(10000, 4, 40000, 0, 5, 9),
+(15000, 2, 30000, 0, 5, 10);
 
 --resto photos
 
-INSERT INTO resto.resto_menu_photos (remp_thumbnial_filname, remp_photo_filename, remp_primary, remp_url)
-VALUES 
-    ('mie-ayam.jpg', 'mie-ayam-large.jpg', 1, 'https://www.example.com/mie-ayam.jpg'),
-    ('nasi-goreng.jpg', 'nasi-goreng-large.jpg', 1, 'https://www.example.com/nasi-goreng.jpg'),
-    ('soto-ayam.jpg', 'soto-ayam-large.jpg', 1, 'https://www.example.com/soto-ayam.jpg'),
-    ('ayam-goreng.jpg', 'ayam-goreng-large.jpg', 0, 'https://www.example.com/ayam-goreng.jpg'),
-    ('sate-ayam.jpg', 'sate-ayam-large.jpg', 0, 'https://www.example.com/sate-ayam.jpg'),
-    ('kare-ayam.jpg', 'kare-ayam-large.jpg', 0, 'https://www.example.com/kare-ayam.jpg'),
-    ('sushi.jpg', 'sushi-large.jpg', 1, 'https://www.example.com/sushi.jpg'),
-    ('udon.jpg', 'udon-large.jpg', 0, 'https://www.example.com/udon.jpg'),
-    ('ramen.jpg', 'ramen-large.jpg', 0, 'https://www.example.com/ramen.jpg'),
-    ('gyudon.jpg', 'gyudon-large.jpg', 1, 'https://www.example.com/gyudon.jpg');
+INSERT INTO resto.resto_menu_photos (remp_thumbnail_filename, remp_photo_filename, remp_primary, remp_url, remp_reme_id)
+VALUES ('thumbnail1.jpg', 'photo1.jpg', 1, 'http://localhost/resto/menu/photo1.jpg', 1),
+('thumbnail2.jpg', 'photo2.jpg', 0, 'http://localhost/resto/menu/photo2.jpg', 1),
+('thumbnail3.jpg', 'photo3.jpg', 0, 'http://localhost/resto/menu/photo3.jpg', 1),
+('thumbnail4.jpg', 'photo4.jpg', 1, 'http://localhost/resto/menu/photo4.jpg', 2),
+('thumbnail5.jpg', 'photo5.jpg', 0, 'http://localhost/resto/menu/photo5.jpg', 2),
+('thumbnail6.jpg', 'photo6.jpg', 0, 'http://localhost/resto/menu/photo6.jpg', 2),
+('thumbnail7.jpg', 'photo7.jpg', 1, 'http://localhost/resto/menu/photo7.jpg', 3),
+('thumbnail8.jpg', 'photo8.jpg', 0, 'http://localhost/resto/menu/photo8.jpg', 3),
+('thumbnail9.jpg', 'photo9.jpg', 0, 'http://localhost/resto/menu/photo9.jpg', 3),
+('thumbnail10.jpg', 'photo10.jpg', 1, 'http://localhost/resto/menu/photo10.jpg', 4);

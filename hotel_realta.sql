@@ -502,3 +502,23 @@ create table Booking.user_breakfast
     CONSTRAINT pk_usbr_borde_id_usbr_modified_date PRIMARY KEY(usbr_borde_id,usbr_modified_date),
     CONSTRAINT fk_usbr_borde_id FOREIGN KEY(usbr_borde_id) REFERENCES Booking.booking_order_detail(borde_id) ON DELETE CASCADE ON UPDATE CASCADE
 )
+ALTER TABLE Booking.booking_orders
+ALTER COLUMN boor_discount DECIMAL;
+
+ALTER TABLE Booking.booking_order_detail
+ALTER COLUMN borde_discount DECIMAL;
+
+ALTER TABLE Booking.special_offers
+ALTER COLUMN spof_discount DECIMAL;
+
+ALTER TABLE Booking.booking_orders
+ALTER COLUMN boor_total_tax DECIMAL;
+
+ALTER TABLE Booking.booking_order_detail
+ALTER COLUMN borde_tax DECIMAL;
+
+ALTER TABLE Booking.booking_orders
+ALTER COLUMN boor_total_tax DECIMAL;
+
+ALTER TABLE Booking.booking_order_detail
+ALTER COLUMN borde_tax DECIMAL;

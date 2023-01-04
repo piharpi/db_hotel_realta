@@ -1,15 +1,15 @@
 -- File insert 
 SET IDENTITY_INSERT Booking.special_offers ON
 INSERT INTO Booking.special_offers (spof_id, spof_name, spof_description, spof_type, spof_discount, spof_start_date, spof_end_date, spof_min_qty, spof_max_qty, spof_modified_date)
-VALUES (1, 'Winter Sale', 'Get 20% off your stay when you book a room during the winter months', 'T', 20, '2022-12-01', '2022-03-31', 1, NULL, '2022-11-27'),
-       (2, 'Weekend Getaway Deal', 'Stay two nights on the weekend and get the third night free', 'C', 100, '2022-12-01', '2022-03-31', 3, NULL, '2022-11-27'),
-       (3, 'Early Bird Special', 'Book at least 30 days in advance and save 15% on your stay', 'I', 15, '2022-12-01', '2022-03-31', 1, NULL, '2022-11-27'),
-       (4, 'Family Fun Package', 'Book a family room and get free breakfast for the kids', 'T', 0, '2022-12-01', '2022-03-31', 4, NULL, '2022-11-27'),
-       (5, 'Romance Package', 'Book a romantic getaway for two and get a bottle of champagne upon arrival', 'C', 0, '2022-12-01', '2022-03-31', 2, NULL, '2022-11-27'),
-       (6, 'Last Minute Deal', 'Book within 48 hours of arrival and save 20% on your stay', 'I', 20, '2022-12-01', '2022-03-31', 1, NULL, '2022-11-27'),
-       (7, 'AAA/CAA Discount', 'Show your AAA or CAA membership card and get 10% off your stay', 'T', 10, '2022-12-01', '2022-03-31', 1, NULL, '2022-11-27'),
-       (8, 'Senior Discount', 'Guests 65 and over receive 10% off their stay', 'C', 10, '2022-12-01', '2022-03-31', 1, NULL, '2022-11-27'),
-       (9, 'Military Discount', 'Active duty military personnel receive 15% off their stay', 'I', 15, '2022-12-01', '2022-03-31', 1, NULL, '2022-11-27')
+VALUES (1, 'Winter Sale', 'Get 20% off your stay when you book a room during the winter months', 'T', 0.2, '2022-12-01', '2023-03-31', 1, 3, GETDATE()),
+       (2, 'Weekend Getaway Deal', 'Stay two nights on the weekend and get 20% for the next night', 'C', 0.2 , '2022-12-01', '2023-03-31', 3, 5, GETDATE()),
+       (3, 'Early Bird Special', 'Book at least 30 days in advance and save 15% on your stay', 'I', 0.15, '2022-12-01', '2023-03-31', 1, 2, GETDATE()),
+       (4, 'Family Fun Package', 'Book a family room and get free breakfast for the kids', 'T', 0, '2022-12-01', '2023-03-31', 4, 6, GETDATE()),
+       (5, 'Romance Package', 'Book a romantic getaway for two and get a bottle of champagne upon arrival', 'C', 0, '2022-12-01', '2023-03-31', 2, 5, GETDATE()),
+       (6, 'Last Minute Deal', 'Book within 48 hours of arrival and save 20% on your stay', 'I', 0.2, '2022-12-01', '2023-03-31', 1, 3, GETDATE()),
+       (7, 'AAA/CAA Discount', 'Show your AAA or CAA membership card and get 10% off your stay', 'T', 0.2 , '2022-12-01', '2023-03-31', 1, 3, GETDATE()),
+       (8, 'Senior Discount', 'Guests 65 and over receive 10% off their stay', 'C', 0.1, '2022-12-01', '2022-03-31', 1, 3, GETDATE()),
+       (9, 'Military Discount', 'Active duty military personnel receive 15% off their stay', 'I', 0.15, '2022-12-01', '2023-03-31', 1, 3, '2022-11-27')
 SET IDENTITY_INSERT Booking.special_offers OFF
 SELECT*FROM Booking.special_offers
 

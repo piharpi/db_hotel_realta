@@ -237,21 +237,25 @@ CREATE TABLE Hotel.hotel_reviews (
 
 IF OBJECT_ID('Hotel.facilities', 'U') IS NOT NULL DROP TABLE Hotel.facilities
 CREATE TABLE Hotel.facilities (
-  faci_id int IDENTITY(1, 1) NOT NULL CONSTRAINT pk_faci_id PRIMARY KEY,
+  faci_id INT IDENTITY(1, 1) NOT NULL CONSTRAINT pk_faci_id PRIMARY KEY,
+  -- primary key column
+  faci_name nvarchar(125) NOT NULL,
   faci_description nvarchar(255) NULL,
-  faci_max_number int NULL,
-  faci_measure_unit varchar(15) NULL CHECK(faci_measure_unit IN('People', 'Beds')),
+  faci_max_number INT NULL,
+  faci_measure_unit VARCHAR(15) NULL CHECK(faci_measure_unit IN('People', 'Beds')),
   faci_room_number nvarchar(6) NOT NULL,
-  faci_startdate datetime NOT NULL,
-  faci_endate datetime NOT NULL,
-  faci_low_price money NOT NULL,
-  faci_high_price money NOT NULL,
-  faci_rate_price money NOT NULL,
-  faci_discount smallint NULL,
-  faci_tax_rate smallint NULL,
-  faci_modified_date datetime NULL,
-  faci_cagro_id int NOT NULL,
-  faci_hotel_id int NOT NULL,
+  faci_startdate DATETIME NOT NULL,
+  faci_endate DATETIME NOT NULL,
+  faci_low_price MONEY NOT NULL,
+  faci_high_price MONEY NOT NULL,
+  faci_rate_price MONEY NOT NULL,
+  faci_discount SMALLMONEY NULL,
+  faci_tax_rate SMALLMONEY NULL,
+  faci_modified_date DATETIME NULL,
+  --FOREIGN KEY
+  faci_cagro_id INTEGER NOT NULL,
+  faci_hotel_id INT NOT NULL,
+  -- UNIQUE ID
   CONSTRAINT uq_faci_room_number UNIQUE (faci_room_number),
   CONSTRAINT fk_faci_cagro_id FOREIGN KEY (faci_cagro_id) REFERENCES Master.category_group(cagro_id) 
     ON DELETE CASCADE 

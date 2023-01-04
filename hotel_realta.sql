@@ -341,7 +341,7 @@ create table hr.employee (
 	constraint pk_emp_id primary key (emp_id),
 	constraint uq_emp_national_id unique (emp_national_id),
 	constraint fk_emp_joro_id foreign key (emp_joro_id) references hr.job_role(joro_id) ON DELETE CASCADE ON UPDATE CASCADE,
-	constraint fk_emp_id foreign key (emp_emp_id) references hr.employee(emp_id) ON DELETE CASCADE ON UPDATE CASCADE
+	constraint fk_emp_id foreign key (emp_emp_id) references hr.employee(emp_id)
 );
 
 create table hr.employee_pay_history (
@@ -404,5 +404,5 @@ create table hr.work_order_detail (
 	constraint fk_wode_woro_id foreign key(wode_woro_id) references hr.work_orders(woro_id) ON DELETE CASCADE ON UPDATE CASCADE,
 	constraint fk_wode_emp_id foreign key(wode_emp_id) references hr.employee(emp_id) ON DELETE CASCADE ON UPDATE CASCADE, -- comment alter
 	constraint fk_wode_seta_id foreign key(wode_seta_id) references master.service_task(seta_id) ON DELETE CASCADE ON UPDATE CASCADE, -- comment alter
-	constraint fk_faci_id foreign key(wode_faci_id) references hotel.facilites(faci_id) ON DELETE CASCADE ON UPDATE CASCADE-- comment alter
+	constraint fk_faci_id foreign key(wode_faci_id) references Hotel.facilities(faci_id) ON DELETE CASCADE ON UPDATE CASCADE-- comment alter
 );

@@ -400,7 +400,7 @@ CREATE TABLE Booking.booking_orders(
 	boor_total_room smallint,
 	boor_total_guest smallint,
 	boor_discount decimal(5,2),
-	boor_total_tax decimal(5,2),
+	boor_total_tax decimal(5,2) DEFAULT 0.11,
 	boor_total_ammount money,
 	boor_down_payment money,
 	boor_pay_type nchar(2) NOT NULL,
@@ -421,8 +421,7 @@ CREATE TABLE Booking.booking_orders(
     ON UPDATE CASCADE,
   CONSTRAINT chk_boor_cardnumber CHECK (
     (boor_pay_type IN ('CR', 'PG') AND boor_cardnumber IS NOT NULL) OR
-    (boor_pay_type IN ('C', 'D') AND boor_cardnumber IS NULL)),
-  CONSTRAINT boor_default_tot_tax DEFAULT 0.11 FOR boor_total_tax
+    (boor_pay_type IN ('C', 'D') AND boor_cardnumber IS NULL))
 );
 
 CREATE TABLE Booking.booking_order_detail(
@@ -435,15 +434,14 @@ CREATE TABLE Booking.booking_order_detail(
 	borde_price money,
 	borde_extra money,
 	borde_discount decimal(5,2),
-	borde_tax decimal(5,2),
+	borde_tax decimal(5,2) DEFAULT 0.11,
 	borde_subtotal money,
 	borde_faci_id integer,
 	CONSTRAINT pk_borde_id_boor_id PRIMARY KEY (borde_id, borde_boor_id),
 	CONSTRAINT fk_border_boor_id FOREIGN KEY(borde_boor_id)	REFERENCES Booking.booking_orders(boor_id),
 	CONSTRAINT fk_borde_faci_id FOREIGN KEY(borde_faci_id) REFERENCES Hotel.facilities(faci_id) 
 		ON DELETE CASCADE 
-    ON UPDATE CASCADE,
-  CONSTRAINT borde_default_tax DEFAULT 0.11 FOR borde_tax
+    ON UPDATE CASCADE
 );
 
 CREATE TABLE Booking.booking_order_detail_extra(

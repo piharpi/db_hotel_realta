@@ -85,6 +85,24 @@ CREATE TABLE Master.category_group (
   CONSTRAINT pk_cagro_id PRIMARY KEY(cagro_id)
 );
 
+CREATE TABLE Master.policy (
+  poli_id int IDENTITY(1, 1),
+  poli_name nvarchar(55) NOT NULL,
+  poli_description nvarchar(255),
+  CONSTRAINT pk_poli_id PRIMARY KEY(poli_id)
+);
+
+CREATE TABLE Master.policy_category_group (
+  poca_poli_id int NOT NULL,
+  poca_cagro_id int NOT NULL,
+  CONSTRAINT fk_poca_poli_id FOREIGN KEY(poca_poli_id) REFERENCES Master.policy(poli_id) 
+    ON DELETE CASCADE 
+    ON UPDATE CASCADE,
+  CONSTRAINT fk_poca_cagro_id FOREIGN KEY(poca_cagro_id) REFERENCES Master.category_group(cagro_id) 
+    ON DELETE CASCADE 
+    ON UPDATE CASCADE
+);
+
 CREATE TABLE Master.price_item (
   prit_id int IDENTITY(1, 1),
   prit_name nvarchar(55) UNIQUE NOT NULL,

@@ -329,7 +329,7 @@ CREATE TABLE HR.employee (
 	emp_joro_id int NOT NULL,
 	CONSTRAINT pk_emp_id PRIMARY KEY (emp_id),
 	CONSTRAINT uq_emp_national_id UNIQUE (emp_national_id),
-	CONSTRAINT fk_emp_joro_id FOREIGN KEY (emp_joro_id) REFERENCES HR.job_role(joro_id),
+	CONSTRAINT fk_emp_joro_id FOREIGN KEY (emp_joro_id) REFERENCES HR.job_role(joro_id) ON DELETE CASCADE ON UPDATE CASCADE,
 	CONSTRAINT fk_emp_id FOREIGN KEY (emp_emp_id) REFERENCES hr.employee(emp_id)
 );
 
@@ -340,7 +340,7 @@ CREATE TABLE HR.employee_pay_history (
 	ephi_pay_frequence int,
 	ephi_modified_date datetime,
 	CONSTRAINT pk_ephi_emp_id_ephi_rate_change_date PRIMARY KEY(ephi_emp_id, ephi_rate_change_date),
-	CONSTRAINT fk_ephi_emp_id FOREIGN KEY(ephi_emp_id) REFERENCES HR.employee(emp_id)
+	CONSTRAINT fk_ephi_emp_id FOREIGN KEY(ephi_emp_id) REFERENCES HR.employee(emp_id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 CREATE TABLE HR.shift(
@@ -363,9 +363,9 @@ CREATE TABLE HR.employee_department_history (
 	edhi_dept_id int NOT NULL,
 	edhi_shift_id int NOT NULL,
 	CONSTRAINT pk_edhi_id_edhi_emp_id PRIMARY KEY (edhi_id, edhi_emp_id),
-	CONSTRAINT fk_edhi_emp_id FOREIGN KEY(edhi_emp_id) REFERENCES HR.employee(emp_id),
-	CONSTRAINT fk_shift_id FOREIGN KEY (edhi_shift_id) REFERENCES HR.shift(shift_id),
-	CONSTRAINT fk_edhi_dept_id FOREIGN KEY (edhi_dept_id) REFERENCES HR.department(dept_id)
+	CONSTRAINT fk_edhi_emp_id FOREIGN KEY(edhi_emp_id) REFERENCES HR.employee(emp_id) ON DELETE CASCADE ON UPDATE CASCADE,
+	CONSTRAINT fk_shift_id FOREIGN KEY (edhi_shift_id) REFERENCES HR.shift(shift_id) ON DELETE CASCADE ON UPDATE CASCADE,
+	CONSTRAINT fk_edhi_dept_id FOREIGN KEY (edhi_dept_id) REFERENCES HR.department(dept_id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 CREATE TABLE HR.work_orders (
@@ -573,7 +573,7 @@ CREATE TABLE Payment.bank(
 	bank_modified_date datetime
 	CONSTRAINT PK_PaymentBankEntityId PRIMARY KEY(bank_entity_id),
 	CONSTRAINT FK_PaymentBankEntityId FOREIGN KEY(bank_entity_id) 
-		REFERENCES Payment.entity (entity_id) 
+		REFERENCES Payment.Entity (entity_id) 
 		ON UPDATE CASCADE 
 		ON DELETE CASCADE
 );
@@ -585,7 +585,7 @@ CREATE TABLE Payment.payment_gateway(
 	paga_modified_date datetime,
 	CONSTRAINT PK_PaymentGatewayEntityId PRIMARY KEY(paga_entity_id),
 	CONSTRAINT FK_PaymentGatewayEntityId FOREIGN KEY(paga_entity_id)
-		REFERENCES Payment.entity (entity_id)
+		REFERENCES Payment.Entity (entity_id)
 		ON UPDATE CASCADE
 		ON DELETE CASCADE
 );
@@ -593,30 +593,26 @@ CREATE TABLE Payment.payment_gateway(
 CREATE TABLE Payment.user_accounts(
 	usac_entity_id int NOT NULL,
 	usac_user_id int NOT NULL,
-	usac_account_number VARCHAR(25) UNIQUE NOT NULL,
+	usac_account_number varchar(25) UNIQUE NOT NULL,
 	usac_saldo money,
 	usac_type nvarchar(15),
-	usac_expmonth TINYINT,
+	usac_expmonth tinyint,
 	usac_expyear smallint,
 	usac_modified_date datetime,
 	CONSTRAINT CK_PaymentUserAccountsType CHECK (usac_type IN ('debet', 'credit card', 'payment')),
 	CONSTRAINT PK_PaymentUserAccountsEntityId PRIMARY KEY(usac_entity_id, usac_user_id),
-	CONSTRAINT FK_PaymentUserAccountsEntityBank FOREIGN KEY(usac_entity_id) 
-		REFERENCES Payment.bank (bank_entity_id)
+	CONSTRAINT FK_PaymentUserAccountsEntityPaymentGateway_Bank FOREIGN KEY(usac_entity_id) 
+		REFERENCES Payment.Entity(entity_id)
 		ON UPDATE CASCADE
 		ON DELETE CASCADE,
-	CONSTRAINT FK_PaymentUserAccountsEntityPayment FOREIGN KEY(usac_entity_id)
-		REFERENCES Payment.payment_gateway(paga_entity_id)
-		ON UPDATE NO ACTION
-		ON DELETE NO ACTION,
 	CONSTRAINT FK_PaymentUserAccountsUserId FOREIGN KEY(usac_user_id)
-		REFERENCES Users.users(user_id)
+		REFERENCES Users.Users (user_id)
 		ON UPDATE CASCADE
 		ON DELETE CASCADE
 );
 
 CREATE TABLE Payment.payment_transaction(
-	patr_id int IDENTITY(1,1) PRIMARY KEY,
+  patr_id int IDENTITY(1,1) PRIMARY KEY,
 	patr_trx_number nvarchar(55) UNIQUE,
 	patr_debet money,
 	patr_credit money,
@@ -630,23 +626,15 @@ CREATE TABLE Payment.payment_transaction(
 	patr_user_id int,
 	CONSTRAINT CK_PaymentPaymentTransactionType CHECK (patr_type IN ('TP', 'TRB', 'RPY', 'RF', 'ORM')),
 	CONSTRAINT FK_PaymentPaymentTransactionUserId FOREIGN KEY (patr_user_id)
-		REFERENCES Users.users (user_id)
+		REFERENCES Users.Users (user_id)
 		ON UPDATE CASCADE
 		ON DELETE CASCADE,
 	CONSTRAINT FK_PaymentPaymentTransactionSourceId FOREIGN KEY (patr_source_id)
-		REFERENCES Payment.bank(bank_entity_id)
+		REFERENCES Payment.Bank(bank_entity_id)
 		ON UPDATE CASCADE
 		ON DELETE CASCADE,
 	CONSTRAINT FK_PaymentPaymentTransactionTargetId FOREIGN KEY (patr_target_id)
-		REFERENCES Payment.bank(bank_entity_id)
-		ON UPDATE NO ACTION
-		ON DELETE NO ACTION,
-	CONSTRAINT FK_PaymentPaymentBookingOrdersId FOREIGN KEY (patr_order_number)
-		REFERENCES Booking.booking_orders(boor_order_number)
-		ON UPDATE NO ACTION
-		ON DELETE NO ACTION,
-	CONSTRAINT FK_PaymentPaymentRestoOrderMenus FOREIGN KEY (patr_order_number)
-		REFERENCES Resto.order_menus(orme_order_number)
+		REFERENCES Payment.Bank(bank_entity_id)
 		ON UPDATE NO ACTION
 		ON DELETE NO ACTION
 );
@@ -695,7 +683,7 @@ CREATE TABLE Purchasing.vendor(
 CREATE TABLE Purchasing.purchase_order_header(
     pohe_id int IDENTITY(1,1) NOT NULL,
     pohe_number nvarchar(20),
-    pohe_status TINYINT DEFAULT 1 CHECK (pohe_status IN(1, 2, 3, 4)),
+    pohe_status tinyint DEFAULT 1 CHECK (pohe_status IN(1, 2, 3, 4)),
     pohe_order_date datetime,
     pohe_subtotal money,
     pohe_tax money,

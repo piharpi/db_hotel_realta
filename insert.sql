@@ -9,30 +9,30 @@ VALUES (1, 'Winter Sale', 'Get 20% off your stay when you book a room during the
        (6, 'Last Minute Deal', 'Book within 48 hours of arrival and save 20% on your stay', 'I', 0.2, '2022-12-01', '2023-03-31', 1, 3, GETDATE()),
        (7, 'AAA/CAA Discount', 'Show your AAA or CAA membership card and get 10% off your stay', 'T', 0.2 , '2022-12-01', '2023-03-31', 1, 3, GETDATE()),
        (8, 'Senior Discount', 'Guests 65 and over receive 10% off their stay', 'C', 0.1, '2022-12-01', '2022-03-31', 1, 3, GETDATE()),
-       (9, 'Military Discount', 'Active duty military personnel receive 15% off their stay', 'I', 0.15, '2022-12-01', '2023-03-31', 1, 3, 'GETDATE()')
+       (9, 'Military Discount', 'Active duty military personnel receive 15% off their stay', 'I', 0.15, '2022-12-01', '2023-03-31', 1, 3, GETDATE())
 SET IDENTITY_INSERT Booking.special_offers OFF
 SELECT*FROM Booking.special_offers
 
 
 SET IDENTITY_INSERT Booking.booking_orders ON
-INSERT INTO Booking.booking_orders (boor_id, boor_order_number, boor_order_date, boor_pay_type, boor_is_paid, boor_type, boor_user_id, boor_hotel_id)
-VALUES (1, 'BO#20221127-0001', '2022-11-27', 'CR', 'DP', 'T', 1, 1),
-       (2, 'BO#20221127-0002', '2022-11-27', 'C', 'P', 'C', 2, 2),
-       (3, 'BO#20221127-0003', '2022-11-27', 'D', 'R', 'I', 3, 3),
-       (4, 'BO#20221127-0004', '2022-11-27', 'PG', 'DP', 'T', 4, 4),
-       (5, 'BO#20221127-0005', '2022-11-27', 'CR', 'P', 'C', 5, 5),
-       (6, 'BO#20221127-0006', '2022-11-27', 'C', 'R', 'I', 6, 6),
-       (7, 'BO#20221127-0007', '2022-11-27', 'D', 'DP', 'T', 7, 7),
-       (8, 'BO#20221127-0008', '2022-11-27', 'PG', 'P', 'C', 8, 8),
-       (9, 'BO#20221127-0009', '2022-11-27', 'CR', 'R', 'I', 9, 9),
-       (10, 'BO#20221127-0010', '2022-11-27', 'C', 'DP', 'T', 10, 10),
-       (11, 'BO#20221127-0011', '2022-11-27', 'D', 'P', 'C', 11, 11),
-       (12, 'BO#20221127-0012', '2022-11-27', 'PG', 'R', 'I', 12, 12),
-       (13, 'BO#20221127-0013', '2022-11-27', 'CR', 'DP', 'T', 13, 13),
-       (14, 'BO#20221127-0014', '2022-11-27', 'C', 'P', 'C', 14, 14),
-       (15, 'BO#20221127-0015', '2022-11-27', 'D', 'R', 'I', 15, 15),
-       (16, 'BO#20221127-0016', '2022-11-27', 'PG', 'DP', 'T', 16, 16),
-       (17, 'BO#20221127-0017', '2022-11-27', 'CR', 'P', 'C', 17, 17)
+INSERT INTO Booking.booking_orders (boor_id, boor_order_number,boor_order_date, boor_total_room ,boor_pay_type, boor_is_paid, boor_type, boor_user_id, boor_hotel_id)
+VALUES (1, 'BO#20221127-0001', '2023-01-27', 4,'C', 'DP', 'T', 1, 1),
+       (2, 'BO#20221127-0002', '2023-01-27', 4,'C', 'P', 'C', 2, 2),
+       (3, 'BO#20221127-0003', '2023-01-27', 4,'D', 'R', 'I', 3, 3),
+       (4, 'BO#20221127-0004', '2023-01-27', 4,'C', 'DP', 'T', 4, 4),
+       (5, 'BO#20221127-0005', '2023-01-27', 4,'D', 'P', 'C', 5, 5),
+       (6, 'BO#20221127-0006', '2023-01-27', 4,'C', 'R', 'I', 6, 6),
+       (7, 'BO#20221127-0007', '2023-01-27', 4,'D', 'DP', 'T', 7, 7),
+       (8, 'BO#20221127-0008', '2023-01-27', 4,'C', 'P', 'C', 8, 8),
+       (9, 'BO#20221127-0009', '2023-01-27', 4,'C', 'R', 'I', 9, 9),
+       (10, 'BO#20221127-0010', '2023-01-27', 3,'C', 'DP', 'T', 10, 10),
+       (11, 'BO#20221127-0011', '2023-01-27', 3,'D', 'P', 'C', 11, 11),
+       (12, 'BO#20221127-0012', '2023-01-27', 3,'D', 'R', 'I', 12, 12),
+       (13, 'BO#20221127-0013', '2023-01-27', 3,'D', 'DP', 'T', 13, 13),
+       (14, 'BO#20221127-0014', '2023-01-27', 3,'C', 'P', 'C', 14, 14),
+       (15, 'BO#20221127-0015', '2023-01-27', 3,'D', 'R', 'I', 15, 15),
+       (16, 'BO#20221127-0016', '2023-01-27', 3,'D', 'DP', 'T', 16, 16),
+       (17, 'BO#20221127-0017', '2023-01-27', 3,'C', 'P', 'C', 17, 17)
 SET IDENTITY_INSERT Booking.booking_orders OFF
 SELECT*FROM Booking.booking_orders
 

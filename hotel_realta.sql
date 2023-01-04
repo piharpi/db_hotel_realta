@@ -81,7 +81,7 @@ CREATE TABLE Master.category_group (
   cagro_description nvarchar(255),
   cagro_type nvarchar(25) NOT NULL CHECK (cagro_type IN('category', 'service', 'facility')),
   cagro_icon nvarchar(255),
-  cagro_icon_url nvarchar(255),
+    cagro_icon_url nvarchar(255),
   CONSTRAINT pk_cagro_id PRIMARY KEY(cagro_id)
 );
 
@@ -401,7 +401,7 @@ CREATE TABLE Booking.special_offers(
     spof_name nvarchar(55) NOT NULL,
     spof_description nvarchar(255) NOT NULL,
     spof_type nchar(5) NOT NULL CHECK (spof_type IN ('T','C','I')),
-    spof_discount smallmoney NOT NULL,
+    spof_discount decimal(5,2) NOT NULL,
     spof_start_date datetime NOT NULL,
     spof_end_date datetime NOT NULL,
     spof_min_qty int,
@@ -417,11 +417,11 @@ CREATE TABLE Booking.booking_orders(
 	boor_arrival_date datetime,
 	boor_total_room smallint,
 	boor_total_guest smallint,
-	boor_discount smallmoney,
-	boor_total_tax smallmoney,
+	boor_discount decimal(5,2),
+	boor_total_tax decimal(5,2) DEFAULT 0.11,
 	boor_total_ammount money,
 	boor_down_payment money,
-	boor_pay_type nchar(2) NOT NULL CHECK (boor_pay_type IN ('CR','C','D ','PG')),
+	boor_pay_type nchar(2) NOT NULL,
 	boor_is_paid nchar(2) NOT NULL CHECK (boor_is_paid IN ('DP','P','R ')),
 	boor_type nvarchar(15) NOT NULL CHECK (boor_type IN ('T','C','I')),
 	boor_cardnumber nvarchar(25),
@@ -436,7 +436,10 @@ CREATE TABLE Booking.booking_orders(
     ON UPDATE CASCADE,
 	CONSTRAINT fk_boor_hotel_id FOREIGN KEY (boor_hotel_id) REFERENCES Hotel.hotels (hotel_id) 
     ON DELETE CASCADE 
-    ON UPDATE CASCADE
+    ON UPDATE CASCADE,
+  CONSTRAINT chk_boor_cardnumber CHECK (
+    (boor_pay_type IN ('CR', 'PG') AND boor_cardnumber IS NOT NULL) OR
+    (boor_pay_type IN ('C', 'D') AND boor_cardnumber IS NULL))
 );
 
 CREATE TABLE Booking.booking_order_detail(
@@ -448,15 +451,15 @@ CREATE TABLE Booking.booking_order_detail(
 	borde_kids integer,
 	borde_price money,
 	borde_extra money,
-	borde_discount smallmoney,
-	borde_tax smallmoney,
+	borde_discount decimal(5,2),
+	borde_tax decimal(5,2) DEFAULT 0.11,
 	borde_subtotal money,
 	borde_faci_id integer,
 	CONSTRAINT pk_borde_id_boor_id PRIMARY KEY (borde_id, borde_boor_id),
 	CONSTRAINT fk_border_boor_id FOREIGN KEY(borde_boor_id)	REFERENCES Booking.booking_orders(boor_id),
 	CONSTRAINT fk_borde_faci_id FOREIGN KEY(borde_faci_id) REFERENCES Hotel.facilities(faci_id) 
 		ON DELETE CASCADE 
-    ON UPDATE CASCADE 
+    ON UPDATE CASCADE
 );
 
 CREATE TABLE Booking.booking_order_detail_extra(

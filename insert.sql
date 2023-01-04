@@ -506,6 +506,8 @@ VALUES
   ('PO-003', 1, GETDATE(), 450000, 0, GETDATE() + 20, 'TR', 1, 3),
   ('PO-004', 1, GETDATE(), 600000, 0, GETDATE() + 25, 'TR', 1, 4),
   ('PO-005', 1, GETDATE(), 750000, 0, GETDATE() + 30, 'CA', 1, 5);
+ 
+ 
 
 INSERT INTO purchasing.stocks (stock_name, stock_description, stock_size, stock_color, stock_modified_date)
 VALUES
@@ -550,5 +552,21 @@ VALUES
   ('thumbnail-3.jpg', 'photo-3.jpg', 0, 'https://stock-photos.com/thumbnail-3.jpg', 3),
   ('thumbnail-4.jpg', 'photo-4.jpg', 1, 'https://stock-photos.com/thumbnail-4.jpg', 4),
   ('thumbnail-5.jpg', 'photo-5.jpg', 0, 'https://stock-photos.com/thumbnail-5.jpg', 5);
+  
+INSERT INTO purchasing.purchase_order_detail (pode_pohe_id, pode_order_qty, pode_price, pode_received_qty, pode_rejected_qty, pode_modified_date, pode_stock_id)
+VALUES
+  (1, 10, 100000, 9, 1, GETDATE(), 1),
+  (1, 20, 150000, 18, 2, GETDATE(), 2),
+  (2, 30, 200000, 28, 2, GETDATE(), 3),
+  (2, 40, 250000, 38, 2, GETDATE(), 4),
+  (2, 50, 300000, 48, 2, GETDATE(), 5),
+  (3, 60, 350000, 57, 3, GETDATE(), 1),
+  (3, 70, 400000, 67, 3, GETDATE(), 2),
+  (3, 80, 450000, 77, 3, GETDATE(), 3),
+  (4, 90, 500000, 87, 3, GETDATE(), 4),
+  (4, 100, 550000, 97, 3, GETDATE(), 5),
+  (5, 110, 600000, 107, 3, GETDATE(), 1),
+  (5, 120, 650000, 117, 3, GETDATE(), 2),
+  (5, 130, 700000, 127, 3, GETDATE(), 3);
 
 -- USE tempdb;

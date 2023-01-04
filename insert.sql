@@ -1,3 +1,18 @@
+-- DELETE MODULE Resto
+DELETE Resto.OrderMenus;
+
+-- DELETE MODULE Users
+DELETE Users.Users;
+
+-- DELETE MODULE Booking
+DELETE Booking.BookingOrders;
+
+-- DELETE MODULE Payment 
+DELETE Payment.Entity;
+DELETE Payment.PaymentGateway;
+DELETE Payment.Bank;
+DELETE Payment.PaymentTransaction;
+
 -- INSERT MASTER MODULE
 --REGION
 SET IDENTITY_INSERT Master.Regions ON;
@@ -129,9 +144,7 @@ SET IDENTITY_INSERT Master.service_task OFF;
 SELECT*FROM Master.service_task
 ORDER BY seta_id ASC
 
-
 --- INSERT MODULE USERS
--- Insert 15 rows into the users.users table
 INSERT INTO users.users (user_full_name, user_type, user_company_name, user_email, user_phone_number, user_modified_date)
 VALUES ('John Smith', 'T', 'Acme Inc.', 'john.smith@acme.com', '123-456-7890', GETDATE()),
        ('Jane Doe', 'C', 'XYZ Corp.', 'jane.doe@xyz.com', '123-456-7891', GETDATE()),
@@ -286,7 +299,6 @@ VALUES ('MENUS#2022-01-01-00001', '2022-01-01', 2, 0, 40000, 'CA', NULL, 'P', GE
 ('MENUS#20220101-00006', '2022-01-01', 7, 0, 140000, 'D', '9876543210987654', 'B', GETDATE(), 6);
 
 --resto order menu detail
-
 INSERT INTO resto.order_menu_detail (orme_price, orme_qty, orme_subtotal, orme_discount, omde_orme_id, omde_reme_id)
 VALUES
 (10000, 2, 20000, 0, 1, 1),
@@ -301,7 +313,6 @@ VALUES
 (15000, 2, 30000, 0, 5, 10);
 
 --resto photos
-
 INSERT INTO resto.resto_menu_photos (remp_thumbnail_filename, remp_photo_filename, remp_primary, remp_url, remp_reme_id)
 VALUES ('thumbnail1.jpg', 'photo1.jpg', 1, 'http://localhost/resto/menu/photo1.jpg', 1),
 ('thumbnail2.jpg', 'photo2.jpg', 0, 'http://localhost/resto/menu/photo2.jpg', 1),
@@ -314,8 +325,66 @@ VALUES ('thumbnail1.jpg', 'photo1.jpg', 1, 'http://localhost/resto/menu/photo1.j
 ('thumbnail9.jpg', 'photo9.jpg', 0, 'http://localhost/resto/menu/photo9.jpg', 3),
 ('thumbnail10.jpg', 'photo10.jpg', 1, 'http://localhost/resto/menu/photo10.jpg', 4);
 
--- PURCHASING INSERT
+-- INSERT MODULE Payment
+-- insert entity
+SET IDENTITY_INSERT Payment.Entity ON
+INSERT 
+  INTO Payment.Entity(entity_id) 
+VALUES (1),(2),(3),(4),(5),(6),(7),(8),(9),(10),(11),(12),(13),(14),(15);
+SET IDENTITY_INSERT Payment.Entity OFF
 
+-- insert bank
+INSERT 
+  INTO Payment.Bank (bank_entity_id, bank_code, bank_name, bank_modified_date)
+VALUES (1, 'BRI', 'PT BANK RAKYAT INDONESIA (PERSERO) Tbk', CURRENT_TIMESTAMP),
+       (2, 'BNI', 'PT BANK NEGARA INDONESIA (PERSERO) Tbk', CURRENT_TIMESTAMP),
+       (3, 'BCA', 'PT BANK CENTRAL ASIA Tbk', CURRENT_TIMESTAMP),
+       (4, 'BSI', 'PT BANK SYARIAH INDONESIA Tbk ', CURRENT_TIMESTAMP),
+       (5, 'BTN', 'PT BANK TABUNGAN NEGARA (PERSERO) Tbk', CURRENT_TIMESTAMP),
+       (6, 'MANDIRI', 'PT BANK MANDIRI (PERSERO) Tbk', CURRENT_TIMESTAMP),
+       (7, 'MUAMALAT', 'PT BANK MUAMALAT INDONESIA Tbk', CURRENT_TIMESTAMP);
+
+-- insert payment_gateway
+INSERT 
+  INTO Payment.PaymentGateway(paga_entity_id, paga_code, paga_name, paga_modified_date)
+VALUES (8, 'GOPAY', 'PT. Dompet Anak Bangsa', CURRENT_TIMESTAMP),
+       (9, 'OVO', 'PT. Visionet Internasional', CURRENT_TIMESTAMP),
+       (10, 'DANA', 'PT. Espay Debit Indonesia', CURRENT_TIMESTAMP),
+       (11, 'SHOPEEPAY', 'Shopee', CURRENT_TIMESTAMP),
+       (12, 'FLIP', 'Fintek Karya Nusantara', CURRENT_TIMESTAMP),
+       (13, 'JENIUS', 'PT. Bank BTPN Tbk', CURRENT_TIMESTAMP),
+       (14, 'JAGO', 'PT. Bank Jago Tbk', CURRENT_TIMESTAMP),
+       (15, 'SAKUKU', 'PT. Bank Central Asia Tbk', CURRENT_TIMESTAMP);
+       
+-- user_accounts
+INSERT
+  INTO Payment.UserAccounts(usac_entity_id, usac_user_id, usac_account_number, usac_saldo, usac_type, usac_expmonth, usac_expyear, usac_modified_date)
+VALUES (1, 1, '6271263188999', 1000000, 'debet', 11, 22, CURRENT_TIMESTAMP),
+       (2, 2, '8012372737662', 1000000, 'credit card', 12, 27, CURRENT_TIMESTAMP),
+       (3, 3, '9712893896126', 1000000, 'debet', 03, 23, CURRENT_TIMESTAMP),
+       (4, 4, '8129387462674', 1000000, 'debet', 08, 24, CURRENT_TIMESTAMP),
+       (5, 5, '7781236462762', 1000000, 'debet', 09, 28, CURRENT_TIMESTAMP),
+       (6, 6, '1278287363663', 1000000, 'credit card', 02, 25, CURRENT_TIMESTAMP),
+       (7, 7, '6326361273712', 1000000, 'debet', 01, 26, CURRENT_TIMESTAMP),
+       (8, 8, '812327176263', 1000000, 'payment', 0, 0, CURRENT_TIMESTAMP),
+       (9, 9, '827363525152', 1000000, 'payment', 0, 0, CURRENT_TIMESTAMP),
+       (10, 10, '829283525152', 1000000, 'payment', 0, 0, CURRENT_TIMESTAMP),
+       (11, 11, '872363155421', 1000000, 'payment', 0, 0, CURRENT_TIMESTAMP),
+       (12, 12, '873652901212', 1000000, 'payment', 0, 0, CURRENT_TIMESTAMP),
+       (13, 13, '809283222364', 1000000, 'payment', 0, 0, CURRENT_TIMESTAMP),
+       (14, 14, '890128352546', 1000000, 'payment', 0, 0, CURRENT_TIMESTAMP),
+       (15, 15, '856272837172', 1000000, 'payment', 0, 0, CURRENT_TIMESTAMP);
+
+-- payment_transactions
+SET IDENTITY_INSERT Payment.PaymentTransaction ON
+INSERT
+  INTO Payment.PaymentTransaction(patr_id, patr_trx_number, patr_debet, patr_credit, patr_type, patr_note, patr_modified_date, 
+                                  patr_order_number, patr_source_id, patr_target_id, patr_trx_number_ref, patr_user_id)
+VALUES (1, 'TRB#20221127-0001', 150000, 150000, 'TRB', NULL, CURRENT_TIMESTAMP, 'BO#20221127-0001', 1, 2, 'TRB#20221127-0001', 1),
+       (2, 'TRB#20221127-0002', 150000, 150000, 'ORM', NULL, CURRENT_TIMESTAMP, 'MENUS#20221127-0001', 2, 1, 'TRB#20221127-0002', 2);
+SET IDENTITY_INSERT Payment.PaymentTransaction OFF
+
+-- PURCHASING INSERT
 INSERT INTO purchasing.vendor (vendor_name, vendor_active, vendor_priority, vendor_register_date, vendor_weburl, vendor_modifier_date)
 VALUES ('Global Equipment Co.', 1, 0, '2022-01-01', 'www.globalequipment.com', '2022-01-02'),
        ('Sustainable Solutions Inc.', 1, 1, '2022-02-01', 'www.sustainablesolutions.com', '2022-02-02'),
@@ -395,3 +464,5 @@ VALUES
   (5, 110, 600000, 107, 3, GETDATE(), 1),
   (5, 120, 650000, 117, 3, GETDATE(), 2),
   (5, 130, 700000, 127, 3, GETDATE(), 3);
+
+-- USE tempdb;

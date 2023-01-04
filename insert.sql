@@ -1,85 +1,78 @@
 -- insert dummy data HR
-SET IDENTITY_INSERT hr.job_role ON;
-Insert into hr.job_role (joro_id,joro_name, joro_modified_date) values 
-('1', 'Cleaning Service' ,'1995-01-14'),
-('2', 'Manager' ,'1995-01-14'),
-('3', 'Acounting' ,'1995-01-14'),
-('4', 'Staff' ,'1995-01-14'),
-('5', 'IT Support' ,'1995-01-14'),
-('6', 'IT Developer' ,'1995-01-14'),
-('7', 'Direktur' ,'1995-01-14'),
-('8', 'Leader' ,'1995-01-14'),
-('9', 'Product Manager' ,'1995-01-14'),
-('10', 'Anality Quality' ,'1995-01-14');
-SET IDENTITY_INSERT hr.job_role OFF;
+insert into hr.job_role values 
+	('Resepsionis', GETDATE()),
+	('Porter', GETDATE()),
+	('Concierge', GETDATE()),
+	('Room Service', GETDATE()),
+	('Waiter', GETDATE()),
+	('Staff Dapur', GETDATE()),
+	('Housekeeper', GETDATE()),
+	('Room Division Manager', GETDATE()),
+	('Maintenance Staff', GETDATE()),
+	('Hotel Manager', GETDATE()),
+	('Purchasing', GETDATE()),
+	('Sales & Marketing', GETDATE()),
+	('Event Planner', GETDATE()),
+	('Akuntan', GETDATE())
+;
 
-SET IDENTITY_INSERT hr.department ON;
-Insert into hr.department (dept_id,dept_name, dept_modified_date) values 
-('1', 'Departement 1' ,'1995-01-14'),
-('2', 'Departement 2' ,'1995-01-14'),
-('3', 'Departement 3' ,'1995-01-14'),
-('4', 'Departement 4' ,'1995-01-14'),
-('5', 'Departement 5' ,'1995-01-14'),
-('6', 'Departement 6' ,'1995-01-14'),
-('7', 'Departement 7' ,'1995-01-14'),
-('8', 'Departement 8' ,'1995-01-14'),
-('9', 'Departement 9' ,'1995-01-14'),
-('10', 'Departement 10' ,'1995-01-14');
-SET IDENTITY_INSERT hr.department OFF;
+insert into hr.employee (emp_national_id, emp_birth_date, emp_marital_status, emp_gender, emp_hire_date,
+	emp_salaried_flag, emp_joro_id) values
+	('a123123123456456456789789', '2001-01-01', 'S', 'M', GETDATE(), '1', 1),
+	('b456456456123123123789789', '2002-02-01', 'M', 'F', GETDATE(), '0', 2),
+	('c231231231339339339013013', '2003-03-01', 'M', 'M', GETDATE(), '1', 3),
+	('d524524524621621621832832', '1999-04-01', 'S', 'F', GETDATE(), '0', 4),
+	('e122122122322322322494944', '1997-05-01', 'S', 'M', GETDATE(), '1', 5),
+	('f090285082940243284423853', '1999-06-01', 'M', 'F', GETDATE(), '0', 6),
+	('g122932483892095343534255', '1998-07-01', 'M', 'M', GETDATE(), '1', 7),
+	('h214392573294812743928523', '2002-08-01', 'S', 'F', GETDATE(), '0', 8),
+	('i217473298498378988932754', '1999-09-01', 'S', 'M', GETDATE(), '1', 9),
+	('j219483945782893873249573', '2001-10-01', 'M', 'F', GETDATE(), '0', 10)
+;
 
-SET IDENTITY_INSERT hr.employee ON;
-Insert into hr.employee (emp_id,emp_national_id, emp_birth_date, emp_marital_status, emp_gender, emp_hire_date, emp_salaried_flag, emp_emp_id, emp_modified_date, emp_joro_id) values 
-('1', '1234111' ,'1995-01-14', 'M', 'M', '2000-02-10', '0', '3', '2000-01-14', '2'),
-('2', '1234111' ,'1995-02-15', 'S', 'M', '2000-03-11', '1', '1', '2000-01-14', '1'),
-('3', '1234111' ,'1995-03-16', 'S', 'F', '2000-04-12', '0', '1', '2000-01-14', '3'),
-('4', '1234111' ,'1995-04-17', 'S', 'F', '2000-05-13', '0', '1', '2000-01-14', '2'),
-('5', '1234111' ,'1995-05-18', 'M', 'F', '2000-06-14', '1', '1', '2000-01-14', '5'),
-('6', '1234111' ,'1995-06-19', 'S', 'M', '2000-07-15', '0', '1', '2000-01-14', '6'),
-('7', '1234111' ,'1995-07-20', 'M', 'M', '2000-08-16', '1', '1', '2000-01-14', '4'),
-('8', '1234111' ,'1995-08-21', 'M', 'F', '2000-09-17', '1', '1', '2000-01-14', '6'),
-('9', '1234111' ,'1995-09-22', 'M', 'F', '2000-10-18', '1', '1', '2000-01-14', '2'),
-('10', '1234111' ,'1995-11-23', 'M', 'M', '2000-11-19', '0', '1', '2000-01-14', '1');
-SET IDENTITY_INSERT hr.employee OFF;
+insert into hr.shift values
+	('Shift 1', '08:00:00', '16:00:00'),
+	('Shift 2', '16:00:00', '00:00:00'),
+	('Shift 3', '00:00:00', '08:00:00')
+;
 
-Insert into hr.employee_pay_history (ephi_emp_id,ephi_rate_change_date, ephi_rate_salary, ephi_pay_frequence, ephi_modified_date) values 
-('1', '1995-01-14' , '4000000' , '1200' , '1995-01-14'),
-('2', '1995-01-14' , '4500000' , '1300' , '1995-01-14'),
-('3', '1995-01-14' , '5000000' , '1400' , '1995-01-14'),
-('4', '1995-01-14' , '6000000' , '1500' , '1995-01-14'),
-('5', '1995-01-14' , '7000000' , '1600' , '1995-01-14'),
-('6', '1995-01-14' , '8000000' , '1700' , '1995-01-14'),
-('7', '1995-01-14' , '9000000' , '1800' , '1995-01-14'),
-('8', '1995-01-14' , '2000000' , '1900' , '1995-01-14'),
-('9', '1995-01-14' , '3000000' , '1100' , '1995-01-14'),
-('10', '1995-01-14' , '10000000' , '100' , '1995-01-14');
+insert into hr.department values 
+	('Front Office', GETDATE()), 
+	('Security', GETDATE()), 
+	('Marketing', GETDATE()), 
+	('Accounting', GETDATE()), 
+	('Food and Beverage', GETDATE()), 
+	('Housekeeping', GETDATE()), 
+	('Purchasing', GETDATE()), 
+	('Engineering', GETDATE()), 
+	('Personalia (HRD)', GETDATE())
+;
 
-SET IDENTITY_INSERT hr.shift ON;
-Insert into hr.shift (shift_id,shift_name, shift_start_time, shift_end_time) values 
-('1', 'shift 1' ,'1995-01-14', '1995-03-14'),
-('2', 'shift 2' ,'1995-01-14', '1995-03-14'),
-('3', 'shift 3' ,'1995-01-14', '1995-03-14'),
-('4', 'shift 4' ,'1995-01-14', '1995-03-14'),
-('5', 'shift 5' ,'1995-01-14', '1995-03-14'),
-('6', 'shift 6' ,'1995-01-14', '1995-03-14'),
-('7', 'shift 7' ,'1995-01-14', '1995-03-14'),
-('8', 'shift 8' ,'1995-01-14', '1995-03-14'),
-('9', 'shift 9' ,'1995-01-14', '1995-03-14'),
-('10', 'shift 10' ,'1995-01-14', '1995-03-14');
-SET IDENTITY_INSERT hr.shift OFF;
+insert into hr.employee_department_history(edhi_emp_id, edhi_dept_id, edhi_shift_id) values 
+	(1, 1, 1),
+	(2, 2, 2),
+	(3, 3, 3),
+	(4, 4, 1),
+	(5, 5, 2),
+	(6, 6, 3),
+	(7, 7, 1),
+	(8, 8, 2),
+	(9, 9, 3),
+	(10, 2, 1)
+;
 
-SET IDENTITY_INSERT hr.employee_department_history ON;
-Insert into hr.employee_department_history (edhi_id,edhi_emp_id, edhi_start_date, edhi_end_date, edhi_modified_date, edhi_dept_id, edhi_shift_id) values 
-('1', '1', '1995-01-14', '1995-03-14', '1999-03-14', '1', '1' ),
-('2', '2', '1995-01-14', '1995-03-14', '1999-03-14', '1', '2' ),
-('3', '1', '1995-01-14', '1995-03-14', '1999-03-14', '1', '1' ),
-('4', '3', '1995-01-14', '1995-03-14', '1999-03-14', '5', '3' ),
-('5', '4', '1995-01-14', '1995-03-14', '1999-03-14', '3', '4' ),
-('6', '5', '1995-01-14', '1995-03-14', '1999-03-14', '2', '5' ),
-('7', '6', '1995-01-14', '1995-03-14', '1999-03-14', '7', '6' ),
-('8', '6', '1995-01-14', '1995-03-14', '1999-03-14', '4', '6' ),
-('9', '5', '1995-01-14', '1995-03-14', '1999-03-14', '10', '5' ),
-('10', '4','1995-01-14', '1995-03-14', '1999-03-14', '8', '4' );
-SET IDENTITY_INSERT hr.employee_department_history OFF;
+insert into hr.employee_pay_history (ephi_emp_id, ephi_rate_change_date) values
+	(1, GETDATE()),
+	(2, GETDATE()),
+	(3, GETDATE()),
+	(4, GETDATE()),
+	(5, GETDATE()),
+	(6, GETDATE()),
+	(7, GETDATE()),
+	(8, GETDATE()),
+	(9, GETDATE()),
+	(10, GETDATE())
+;
 
 SET IDENTITY_INSERT HR.work_orders ON;
 Insert into HR.work_orders (woro_id,woro_date, woro_status, woro_user_id) values ('1','1995-01-14', 'OPEN' ,'2');

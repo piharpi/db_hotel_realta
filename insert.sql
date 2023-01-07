@@ -741,36 +741,37 @@ SELECT*FROM payment.payment_transaction;
 
 -- PURCHASING INSERT
 SET IDENTITY_INSERT purchasing.vendor ON
-INSERT INTO purchasing.vendor (vendor_id, vendor_name, vendor_active, vendor_priority, vendor_register_date, vendor_weburl, vendor_modifier_date)
-VALUES (1,'Global Equipment Co.', 1, 0, '2022-01-01', 'www.globalequipment.com', '2022-01-02'),
-       (2,'Sustainable Solutions Inc.', 1, 1, '2022-02-01', 'www.sustainablesolutions.com', '2022-02-02'),
-       (3,'Quality Parts LLC', 1, 0, '2022-03-01', 'www.qualityparts.com', '2022-03-02'),
-       (4,'Innovative Technologies Corp.', 0, 1, '2022-04-01', 'www.innovativetechnologies.com', '2022-04-02'),
-       (5,'Dynamic Enterprises Inc.', 1, 0, '2022-05-01', 'www.dynamicenterprises.com', '2022-05-02'),
-       (6,'Elite Supplies Co.', 1, 1, '2022-06-01', 'www.elitesupplies.com', '2022-06-02'),
-       (7,'Superior Products LLC', 0, 0, '2022-07-01', 'www.superiorproducts.com', '2022-07-02'),
-       (8,'Advanced Materials Inc.', 1, 1, '2022-08-01', 'www.advancedmaterials.com', '2022-08-02'),
-       (9,'Bright Ideas Inc.', 1, 0, '2022-09-01', 'www.brightideas.com', '2022-09-02'),
-       (10,'Progressive Solutions Inc.', 0, 1, '2022-10-01', 'www.progressivesolutions.com', '2022-10-02');
+INSERT INTO purchasing.vendor (vendor_id, vendor_name, vendor_active, vendor_priority, vendor_weburl)
+VALUES (1,'Global Equipment Co.', 1, 0, 'www.globalequipment.com'),
+       (2,'Sustainable Solutions Inc.', 1, 1, 'www.sustainablesolutions.com'),
+       (3,'Quality Parts LLC', 1, 0, 'www.qualityparts.com'),
+       (4,'Innovative Technologies Corp.', 0, 1, 'www.innovativetechnologies.com'),
+       (5,'Dynamic Enterprises Inc.', 1, 0, 'www.dynamicenterprises.com'),
+       (6,'Elite Supplies Co.', 1, 1, 'www.elitesupplies.com'),
+       (7,'Superior Products LLC', 0, 0, 'www.superiorproducts.com'),
+       (8,'Advanced Materials Inc.', 1, 1, 'www.advancedmaterials.com'),
+       (9,'Bright Ideas Inc.', 1, 0, 'www.brightideas.com'),
+       (10,'Progressive Solutions Inc.', 0, 1, 'www.progressivesolutions.com');
 SET IDENTITY_INSERT purchasing.vendor OFF
+UPDATE purchasing.vendor SET vendor_priority = 0 where vendor_id=1
 SELECT*FROM Purchasing.vendor;
 
-INSERT INTO purchasing.purchase_order_header (pohe_number, pohe_status, pohe_order_date, pohe_tax, pohe_refund, pohe_arrival_date, pohe_pay_type, pohe_emp_id, pohe_vendor_id)
+INSERT INTO purchasing.purchase_order_header (pohe_number, pohe_status, pohe_tax, pohe_refund, pohe_arrival_date, pohe_pay_type, pohe_emp_id, pohe_vendor_id)
 VALUES
-  ('PO-001', 1, GETDATE(), 150000, 0, GETDATE() + 10, 'CA', 1, 1),
-  ('PO-002', 1, GETDATE(), 300000, 0, GETDATE() + 15, 'CA', 1, 2),
-  ('PO-003', 1, GETDATE(), 450000, 0, GETDATE() + 20, 'TR', 1, 3),
-  ('PO-004', 1, GETDATE(), 600000, 0, GETDATE() + 25, 'TR', 1, 4),
-  ('PO-005', 1, GETDATE(), 750000, 0, GETDATE() + 30, 'CA', 1, 5);
+  ('PO-001', 1, 150000, 0, GETDATE() + 10, 'CA', 1, 1),
+  ('PO-002', 1, 300000, 0, GETDATE() + 15, 'CA', 1, 2),
+  ('PO-003', 1, 450000, 0, GETDATE() + 20, 'TR', 1, 3),
+  ('PO-004', 1, 600000, 0, GETDATE() + 25, 'TR', 1, 4),
+  ('PO-005', 1, 750000, 0, GETDATE() + 30, 'CA', 1, 5);
  SELECT*FROM Purchasing.purchase_order_header;
 
-INSERT INTO purchasing.stocks (stock_name, stock_description, stock_size, stock_color, stock_modified_date)
+INSERT INTO purchasing.stocks (stock_name, stock_description, stock_size, stock_color)
 VALUES
-  ('Sprei Hotel', 'Sprei dengan bahan yang nyaman dan tahan lama', 'King', 'Putih', GETDATE()),
-  ('Bantal Hotel', 'Bantal dengan bahan yang nyaman dan tahan lama', 'Standard', 'Putih', GETDATE()),
-  ('Handuk Hotel', 'Handuk dengan bahan yang nyaman dan tahan lama', 'Standard', 'Putih', GETDATE()),
-  ('Gorden Hotel', 'Gorden dengan bahan yang tahan lama dan mudah dicuci', 'Standard', 'Putih', GETDATE()),
-  ('Gelas Hotel', 'Gelas dengan bahan yang tahan lama dan mudah dicuci', 'Standard', 'Transparan', GETDATE());
+  ('Sprei Hotel', 'Sprei dengan bahan yang nyaman dan tahan lama', 'King', 'Putih'),
+  ('Bantal Hotel', 'Bantal dengan bahan yang nyaman dan tahan lama', 'Standard', 'Putih'),
+  ('Handuk Hotel', 'Handuk dengan bahan yang nyaman dan tahan lama', 'Standard', 'Putih'),
+  ('Gorden Hotel', 'Gorden dengan bahan yang tahan lama dan mudah dicuci', 'Standard', 'Putih'),
+  ('Gelas Hotel', 'Gelas dengan bahan yang tahan lama dan mudah dicuci', 'Standard', 'Transparan');
 SELECT*FROM Purchasing.stocks;
 
 INSERT INTO purchasing.stock_detail (stod_stock_id, stod_barcode_number, stod_status, stod_notes, stod_faci_id, stod_pohe_id)
@@ -811,21 +812,21 @@ VALUES
   ('thumbnail-5.jpg', 'photo-5.jpg', 0, 'https://stock-photos.com/thumbnail-5.jpg', 5);
 SELECT*FROM Purchasing.stock_photo;
 
-INSERT INTO purchasing.purchase_order_detail (pode_pohe_id, pode_order_qty, pode_price, pode_received_qty, pode_rejected_qty, pode_modified_date, pode_stock_id)
+INSERT INTO purchasing.purchase_order_detail (pode_pohe_id, pode_order_qty, pode_price, pode_received_qty, pode_rejected_qty, pode_stock_id)
 VALUES
-  (1, 10, 100000, 9, 1, GETDATE(), 1),
-  (1, 20, 150000, 18, 2, GETDATE(), 2),
-  (2, 30, 200000, 28, 2, GETDATE(), 3),
-  (2, 40, 250000, 38, 2, GETDATE(), 4),
-  (2, 50, 300000, 48, 2, GETDATE(), 5),
-  (3, 60, 350000, 57, 3, GETDATE(), 1),
-  (3, 70, 400000, 67, 3, GETDATE(), 2),
-  (3, 80, 450000, 77, 3, GETDATE(), 3),
-  (4, 90, 500000, 87, 3, GETDATE(), 4),
-  (4, 100, 550000, 97, 3, GETDATE(), 5),
-  (5, 110, 600000, 107, 3, GETDATE(), 1),
-  (5, 120, 650000, 117, 3, GETDATE(), 2),
-  (5, 130, 700000, 127, 3, GETDATE(), 3);
+  (1, 10, 100000, 9, 1, 1),
+  (1, 20, 150000, 18, 2, 2),
+  (2, 30, 200000, 28, 2, 3),
+  (2, 40, 250000, 38, 2, 4),
+  (2, 50, 300000, 48, 2, 5),
+  (3, 60, 350000, 57, 3, 1),
+  (3, 70, 400000, 67, 3, 2),
+  (3, 80, 450000, 77, 3, 3),
+  (4, 90, 500000, 87, 3, 4),
+  (4, 100, 550000, 97, 3, 5),
+  (5, 110, 600000, 107, 3, 1),
+  (5, 120, 650000, 117, 3, 2),
+  (5, 130, 700000, 127, 3, 3);
 SELECT*FROM Purchasing.purchase_order_detail;
 
--- USE tempdb;
+-- USE Northwind;

@@ -1,8 +1,42 @@
 USE Hotel_Realta;
 GO
-
--- DROP TRIGGER purchasing.tr_purchase_order_detail;
+-- DROP TRIGGER purchasing.tr_vendor_modified_date;
+-- DROP TRIGGER purchasing.tr_stocks_modified_date;
+-- DROP TRIGGER purchasing.tr_pode_modified_date;
 -- GO
+
+CREATE TRIGGER tr_vendor_modified_date
+ON purchasing.vendor
+AFTER UPDATE
+AS
+BEGIN
+  UPDATE purchasing.vendor
+  SET vendor_modified_date = GETDATE()
+  WHERE vendor_id IN(SELECT vendor_id FROM inserted)
+END;
+GO
+
+CREATE TRIGGER tr_stocks_modified_date
+ON purchasing.stocks
+AFTER UPDATE
+AS
+BEGIN
+  UPDATE purchasing.stocks
+  SET stock_modified_date = GETDATE()
+  WHERE stock_id IN(SELECT stock_id FROM inserted)
+END;
+GO
+
+CREATE TRIGGER tr_pode_modified_date
+ON purchasing.purchase_order_detail
+AFTER UPDATE
+AS
+BEGIN
+  UPDATE purchasing.purchase_order_detail
+  SET pode_modified_date = GETDATE()
+  WHERE pode_id IN(SELECT pode_id FROM inserted)
+END;
+GO
 
 CREATE TRIGGER tr_update_sub_total
 ON purchasing.purchase_order_detail

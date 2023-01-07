@@ -1,4 +1,4 @@
-USE tempdb;
+USE Northwind;
 GO
 
 DROP DATABASE IF EXISTS Hotel_Realta;
@@ -652,9 +652,9 @@ CREATE TABLE purchasing.vendor(
   vendor_name NVARCHAR(55) NOT NULL,
   vendor_active BIT DEFAULT 1,
   vendor_priority BIT DEFAULT 0,
-  vendor_register_date DATETIME NOT NULL,
+  vendor_register_date DATETIME NOT NULL DEFAULT GETDATE(),
   vendor_weburl NVARCHAR(1025),
-  vendor_modifier_date DATETIME,
+  vendor_modified_date DATETIME NOT NULL DEFAULT GETDATE(),
 
   CONSTRAINT pk_vendor_id PRIMARY KEY (vendor_id),
   CONSTRAINT ck_vendor_priority CHECK (vendor_priority IN (0,1)),
@@ -673,7 +673,7 @@ CREATE TABLE purchasing.stocks(
   stock_standar_cost MONEY DEFAULT 0,
   stock_size NVARCHAR(25),
   stock_color NVARCHAR(15),
-  stock_modified_date DATETIME,
+  stock_modified_date DATETIME NOT NULL DEFAULT GETDATE(),
 
   CONSTRAINT pk_department_id PRIMARY KEY (stock_id)
 );
@@ -698,7 +698,7 @@ CREATE TABLE purchasing.purchase_order_header(
     pohe_id INT IDENTITY(1,1) NOT NULL,
     pohe_number NVARCHAR(20),
     pohe_status TINYINT DEFAULT 1,
-    pohe_order_date DATETIME,
+    pohe_order_date DATETIME NOT NULL DEFAULT GETDATE(),
     pohe_subtotal MONEY,
     pohe_tax MONEY,
     pohe_total_amount AS pohe_subtotal+pohe_tax,
@@ -729,7 +729,7 @@ CREATE TABLE purchasing.purchase_order_detail (
   pode_received_qty DECIMAL(8,2),
   pode_rejected_qty DECIMAL(8,2),
   pode_stocked_qty AS pode_received_qty - pode_rejected_qty,
-  pode_modified_date DATETIME,
+  pode_modified_date DATETIME NOT NULL DEFAULT GETDATE(),
   pode_stock_id INT,
 
   CONSTRAINT pk_pode_id PRIMARY KEY (pode_id),
@@ -742,8 +742,8 @@ CREATE TABLE purchasing.purchase_order_detail (
 );
 
 CREATE TABLE purchasing.stock_detail (
-  stod_stock_id INT,
   stod_id INT IDENTITY,
+  stod_stock_id INT,
   stod_barcode_number NVARCHAR(255),
   stod_status NCHAR(2) DEFAULT 1,
   stod_notes NVARCHAR(1024),

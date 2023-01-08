@@ -109,5 +109,35 @@ BEGIN
 END;
 GO
 
+DROP PROCEDURE IF EXISTS spUpdateVendor;
+GO
+
+CREATE PROCEDURE purchasing.spUpdateVendor
+(
+  @id INT,
+  @name NVARCHAR(55),
+  @active BIT,
+  @priority BIT,
+  @weburl NVARCHAR(1025)
+)
+AS
+BEGIN
+  UPDATE purchasing.vendor
+  SET
+    vendor_name = @name,
+    vendor_active = @active,
+    vendor_priority = @priority,
+    vendor_modified_date = GETDATE(),
+    vendor_weburl = @weburl
+  WHERE
+    vendor_id = @id;
+END
+GO
+
+-- purchasing.spUpdateVendor @id = 15, @name = "abcde", @active = false, @priority = true, @weburl = NULL
+-- GO
+
+-- select * from purchasing.vendor
+
 USE tempdb;
 GO

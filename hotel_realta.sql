@@ -414,11 +414,6 @@ CREATE TABLE Booking.special_offers(
     CONSTRAINT pk_spof_id PRIMARY KEY(spof_id)
 );
 
-set IDENTITY_INSERT region ON
-insert into region (regionId) values(5)
-set IDENTITY_INSERT region Off
-select * from region
-
 
 CREATE TABLE Booking.booking_orders(
 	boor_id int	IDENTITY (1,1),

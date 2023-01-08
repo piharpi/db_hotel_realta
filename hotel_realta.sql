@@ -121,7 +121,7 @@ CREATE TABLE Master.service_task (
 
 CREATE TABLE Master.members (
   memb_name nvarchar(15) NOT NULL,
-  memb_description nvarchar(200),
+  memb_description nvarchar(255),
   CONSTRAINT pk_memb_name PRIMARY KEY(memb_name)
 );
 

@@ -635,11 +635,11 @@ CREATE TABLE Payment.payment_transaction(
 	CONSTRAINT FK_PaymentPaymentTransactionUserId FOREIGN KEY (patr_user_id)
 		REFERENCES Users.Users (user_id)
 		ON UPDATE CASCADE
-		ON DELETE CASCADE,
+		ON DELETE SET NULL,
 	CONSTRAINT FK_PaymentPaymentTransactionSourceId FOREIGN KEY (patr_source_id)
 		REFERENCES Payment.Bank(bank_entity_id)
 		ON UPDATE CASCADE
-		ON DELETE CASCADE,
+		ON DELETE SET NULL,
 	CONSTRAINT FK_PaymentPaymentTransactionTargetId FOREIGN KEY (patr_target_id)
 		REFERENCES Payment.Bank(bank_entity_id)
 		ON UPDATE NO ACTION

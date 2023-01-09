@@ -828,4 +828,4 @@ VALUES
   (5, 130, 700000, 127, 3, GETDATE(), 3);
 SELECT*FROM Purchasing.purchase_order_detail;
 
--- USE tempdb;
+USE tempdb;

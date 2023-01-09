@@ -121,7 +121,7 @@ CREATE TABLE Master.service_task (
 
 CREATE TABLE Master.members (
   memb_name nvarchar(15) NOT NULL,
-  memb_description nvarchar(200),
+  memb_description nvarchar(255),
   CONSTRAINT pk_memb_name PRIMARY KEY(memb_name)
 );
 
@@ -635,11 +635,11 @@ CREATE TABLE Payment.payment_transaction(
 	CONSTRAINT FK_PaymentPaymentTransactionUserId FOREIGN KEY (patr_user_id)
 		REFERENCES Users.Users (user_id)
 		ON UPDATE CASCADE
-		ON DELETE CASCADE,
+		ON DELETE SET NULL,
 	CONSTRAINT FK_PaymentPaymentTransactionSourceId FOREIGN KEY (patr_source_id)
 		REFERENCES Payment.Bank(bank_entity_id)
 		ON UPDATE CASCADE
-		ON DELETE CASCADE,
+		ON DELETE SET NULL,
 	CONSTRAINT FK_PaymentPaymentTransactionTargetId FOREIGN KEY (patr_target_id)
 		REFERENCES Payment.Bank(bank_entity_id)
 		ON UPDATE NO ACTION

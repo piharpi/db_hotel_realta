@@ -376,7 +376,7 @@ CREATE TABLE HR.employee_department_history (
 CREATE TABLE HR.work_orders (
 	woro_id int IDENTITY(1,1),
 	woro_date datetime NOT NULL,
-	woro_status nvarchar(15), 
+	woro_status nvarchar(15) NOT NULL, 
 	woro_user_id int,
 	CONSTRAINT pk_woro_id PRIMARY KEY(woro_id),
 	CONSTRAINT fk_woro_user_id FOREIGN KEY(woro_user_id) REFERENCES Users.users(user_id)
@@ -384,10 +384,10 @@ CREATE TABLE HR.work_orders (
 
 CREATE TABLE HR.work_order_detail (
 	wode_id int IDENTITY(1,1),
-	wode_task_name nvarchar(255),
-	wode_status nvarchar(15),
-	wode_start_date datetime,
-	wode_end_date datetime,
+	wode_task_name nvarchar(255) NOT NULL,
+	wode_status nvarchar(15) NOT NULL,
+	wode_start_date datetime NOT NULL,
+	wode_end_date datetime NOT NULL,
 	wode_notes nvarchar(255),
 	wode_emp_id int,
 	wode_seta_id int,

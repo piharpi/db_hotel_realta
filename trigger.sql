@@ -3,11 +3,11 @@ GO
 
 USE Hotel_Realta;
 GO
--- DROP TRIGGER purchasing.tr_vendor_modified_date;
--- DROP TRIGGER purchasing.tr_stocks_modified_date;
--- DROP TRIGGER purchasing.tr_pode_modified_date;
--- DROP TRIGGER purchasing.tr_update_stock_quantity;
--- GO
+DROP TRIGGER purchasing.tr_vendor_modified_date;
+DROP TRIGGER purchasing.tr_stocks_modified_date;
+DROP TRIGGER purchasing.tr_pode_modified_date;
+DROP TRIGGER purchasing.tr_update_stock_quantity;
+GO
 
 CREATE TRIGGER tr_vendor_modified_date
 ON purchasing.vendor
@@ -198,7 +198,7 @@ BEGIN
   BEGIN TRY
       BEGIN TRANSACTION
           UPDATE purchasing.stock_photo
-          SET spho_thumbnail_filename = thumbnail,
+          SET spho_thumbnail_filename = @thumbnail,
               spho_photo_filename = @photo,
               spho_primary = @primary,
               spho_url = @url,
@@ -215,6 +215,86 @@ END
 GO
 
 
+-----create Store Procedure Update For Table 'Purchase Order Header'
+
+DROP PROCEDURE IF EXISTS SpUpdatePohe;
+GO
+
+CREATE PROCEDURE [Purchasing].[SpUpdatePohe]
+    @ID int,
+    @Number nvarchar(20),
+    @PoheStatus tinyint,
+    @PoheTax decimal(10,2),
+    @PoheRefund decimal(10,2),
+    @PoheArrivalDate date,
+    @PohePayType nchar(2),
+    @PoheEmpID int,
+    @PoheVendorID int
+AS
+BEGIN
+  SET NOCOUNT ON;
+    
+    BEGIN TRY
+      BEGIN TRANSACTION
+        UPDATE purchasing.purchase_order_header
+        SET pohe_number = @Number,
+            pohe_status = @PoheStatus,
+            pohe_tax = @PoheTax,
+            pohe_refund = @PoheRefund,
+            pohe_arrival_date = @PoheArrivalDate,
+            pohe_pay_type = @PohePayType,
+            pohe_emp_id = @PoheEmpID,
+            pohe_vendor_id = @PoheVendorID
+        WHERE pohe_id = @ID
+      COMMIT TRANSACTION
+    END TRY
+      BEGIN CATCH
+      IF @@TRANCOUNT > 0
+        ROLLBACK TRANSACTION
+      THROW;
+    END CATCH
+END
+GO
+
+
+-----create Store Procedure Update For Table 'Purchase Order Detail'
+
+DROP PROCEDURE IF EXISTS spUpdatePode;
+GO
+
+CREATE PROCEDURE [Purchasing].[spUpdatePode]
+      @PodeId int,
+      @podePoheId int, 
+      @PodeOrderQty smallint, 
+      @PodePrice money,
+      @PodeReceivedQty decimal(8,2),
+      @PodeRejectedQty decimal (8,2),
+      @PodeStockId int
+AS
+BEGIN
+  SET NOCOUNT ON;
+    
+    BEGIN TRY
+      BEGIN TRANSACTION
+        UPDATE purchasing.purchase_order_detail
+            SET pode_pohe_id = @podePoheId, 
+              pode_order_qty = @PodeOrderQty, 
+              pode_price = @PodePrice, 
+              pode_received_qty = @PodeReceivedQty,
+              pode_rejected_qty=@PodeRejectedQty,
+              pode_stock_id =@PodeStockId
+            WHERE pode_id = @PodeId
+      COMMIT TRANSACTION
+    END TRY
+      BEGIN CATCH
+      IF @@TRANCOUNT > 0
+        ROLLBACK TRANSACTION
+      THROW;
+    END CATCH
+END
+GO
+
+
 -- purchasing.spUpdateVendor @id = 15, @name = "abcde", @active = false, @priority = true, @weburl = NULL
 -- GO
 -- purchasing.spUpdateStocks @id = 6, @name = "abcde", @description = "abc", @size = "abc", @color = "abc"
@@ -225,5 +305,5 @@ GO
 -- select * from purchasing.stock_photo
 
 SELECT * from INFORMATION_SCHEMA.columns where table_name = 'stock_photo'
-USE Northwind;
-GO
+-- USE Northwind;
+-- GO

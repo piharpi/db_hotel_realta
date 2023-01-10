@@ -684,7 +684,7 @@ CREATE TABLE purchasing.stock_photo(
   spho_thumbnail_filename NVARCHAR(50) NOT NULL,
   spho_photo_filename NVARCHAR(50) NOT NULL,
   spho_primary BIT NOT NULL DEFAULT 0,
-  spho_url NVARCHAR(355) NOT NULL,
+  spho_url NVARCHAR(255) NOT NULL,
   spho_stock_id INT NOT NULL,
 
   CONSTRAINT pk_spho_id PRIMARY KEY (spho_id),

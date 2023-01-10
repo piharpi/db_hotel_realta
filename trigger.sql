@@ -181,6 +181,40 @@ END
 GO
 
 
+DROP PROCEDURE IF EXISTS spUpdateStockPhoto;
+GO
+
+CREATE PROCEDURE purchasing.spUpdateStockPhoto
+  @id INT,
+  @thumbnail NVARCHAR(50),
+  @photo NVARCHAR(50),
+  @primary BIT,
+  @url NVARCHAR(255),
+  @stockId INT
+AS
+BEGIN
+  SET NOCOUNT ON;
+
+  BEGIN TRY
+      BEGIN TRANSACTION
+          UPDATE purchasing.stock_photo
+          SET spho_thumbnail_filename = thumbnail,
+              spho_photo_filename = @photo,
+              spho_primary = @primary,
+              spho_url = @url,
+              spho_stock_id = @stockId
+          WHERE spho_id = @id
+      COMMIT TRANSACTION
+  END TRY
+  BEGIN CATCH
+    IF @@TRANCOUNT > 0
+      ROLLBACK TRANSACTION
+    THROW;
+  END CATCH
+END
+GO
+
+
 -- purchasing.spUpdateVendor @id = 15, @name = "abcde", @active = false, @priority = true, @weburl = NULL
 -- GO
 -- purchasing.spUpdateStocks @id = 6, @name = "abcde", @description = "abc", @size = "abc", @color = "abc"

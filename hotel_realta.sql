@@ -666,7 +666,7 @@ CREATE TABLE purchasing.stocks(
   stock_id INT IDENTITY(1,1),
   stock_name NVARCHAR(255) NOT NULL,
   stock_description NVARCHAR(255),
-  stock_quantity SMALLINT DEFAULT 0,
+  stock_quantity SMALLINT NOT NULL DEFAULT 0,
   stock_reorder_point SMALLINT DEFAULT 0,
   stock_used SMALLINT DEFAULT 0,
   stock_scrap SMALLINT DEFAULT 0,
@@ -681,11 +681,11 @@ CREATE TABLE purchasing.stocks(
 
 CREATE TABLE purchasing.stock_photo(
   spho_id INT IDENTITY(1,1),
-  spho_thumbnail_filename NVARCHAR(50),
-  spho_photo_filename NVARCHAR(50),
-  spho_primary BIT DEFAULT 0,
-  spho_url NVARCHAR(355),
-  spho_stock_id INT,
+  spho_thumbnail_filename NVARCHAR(50) NOT NULL,
+  spho_photo_filename NVARCHAR(50) NOT NULL,
+  spho_primary BIT NOT NULL DEFAULT 0,
+  spho_url NVARCHAR(355) NOT NULL,
+  spho_stock_id INT NOT NULL,
 
   CONSTRAINT pk_spho_id PRIMARY KEY (spho_id),
   CONSTRAINT fk_spho_stock_id FOREIGN KEY (spho_stock_id) 

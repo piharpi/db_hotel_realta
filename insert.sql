@@ -1,4 +1,8 @@
+USE Northwind
+GO
+
 USE Hotel_Realta;
+GO
 
 -- DELETE MODULE Purchasing
 DELETE Purchasing.purchase_order_detail;
@@ -753,7 +757,7 @@ VALUES (1,'Global Equipment Co.', 1, 0, 'www.globalequipment.com'),
        (9,'Bright Ideas Inc.', 1, 0, 'www.brightideas.com'),
        (10,'Progressive Solutions Inc.', 0, 1, 'www.progressivesolutions.com');
 SET IDENTITY_INSERT purchasing.vendor OFF
-UPDATE purchasing.vendor SET vendor_priority = 0 where vendor_id=1
+-- UPDATE purchasing.vendor SET vendor_priority = 0 where vendor_id=1
 SELECT*FROM Purchasing.vendor;
 
 INSERT INTO purchasing.purchase_order_header (pohe_number, pohe_status, pohe_tax, pohe_refund, pohe_arrival_date, pohe_pay_type, pohe_emp_id, pohe_vendor_id)
@@ -773,6 +777,8 @@ VALUES
   ('Gorden Hotel', 'Gorden dengan bahan yang tahan lama dan mudah dicuci', 'Standard', 'Putih'),
   ('Gelas Hotel', 'Gelas dengan bahan yang tahan lama dan mudah dicuci', 'Standard', 'Transparan');
 SELECT*FROM Purchasing.stocks;
+
+select * from information_schema.Columns where table_name = 'stocks'
 
 INSERT INTO purchasing.stock_detail (stod_stock_id, stod_barcode_number, stod_status, stod_notes, stod_faci_id, stod_pohe_id)
 VALUES

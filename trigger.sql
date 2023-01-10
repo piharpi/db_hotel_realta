@@ -1,8 +1,12 @@
+USE Northwind
+GO
+
 USE Hotel_Realta;
 GO
 -- DROP TRIGGER purchasing.tr_vendor_modified_date;
 -- DROP TRIGGER purchasing.tr_stocks_modified_date;
 -- DROP TRIGGER purchasing.tr_pode_modified_date;
+-- DROP TRIGGER purchasing.tr_update_stock_quantity;
 -- GO
 
 CREATE TRIGGER tr_vendor_modified_date
@@ -100,11 +104,10 @@ AS
 BEGIN
   -- Update data di tabel stocks
   UPDATE s
-  SET s.stock_quantity = 
-    (SELECT SUM(pod.pode_stocked_qty)
-     FROM purchasing.purchase_order_detail pod
-     JOIN purchasing.purchase_order_header poh ON poh.pohe_id = pod.pode_pohe_id
-     WHERE s.stock_id = pod.pode_stock_id and poh.pohe_status = 4)
+  SET s.stock_quantity = ISNULL((SELECT SUM(pod.pode_stocked_qty) 
+                                FROM purchasing.purchase_order_detail pod
+                                JOIN purchasing.purchase_order_header poh ON poh.pohe_id = pod.pode_pohe_id
+                                WHERE s.stock_id = pod.pode_stock_id and poh.pohe_status = 4), 0)
   FROM purchasing.stocks s;
 END;
 GO
@@ -122,22 +125,71 @@ CREATE PROCEDURE purchasing.spUpdateVendor
 )
 AS
 BEGIN
-  UPDATE purchasing.vendor
-  SET
-    vendor_name = @name,
-    vendor_active = @active,
-    vendor_priority = @priority,
-    vendor_modified_date = GETDATE(),
-    vendor_weburl = @weburl
-  WHERE
-    vendor_id = @id;
+  BEGIN TRY
+    BEGIN TRANSACTION
+
+    UPDATE purchasing.vendor
+    SET
+      vendor_name = @name,
+      vendor_active = @active,
+      vendor_priority = @priority,
+      vendor_modified_date = GETDATE(),
+      vendor_weburl = @weburl
+    WHERE
+      vendor_id = @id;
+
+    COMMIT TRANSACTION
+  END TRY
+  BEGIN CATCH
+    IF @@TRANCOUNT > 0
+      ROLLBACK TRANSACTION
+    THROW;
+  END CATCH
 END
 GO
 
+DROP PROCEDURE IF EXISTS spUpdateStocks;
+GO
+
+CREATE PROCEDURE purchasing.spUpdateStocks
+  @id INT,
+  @name NVARCHAR(255),
+  @description NVARCHAR(255),
+  @size NVARCHAR(25),
+  @color NVARCHAR(15)
+AS
+BEGIN
+  SET NOCOUNT ON;
+
+  BEGIN TRY
+      BEGIN TRANSACTION
+          UPDATE purchasing.stocks
+          SET stock_name = @name,
+              stock_description = @description,
+              stock_size = @size,
+              stock_color = @color,
+              stock_modified_date = GETDATE()
+          WHERE stock_id = @id
+      COMMIT TRANSACTION
+  END TRY
+  BEGIN CATCH
+    IF @@TRANCOUNT > 0
+      ROLLBACK TRANSACTION
+    THROW;
+  END CATCH
+END
+GO
+
+
 -- purchasing.spUpdateVendor @id = 15, @name = "abcde", @active = false, @priority = true, @weburl = NULL
+-- GO
+-- purchasing.spUpdateStocks @id = 6, @name = "abcde", @description = "abc", @size = "abc", @color = "abc"
 -- GO
 
 -- select * from purchasing.vendor
+-- select * from purchasing.stocks
+-- select * from purchasing.stock_photo
 
-USE tempdb;
+SELECT * from INFORMATION_SCHEMA.columns where table_name = 'stock_photo'
+USE Northwind;
 GO

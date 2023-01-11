@@ -3,10 +3,10 @@ GO
 
 USE Hotel_Realta;
 GO
-DROP TRIGGER purchasing.tr_vendor_modified_date;
-DROP TRIGGER purchasing.tr_stocks_modified_date;
-DROP TRIGGER purchasing.tr_pode_modified_date;
-DROP TRIGGER purchasing.tr_update_stock_quantity;
+DROP TRIGGER IF EXISTS purchasing.tr_vendor_modified_date;
+DROP TRIGGER IF EXISTS purchasing.tr_stocks_modified_date;
+DROP TRIGGER IF EXISTS purchasing.tr_pode_modified_date;
+DROP TRIGGER IF EXISTS purchasing.tr_update_stock_quantity;
 GO
 
 CREATE TRIGGER tr_vendor_modified_date
@@ -220,7 +220,7 @@ GO
 DROP PROCEDURE IF EXISTS SpUpdatePohe;
 GO
 
-CREATE PROCEDURE [Purchasing].[SpUpdatePohe]
+CREATE PROCEDURE [Purchasing].[spUpdatePohe]
     @ID int,
     @Number nvarchar(20),
     @PoheStatus tinyint,

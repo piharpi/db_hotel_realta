@@ -342,6 +342,7 @@ select * from users.bonus_points;
 
 -- INSERT MODULE Hotel
 SET IDENTITY_INSERT Hotel.Hotels ON;
+
 INSERT INTO Hotel.Hotels (hotel_id, hotel_name, hotel_description, hotel_rating_star, hotel_phonenumber, hotel_modified_date, hotel_addr_id)
 VALUES
 (1,'Hotel Amaris Palembang', 'Hotel bintang 3 dengan fasilitas yang lengkap dan modern di Palembang', 3, '+62 823 3456 7891', '2022-01-01', 1),
@@ -358,7 +359,6 @@ SET IDENTITY_INSERT Hotel.Hotels OFF;
 select * from Hotel.hotels;
 
 SET IDENTITY_INSERT Hotel.Facilities ON;
-
 INSERT INTO Hotel.Facilities (faci_id, faci_name, faci_description, faci_max_number, faci_measure_unit, 
 faci_room_number, faci_startdate, faci_endate, faci_low_price, faci_high_price, faci_rate_price, 
 faci_discount, faci_tax_rate, faci_cagro_id, faci_hotel_id)
@@ -684,7 +684,7 @@ SELECT*FROM resto.resto_menu_photos;
 SET IDENTITY_INSERT Payment.entity ON
 INSERT 
   INTO Payment.entity(entity_id) 
-VALUES (1),(2),(3),(4),(5),(6),(7),(8),(9),(10),(11),(12),(13),(14),(15);
+VALUES (1),(2),(3),(4),(5),(6),(7),(8),(9),(10),(11),(12),(13),(14),(15),(16),(17),(18),(19),(20),(21),(22),(23),(24),(25);
 SET IDENTITY_INSERT Payment.Entity OFF
 SELECT*FROM payment.entity;
 
@@ -734,78 +734,73 @@ VALUES (1, 1, '6271263188999', 1000000, 'debet', 11, 22, CURRENT_TIMESTAMP),
 SELECT*FROM payment.user_accounts;
 
 -- payment_transactions
-SET IDENTITY_INSERT Payment.payment_transaction ON
+SET IDENTITY_INSERT Payment.payment_transaction ON;
 INSERT
   INTO Payment.payment_transaction(patr_id, patr_trx_number, patr_debet, patr_credit, patr_type, patr_note, patr_modified_date, 
                                   patr_order_number, patr_source_id, patr_target_id, patr_trx_number_ref, patr_user_id)
 VALUES (1, 'TRB#20221127-0001', 150000, 150000, 'TRB', NULL, CURRENT_TIMESTAMP, 'BO#20221127-0001', 1, 2, 'TRB#20221127-0001', 1),
        (2, 'TRB#20221127-0002', 150000, 150000, 'ORM', NULL, CURRENT_TIMESTAMP, 'MENUS#20221127-0001', 2, 1, 'TRB#20221127-0002', 2);
-SET IDENTITY_INSERT Payment.payment_transaction OFF
+SET IDENTITY_INSERT Payment.payment_transaction OFF;
 SELECT*FROM payment.payment_transaction;
 
 -- PURCHASING INSERT
-SET IDENTITY_INSERT purchasing.vendor ON
-INSERT INTO purchasing.vendor (vendor_id, vendor_name, vendor_active, vendor_priority, vendor_weburl)
-VALUES (1,'Global Equipment Co.', 1, 0, 'www.globalequipment.com'),
-       (2,'Sustainable Solutions Inc.', 1, 1, 'www.sustainablesolutions.com'),
-       (3,'Quality Parts LLC', 1, 0, 'www.qualityparts.com'),
-       (4,'Innovative Technologies Corp.', 0, 1, 'www.innovativetechnologies.com'),
-       (5,'Dynamic Enterprises Inc.', 1, 0, 'www.dynamicenterprises.com'),
-       (6,'Elite Supplies Co.', 1, 1, 'www.elitesupplies.com'),
-       (7,'Superior Products LLC', 0, 0, 'www.superiorproducts.com'),
-       (8,'Advanced Materials Inc.', 1, 1, 'www.advancedmaterials.com'),
-       (9,'Bright Ideas Inc.', 1, 0, 'www.brightideas.com'),
-       (10,'Progressive Solutions Inc.', 0, 1, 'www.progressivesolutions.com');
-SET IDENTITY_INSERT purchasing.vendor OFF
+INSERT INTO purchasing.vendor (vendor_entity_id, vendor_name, vendor_active, vendor_priority, vendor_weburl)
+VALUES (16,'Global Equipment Co.', 1, 0, 'www.globalequipment.com'),
+       (17,'Sustainable Solutions Inc.', 1, 1, 'www.sustainablesolutions.com'),
+       (18,'Quality Parts LLC', 1, 0, 'www.qualityparts.com'),
+       (19,'Innovative Technologies Corp.', 0, 1, 'www.innovativetechnologies.com'),
+       (20,'Dynamic Enterprises Inc.', 1, 0, 'www.dynamicenterprises.com'),
+       (21,'Elite Supplies Co.', 1, 1, 'www.elitesupplies.com'),
+       (22,'Superior Products LLC', 0, 0, 'www.superiorproducts.com'),
+       (23,'Advanced Materials Inc.', 1, 1, 'www.advancedmaterials.com'),
+       (24,'Bright Ideas Inc.', 1, 0, 'www.brightideas.com'),
+       (25,'Progressive Solutions Inc.', 0, 1, 'www.progressivesolutions.com');
 -- UPDATE purchasing.vendor SET vendor_priority = 0 where vendor_id=1
 SELECT*FROM Purchasing.vendor;
 
+SET IDENTITY_INSERT purchasing.stocks ON;
+INSERT INTO purchasing.stocks (stock_id, stock_name, stock_description, stock_size, stock_color)
+VALUES
+  (1, 'Sprei Hotel', 'Sprei dengan bahan yang nyaman dan tahan lama', 'King', 'Putih'),
+  (2, 'Bantal Hotel', 'Bantal dengan bahan yang nyaman dan tahan lama', 'Standard', 'Putih'),
+  (3, 'Handuk Hotel', 'Handuk dengan bahan yang nyaman dan tahan lama', 'Standard', 'Putih'),
+  (4, 'Gorden Hotel', 'Gorden dengan bahan yang tahan lama dan mudah dicuci', 'Standard', 'Putih'),
+  (5, 'Gelas Hotel', 'Gelas dengan bahan yang tahan lama dan mudah dicuci', 'Standard', 'Transparan');
+SET IDENTITY_INSERT purchasing.stocks OFF;
+SELECT*FROM purchasing.stocks;
+
+SET IDENTITY_INSERT purchasing.vendor_product ON;
+INSERT INTO purchasing.vendor_product (vepro_id, vepro_qty_stocked, vepro_qty_remaining, vepro_price, venpro_stock_id, vepro_vendor_id)
+VALUES (1, 3, 2, 1000000, 1, 25),
+       (2, 5, 6, 2000000, 2, 24),
+       (3, 2, 2, 3000000, 3, 23),
+       (4, 4, 4, 4000000, 4, 22),
+       (5, 8, 9, 5000000, 5, 21),
+       (6, 1, 9, 5000000, 5, 20),
+       (7, 6, 7, 7000000, 4, 19),
+       (8, 1, 5, 8000000, 3, 18),
+       (9, 4, 5, 9000000, 2, 17),
+       (10, 2, 3, 10000000, 1, 16);
+SET IDENTITY_INSERT purchasing.vendor_product OFF;
+-- UPDATE purchasing.vendor SET vendor_priority = 0 where vendor_id=1
+SELECT*FROM Purchasing.vendor_product;
+
 INSERT INTO purchasing.purchase_order_header (pohe_number, pohe_status, pohe_tax, pohe_refund, pohe_arrival_date, pohe_pay_type, pohe_emp_id, pohe_vendor_id)
 VALUES
-  ('PO-001', 1, 150000, 0, GETDATE() + 10, 'CA', 1, 1),
-  ('PO-002', 1, 300000, 0, GETDATE() + 15, 'CA', 1, 2),
-  ('PO-003', 1, 450000, 0, GETDATE() + 20, 'TR', 1, 3),
-  ('PO-004', 1, 600000, 0, GETDATE() + 25, 'TR', 1, 4),
-  ('PO-005', 1, 750000, 0, GETDATE() + 30, 'CA', 1, 5);
- SELECT*FROM Purchasing.purchase_order_header;
-
-INSERT INTO purchasing.stocks (stock_name, stock_description, stock_size, stock_color)
-VALUES
-  ('Sprei Hotel', 'Sprei dengan bahan yang nyaman dan tahan lama', 'King', 'Putih'),
-  ('Bantal Hotel', 'Bantal dengan bahan yang nyaman dan tahan lama', 'Standard', 'Putih'),
-  ('Handuk Hotel', 'Handuk dengan bahan yang nyaman dan tahan lama', 'Standard', 'Putih'),
-  ('Gorden Hotel', 'Gorden dengan bahan yang tahan lama dan mudah dicuci', 'Standard', 'Putih'),
-  ('Gelas Hotel', 'Gelas dengan bahan yang tahan lama dan mudah dicuci', 'Standard', 'Transparan');
-SELECT*FROM Purchasing.stocks;
-
-select * from information_schema.Columns where table_name = 'stocks'
+  ('PO-001', 1, 150000, 0, GETDATE() + 10, 'CA', 1, 16),
+  ('PO-002', 1, 300000, 0, GETDATE() + 15, 'CA', 1, 17),
+  ('PO-003', 1, 450000, 0, GETDATE() + 20, 'TR', 1, 18),
+  ('PO-004', 1, 600000, 0, GETDATE() + 25, 'TR', 1, 19),
+  ('PO-005', 1, 750000, 0, GETDATE() + 30, 'CA', 1, 16);
+SELECT*FROM Purchasing.purchase_order_header;
+select * from information_schema.Columns where table_name = 'stocks';
 
 INSERT INTO purchasing.stock_detail (stod_stock_id, stod_barcode_number, stod_status, stod_notes, stod_faci_id, stod_pohe_id)
 VALUES
-  (1, 'Barcode Sprei 1', 2, 'Sprei di kamar 101', 1, 1),
-  (1, 'Barcode Sprei 2', 4, 'Sprei di kamar 102', 1, 1),
-  (1, 'Barcode Sprei 3', 4, 'Sprei di kamar 103', 1, 1),
-  (1, 'Barcode Sprei 4', 1, 'Sprei di kamar 104', 1, 1),
-  (1, 'Barcode Sprei 5', 1, 'Sprei di kamar 105', 1, 1),
+  (1, 'Barcode Sprei 1', 2, 'Sprei di kamar 101', 1, 6),
   (2, 'Barcode Bantal 1', 3, 'Bantal di kamar 106', 2, 2),
-  (2, 'Barcode Bantal 2', 1, 'Bantal di kamar 107', 2, 2),
-  (2, 'Barcode Bantal 3', 1, 'Bantal di kamar 108', 2, 2),
-  (2, 'Barcode Bantal 4', 1, 'Bantal di kamar 109', 2, 2),
-  (2, 'Barcode Bantal 5', 1, 'Bantal di kamar 110', 2, 2),
-  (3, 'Barcode Handuk 6', 1, 'Handuk di kamar 111', 3, 3),
-  (3, 'Barcode Handuk 7', 1, 'Handuk di kamar 112', 3, 3),
-  (3, 'Barcode Handuk 8', 1, 'Handuk di kamar 113', 3, 3),
-  (3, 'Barcode Handuk 9', 1, 'Handuk di kamar 114', 3, 3),
   (3, 'Barcode Handuk 10', 1, 'Handuk di kamar 115', 3, 3),
-  (4, 'Barcode Gorden 1', 1, 'Gorden di kamar 116', 4, 4),
-  (4, 'Barcode Gorden 2', 1, 'Gorden di kamar 117', 4, 4),
-  (4, 'Barcode Gorden 3', 1, 'Gorden di kamar 118', 4, 4),
-  (4, 'Barcode Gorden 4', 1, 'Gorden di kamar 119', 4, 4),
   (4, 'Barcode Gorden 5', 1, 'Gorden di kamar 120', 4, 4),
-  (5, 'Barcode Gelas 1', 1, 'Gelas di kamar 121', 5, 5),
-  (5, 'Barcode Gelas 2', 1, 'Gelas di kamar 122', 5, 5),
-  (5, 'Barcode Gelas 3', 1, 'Gelas di kamar 123', 5, 5),
-  (5, 'Barcode Gelas 4', 1, 'Gelas di kamar 124', 5, 5),
   (5, 'Barcode Gelas 5', 1, 'Gelas di kamar 125', 5, 5);
 SELECT*FROM Purchasing.stock_detail;
 
@@ -820,19 +815,11 @@ SELECT*FROM Purchasing.stock_photo;
 
 INSERT INTO purchasing.purchase_order_detail (pode_pohe_id, pode_order_qty, pode_price, pode_received_qty, pode_rejected_qty, pode_stock_id)
 VALUES
-  (1, 10, 100000, 9, 1, 1),
-  (1, 20, 150000, 18, 2, 2),
-  (2, 30, 200000, 28, 2, 3),
-  (2, 40, 250000, 38, 2, 4),
+  (6, 10, 100000, 9, 1, 1),
   (2, 50, 300000, 48, 2, 5),
   (3, 60, 350000, 57, 3, 1),
-  (3, 70, 400000, 67, 3, 2),
-  (3, 80, 450000, 77, 3, 3),
-  (4, 90, 500000, 87, 3, 4),
   (4, 100, 550000, 97, 3, 5),
-  (5, 110, 600000, 107, 3, 1),
-  (5, 120, 650000, 117, 3, 2),
-  (5, 130, 700000, 127, 3, 3);
+  (5, 110, 600000, 107, 3, 1);
 SELECT*FROM Purchasing.purchase_order_detail;
 
 -- USE Northwind;

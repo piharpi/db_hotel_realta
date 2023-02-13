@@ -384,7 +384,7 @@ CREATE TABLE HR.work_orders (
 
 CREATE TABLE HR.work_order_detail (
 	wode_id int IDENTITY(1,1),
-	wode_task_name nvarchar(255),
+	wode_task_menu nvarchar(255),
 	wode_status nvarchar(15),
 	wode_start_date datetime,
 	wode_end_date datetime,

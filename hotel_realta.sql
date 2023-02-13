@@ -649,7 +649,7 @@ CREATE TABLE Payment.payment_transaction(
 
 -- MODULE PURCHASING --
 CREATE TABLE purchasing.vendor(
-  vendor_id INT IDENTITY(1,1),
+  vendor_entity_id INT,
   vendor_name NVARCHAR(55) NOT NULL,
   vendor_active BIT DEFAULT 1,
   vendor_priority BIT DEFAULT 0,
@@ -657,7 +657,10 @@ CREATE TABLE purchasing.vendor(
   vendor_weburl NVARCHAR(1025),
   vendor_modified_date DATETIME NOT NULL DEFAULT GETDATE(),
 
-  CONSTRAINT pk_vendor_id PRIMARY KEY (vendor_id),
+  CONSTRAINT pk_vendor_entity_id PRIMARY KEY (vendor_entity_id),
+  CONSTRAINT fk_vendor_entity_id FOREIGN KEY (vendor_entity_id) 
+      REFERENCES payment.entity(entity_id) 
+      ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT ck_vendor_priority CHECK (vendor_priority IN (0,1)),
   CONSTRAINT ck_vendor_active CHECK (vendor_active IN (0,1))
 );
@@ -677,6 +680,23 @@ CREATE TABLE purchasing.stocks(
   stock_modified_date DATETIME NOT NULL DEFAULT GETDATE(),
 
   CONSTRAINT pk_department_id PRIMARY KEY (stock_id)
+);
+
+CREATE TABLE purchasing.vendor_product(
+  vepro_id INT IDENTITY (1,1),
+  vepro_qty_stocked INT NOT NULL,
+  vepro_qty_remaining INT NOT NULL,
+  vepro_price MONEY NOT NULL,
+  venpro_stock_id INT,
+  vepro_vendor_id INT
+
+  CONSTRAINT pk_vepro_id PRIMARY KEY (vepro_id),
+  CONSTRAINT fk_venpro_stock_id FOREIGN KEY (venpro_stock_id) 
+      REFERENCES purchasing.stocks(stock_id) 
+      ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT fk_vepro_vendor_id FOREIGN KEY (vepro_vendor_id) 
+      REFERENCES purchasing.vendor(vendor_entity_id) 
+      ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 CREATE TABLE purchasing.stock_photo(
@@ -715,7 +735,7 @@ CREATE TABLE purchasing.purchase_order_header(
       REFERENCES hr.employee(emp_id) 
       ON DELETE CASCADE ON UPDATE CASCADE,
     CONSTRAINT fk_pohe_vendor_id FOREIGN KEY (pohe_vendor_id) 
-      REFERENCES purchasing.vendor(vendor_id) 
+      REFERENCES purchasing.vendor(vendor_entity_id) 
       ON DELETE CASCADE ON UPDATE CASCADE,
     CONSTRAINT ck_pohe_pay_type CHECK (pohe_pay_type IN('TR', 'CA')),
     CONSTRAINT ck_pohe_status CHECK (pohe_status IN(1, 2, 3, 4)),

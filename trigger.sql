@@ -106,6 +106,7 @@ BEGIN
 
 		INSERT 
 			INTO Payment.bank (bank_entity_id, bank_code, bank_name, bank_modified_date) 
+    OUTPUT INSERTED.bank_entity_id
 		VALUES (SCOPE_IDENTITY(), @bank_code, @bank_name, GETDATE())  
 END
 GO  
@@ -136,6 +137,7 @@ BEGIN
 
 		INSERT 
 			INTO Payment.payment_gateway (paga_entity_id, paga_code, paga_name, paga_modified_date) 
+    OUTPUT INSERTED.paga_entity_id
 		VALUES (SCOPE_IDENTITY(), @paga_code, @paga_name, GETDATE())
 END
 GO

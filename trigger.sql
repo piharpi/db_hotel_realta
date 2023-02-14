@@ -291,7 +291,7 @@ BEGIN
               pode_order_qty = @PodeOrderQty, 
               pode_price = @PodePrice, 
               pode_received_qty = @PodeReceivedQty,
-              pode_rejected_qty=@PodeRejectedQty,
+              pode_rejected=@PodeRejectedQty,
               pode_stock_id =@PodeStockId
             WHERE pode_id = @PodeId
       COMMIT TRANSACTION

@@ -384,7 +384,7 @@ CREATE TABLE HR.work_orders (
 
 CREATE TABLE HR.work_order_detail (
 	wode_id int IDENTITY(1,1),
-	wode_task_menu nvarchar(255),
+	wode_task_name nvarchar(255),
 	wode_status nvarchar(15),
 	wode_start_date datetime,
 	wode_end_date datetime,
@@ -739,7 +739,7 @@ CREATE TABLE purchasing.purchase_order_header(
       REFERENCES purchasing.vendor(vendor_entity_id) 
       ON DELETE CASCADE ON UPDATE CASCADE,
     CONSTRAINT ck_pohe_pay_type CHECK (pohe_pay_type IN('TR', 'CA')),
-    CONSTRAINT ck_pohe_status CHECK (pohe_status IN(1, 2, 3, 4)),
+    CONSTRAINT ck_pohe_status CHECK (pohe_status IN(1, 2, 3, 4, 5)),
 );
 
 CREATE TABLE purchasing.purchase_order_detail (

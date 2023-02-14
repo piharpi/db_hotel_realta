@@ -797,7 +797,7 @@ select * from information_schema.Columns where table_name = 'stocks';
 
 INSERT INTO purchasing.stock_detail (stod_stock_id, stod_barcode_number, stod_status, stod_notes, stod_faci_id, stod_pohe_id)
 VALUES
-  (1, 'Barcode Sprei 1', 2, 'Sprei di kamar 101', 1, 6),
+  (1, 'Barcode Sprei 1', 2, 'Sprei di kamar 101', 1, 1),
   (2, 'Barcode Bantal 1', 3, 'Bantal di kamar 106', 2, 2),
   (3, 'Barcode Handuk 10', 1, 'Handuk di kamar 115', 3, 3),
   (4, 'Barcode Gorden 5', 1, 'Gorden di kamar 120', 4, 4),
@@ -815,7 +815,7 @@ SELECT*FROM Purchasing.stock_photo;
 
 INSERT INTO purchasing.purchase_order_detail (pode_pohe_id, pode_order_qty, pode_price, pode_received_qty, pode_rejected_qty, pode_stock_id)
 VALUES
-  (6, 10, 100000, 9, 1, 1),
+  (1, 10, 100000, 9, 1, 1),
   (2, 50, 300000, 48, 2, 5),
   (3, 60, 350000, 57, 3, 1),
   (4, 100, 550000, 97, 3, 5),

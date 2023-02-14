@@ -7,6 +7,16 @@ DROP TRIGGER IF EXISTS purchasing.tr_vendor_modified_date;
 DROP TRIGGER IF EXISTS purchasing.tr_stocks_modified_date;
 DROP TRIGGER IF EXISTS purchasing.tr_pode_modified_date;
 DROP TRIGGER IF EXISTS purchasing.tr_update_stock_quantity;
+DROP TRIGGER IF EXISTS purchasing.tr_update_stock_scrap;
+DROP TRIGGER IF EXISTS purchasing.tr_update_stock_quantity;
+DROP TRIGGER IF EXISTS purchasing.tr_update_stock_used;
+DROP TRIGGER IF EXISTS purchasing.tr_update_sub_total;
+DROP PROCEDURE IF EXISTS purchasing.spUpdateVendor;
+DROP PROCEDURE IF EXISTS purchasing.spUpdateStocks;
+DROP PROCEDURE IF EXISTS purchasing.spUpdateStockPhoto;
+DROP PROCEDURE IF EXISTS purchasing.spUpdatePohe;
+DROP PROCEDURE IF EXISTS purchasing.spUpdatePode;
+
 GO
 
 CREATE TRIGGER tr_vendor_modified_date
@@ -16,7 +26,7 @@ AS
 BEGIN
   UPDATE purchasing.vendor
   SET vendor_modified_date = GETDATE()
-  WHERE vendor_id IN(SELECT vendor_id FROM inserted)
+  WHERE vendor_entity_id IN(SELECT vendor_entity_id FROM inserted)
 END;
 GO
 
@@ -136,7 +146,7 @@ BEGIN
       vendor_modified_date = GETDATE(),
       vendor_weburl = @weburl
     WHERE
-      vendor_id = @id;
+      vendor_entity_id = @id;
 
     COMMIT TRANSACTION
   END TRY
@@ -304,6 +314,6 @@ GO
 -- select * from purchasing.stocks
 -- select * from purchasing.stock_photo
 
-SELECT * from INFORMATION_SCHEMA.columns where table_name = 'stock_photo'
+--SELECT * from INFORMATION_SCHEMA.columns where table_name = 'stock_photo'
 -- USE Northwind;
 -- GO

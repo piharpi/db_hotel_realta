@@ -734,8 +734,8 @@ SET IDENTITY_INSERT Payment.payment_transaction ON
 INSERT
   INTO Payment.payment_transaction(patr_id, patr_trx_number, patr_debet, patr_credit, patr_type, patr_note, patr_modified_date, 
                                   patr_order_number, patr_source_id, patr_target_id, patr_trx_number_ref, patr_user_id)
-VALUES (1, 'TRB#20221127-0001', 150000, 150000, 'TRB', NULL, CURRENT_TIMESTAMP, 'BO#20221127-0001', 1, 2, 'TRB#20221127-0001', 1),
-       (2, 'TRB#20221127-0002', 150000, 150000, 'ORM', NULL, CURRENT_TIMESTAMP, 'MENUS#20221127-0001', 2, 1, 'TRB#20221127-0002', 2);
+VALUES (1, 'TRB#20221127-0001', 150000, 150000, 'TRB', 'Tranfer Booking', CURRENT_TIMESTAMP, 'BO#20221127-0001', '6271263188999', '8012372737662', 'TRB#20221127-0001', 1),
+       (2, 'TRB#20221127-0002', 150000, 150000, 'ORM', 'Order Menu', CURRENT_TIMESTAMP, 'MENUS#20221127-0001', '8012372737662', '6271263188999', 'TRB#20221127-0002', 2);
 SET IDENTITY_INSERT Payment.payment_transaction OFF
 SELECT*FROM payment.payment_transaction;
 

@@ -603,8 +603,8 @@ CREATE TABLE Payment.user_accounts(
 	usac_account_number varchar(25) UNIQUE NOT NULL,
 	usac_saldo money,
 	usac_type nvarchar(15),
-	usac_expmonth tinyint,
-	usac_expyear smallint,
+	usac_expmonth tinyint DEFAULT NULL,
+	usac_expyear smallint DEFAULT NULL,
 	usac_modified_date datetime,
 	CONSTRAINT CK_PaymentUserAccountsType CHECK (usac_type IN ('debet', 'credit card', 'payment')),
 	CONSTRAINT PK_PaymentUserAccountsEntityId PRIMARY KEY(usac_entity_id, usac_user_id),
@@ -627,8 +627,8 @@ CREATE TABLE Payment.payment_transaction(
 	patr_note nvarchar(255),
 	patr_modified_date datetime,
 	patr_order_number nvarchar(55),
-	patr_source_id int,
-	patr_target_id int,
+	patr_source_id varchar(25),
+	patr_target_id varchar(25),
 	patr_trx_number_ref nvarchar(55) UNIQUE,
 	patr_user_id int,
 	CONSTRAINT CK_PaymentPaymentTransactionType CHECK (patr_type IN ('TP', 'TRB', 'RPY', 'RF', 'ORM')),
@@ -637,13 +637,9 @@ CREATE TABLE Payment.payment_transaction(
 		ON UPDATE CASCADE
 		ON DELETE SET NULL,
 	CONSTRAINT FK_PaymentPaymentTransactionSourceId FOREIGN KEY (patr_source_id)
-		REFERENCES Payment.Bank(bank_entity_id)
-		ON UPDATE CASCADE
-		ON DELETE SET NULL,
+		REFERENCES Payment.User_Accounts(usac_account_number),
 	CONSTRAINT FK_PaymentPaymentTransactionTargetId FOREIGN KEY (patr_target_id)
-		REFERENCES Payment.Bank(bank_entity_id)
-		ON UPDATE NO ACTION
-		ON DELETE NO ACTION
+		REFERENCES Payment.User_Accounts(usac_account_number)
 );
 
 -- MODULE PURCHASING --

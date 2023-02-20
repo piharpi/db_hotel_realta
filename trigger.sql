@@ -141,3 +141,45 @@ BEGIN
 		VALUES (SCOPE_IDENTITY(), @paga_code, @paga_name, GETDATE())
 END
 GO
+
+-- =============================================
+-- Author:		Harpi
+-- Create date: 8 January 2023
+-- Description:	Create identity in Entity table and insert payment 
+-- =============================================
+CREATE TRIGGER Payment.CalculateUserAccountCredit
+   ON  Payment.Payment_Transaction 
+   AFTER INSERT
+AS 
+BEGIN
+	-- SET NOCOUNT ON added to prevent extra result sets from
+	-- interfering with SELECT statements.
+	SET NOCOUNT ON
+		DECLARE @tar_account As nvarchar(50)
+		DECLARE @src_account As nvarchar(50)
+		DECLARE @transaction_type As nvarchar(10)
+		DECLARE @xpse As Money
+
+		SELECT @src_account = patr_source_id FROM inserted;
+		SELECT @tar_account = patr_target_id FROM inserted;
+		SELECT @transaction_type = patr_type FROM inserted;
+		SELECT @xpse = (patr_credit + patr_debet) FROM inserted;
+
+    -- Insert statements for trigger here
+		-- TOP UP
+		IF TRIM(@transaction_type) = 'TP'
+		BEGIN
+			EXECUTE [Payment].[spTopUpTransaction] 
+				 @source_account = @src_account
+				,@target_account = @tar_account
+				,@expense = @xpse
+		END
+
+		SELECT patr_id FROM inserted;
+
+		-- TRANSFER BOOKING
+		-- REPAYMENT 
+		-- REFUND 
+		-- ORDER MENU
+END
+GO

@@ -142,13 +142,21 @@ BEGIN
 END
 GO
 
+USE [Hotel_Realta]
+GO
+/****** Object:  Trigger [Payment].[CalculateUserAccountCredit]    Script Date: 20/02/2023 21:49:17 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+
 -- =============================================
 -- Author:		Harpi
 -- Create date: 8 January 2023
 -- Description:	Create identity in Entity table and insert payment 
 -- =============================================
-CREATE TRIGGER Payment.CalculateUserAccountCredit
-   ON  Payment.Payment_Transaction 
+ALTER TRIGGER [Payment].[CalculateUserAccountCredit]
+   ON  [Payment].[payment_transaction] 
    AFTER INSERT
 AS 
 BEGIN
@@ -163,11 +171,11 @@ BEGIN
 		SELECT @src_account = patr_source_id FROM inserted;
 		SELECT @tar_account = patr_target_id FROM inserted;
 		SELECT @transaction_type = patr_type FROM inserted;
-		SELECT @xpse = (patr_credit + patr_debet) FROM inserted;
+		SELECT @xpse = (patr_credit + patr_debet) FROM inserted
 
     -- Insert statements for trigger here
 		-- TOP UP
-		IF TRIM(@transaction_type) = 'TP'
+		IF @transaction_type = 'TP'
 		BEGIN
 			EXECUTE [Payment].[spTopUpTransaction] 
 				 @source_account = @src_account
@@ -175,11 +183,42 @@ BEGIN
 				,@expense = @xpse
 		END
 
-		SELECT patr_id FROM inserted;
-
 		-- TRANSFER BOOKING
+		IF @transaction_type = 'TRB' 
+		BEGIN
+			EXECUTE [Payment].[spTopUpTransaction] 
+				 @source_account = @src_account
+				,@target_account = @tar_account
+				,@expense = @xpse
+		END
+
 		-- REPAYMENT 
+		IF @transaction_type = 'RPY' 
+		BEGIN
+			EXECUTE [Payment].[spTopUpTransaction] 
+				 @source_account = @src_account
+				,@target_account = @tar_account
+				,@expense = @xpse
+		END
+			
 		-- REFUND 
+		IF @transaction_type = 'RF' 
+		BEGIN
+			EXECUTE [Payment].[spTopUpTransaction] 
+				 @source_account = @tar_account
+				,@target_account = @src_account
+				,@expense =  @xpse
+		END
+
 		-- ORDER MENU
+		IF @transaction_type = 'ORM' 
+		BEGIN
+			EXECUTE [Payment].[spTopUpTransaction] 
+				 @source_account = @src_account
+				,@target_account = @tar_account
+				,@expense = @xpse
+		END
+			
+		SELECT patr_id FROM inserted;
 END
-GO
+

@@ -629,7 +629,7 @@ CREATE TABLE Payment.payment_transaction(
 	patr_order_number nvarchar(55),
 	patr_source_id varchar(25),
 	patr_target_id varchar(25),
-	patr_trx_number_ref nvarchar(55) UNIQUE,
+	patr_trx_number_ref nvarchar(55) NULL,
 	patr_user_id int,
 	CONSTRAINT CK_PaymentPaymentTransactionType CHECK (patr_type IN ('TP', 'TRB', 'RPY', 'RF', 'ORM')),
 	CONSTRAINT FK_PaymentPaymentTransactionUserId FOREIGN KEY (patr_user_id)
@@ -641,6 +641,10 @@ CREATE TABLE Payment.payment_transaction(
 	CONSTRAINT FK_PaymentPaymentTransactionTargetId FOREIGN KEY (patr_target_id)
 		REFERENCES Payment.User_Accounts(usac_account_number)
 );
+
+CREATE UNIQUE INDEX UQ_PaymentTransaction_patr_trx_number_ref
+  ON Payment.payment_transaction(patr_trx_number_ref)
+  WHERE patr_trx_number_ref IS NOT NULL
 
 -- MODULE PURCHASING --
 CREATE TABLE purchasing.vendor(

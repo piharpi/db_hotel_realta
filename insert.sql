@@ -685,6 +685,7 @@ SET IDENTITY_INSERT Payment.Entity OFF
 SELECT*FROM payment.entity;
 
 -- insert bank
+DISABLE TRIGGER [Payment].[InsertBankEntityId] ON [Payment].bank
 INSERT 
   INTO Payment.bank (bank_entity_id, bank_code, bank_name, bank_modified_date)
 VALUES (1, '002', 'BRI', CURRENT_TIMESTAMP),
@@ -694,9 +695,12 @@ VALUES (1, '002', 'BRI', CURRENT_TIMESTAMP),
        (5, '200', 'BTN', CURRENT_TIMESTAMP),
        (6, '008', 'MANDIRI', CURRENT_TIMESTAMP),
        (7, '147', 'MUAMALAT', CURRENT_TIMESTAMP);
+ENABLE TRIGGER [Payment].[InsertBankEntityId] ON [Payment].bank
 SELECT*FROM payment.bank;
 
 -- insert payment_gateway
+DISABLE TRIGGER [Payment].[InsertPaymentEntityId] ON [Payment].payment_gateway;
+
 INSERT 
   INTO Payment.payment_gateway(paga_entity_id, paga_code, paga_name, paga_modified_date)
 VALUES (8, 'GOPAY', 'PT. Dompet Anak Bangsa', CURRENT_TIMESTAMP),
@@ -707,6 +711,8 @@ VALUES (8, 'GOPAY', 'PT. Dompet Anak Bangsa', CURRENT_TIMESTAMP),
        (13, 'JENIUS', 'PT. Bank BTPN Tbk', CURRENT_TIMESTAMP),
        (14, 'JAGO', 'PT. Bank Jago Tbk', CURRENT_TIMESTAMP),
        (15, 'SAKUKU', 'PT. Bank Central Asia Tbk', CURRENT_TIMESTAMP);
+ENABLE TRIGGER [Payment].[InsertPaymentEntityId] ON [Payment].payment_gateway;
+
 SELECT*FROM payment.payment_gateway;
        
 -- user_accounts

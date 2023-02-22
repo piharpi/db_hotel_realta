@@ -6,10 +6,10 @@ GO
 DROP TRIGGER IF EXISTS purchasing.tr_vendor_modified_date;
 DROP TRIGGER IF EXISTS purchasing.tr_stocks_modified_date;
 DROP TRIGGER IF EXISTS purchasing.tr_pode_modified_date;
-DROP TRIGGER IF EXISTS purchasing.tr_update_stock_quantity;
-DROP TRIGGER IF EXISTS purchasing.tr_update_stock_scrap;
-DROP TRIGGER IF EXISTS purchasing.tr_update_stock_quantity;
-DROP TRIGGER IF EXISTS purchasing.tr_update_stock_used;
+DROP TRIGGER IF EXISTS purchasing.tr_delete_header_if_no_detail;
+--DROP TRIGGER IF EXISTS purchasing.tr_update_stock_quantity;
+--DROP TRIGGER IF EXISTS purchasing.tr_update_stock_scrap;
+--DROP TRIGGER IF EXISTS purchasing.tr_update_stock_used;
 DROP TRIGGER IF EXISTS purchasing.tr_update_sub_total;
 DROP PROCEDURE IF EXISTS purchasing.spUpdateVendor;
 DROP PROCEDURE IF EXISTS purchasing.spUpdateStocks;
@@ -17,6 +17,22 @@ DROP PROCEDURE IF EXISTS purchasing.spUpdateStockPhoto;
 DROP PROCEDURE IF EXISTS purchasing.spUpdatePohe;
 DROP PROCEDURE IF EXISTS purchasing.spUpdatePode;
 
+GO
+
+CREATE TRIGGER tr_delete_header_if_no_detail
+ON purchasing.purchase_order_detail
+AFTER DELETE
+AS
+BEGIN
+    DECLARE @pode_pohe_id INT;
+    
+    SELECT @pode_pohe_id = pode_pohe_id FROM deleted;
+    
+    IF NOT EXISTS (SELECT 1 FROM purchasing.purchase_order_detail WHERE pode_pohe_id = @pode_pohe_id)
+    BEGIN
+        DELETE FROM purchasing.purchase_order_header WHERE pohe_id = @pode_pohe_id;
+    END
+END
 GO
 
 CREATE TRIGGER tr_vendor_modified_date
@@ -73,54 +89,54 @@ GO
 -- TRIGGER STOCKS
 -- DROP TRIGGER purchasing.tr_update_stock_scrap;
 
-CREATE TRIGGER tr_update_stock_scrap
-ON purchasing.stock_detail
-AFTER INSERT, UPDATE, DELETE
-AS
-BEGIN
-  -- Update data di tabel stocks
-  UPDATE s
-  SET s.stock_scrap = 
-    (SELECT COUNT(*)
-     FROM purchasing.stock_detail sd
-     WHERE sd.stod_status IN (2, 3) AND s.stock_id = sd.stod_stock_id)
-  FROM purchasing.stocks s;
-END;
-GO
+--CREATE TRIGGER tr_update_stock_scrap
+--ON purchasing.stock_detail
+--AFTER INSERT, UPDATE, DELETE
+--AS
+--BEGIN
+--  -- Update data di tabel stocks
+--  UPDATE s
+--  SET s.stock_scrap = 
+--    (SELECT COUNT(*)
+--     FROM purchasing.stock_detail sd
+--     WHERE sd.stod_status IN (2, 3) AND s.stock_id = sd.stod_stock_id)
+--  FROM purchasing.stocks s;
+--END;
+--GO
 
 -- DROP TRIGGER purchasing.tr_update_stock_used;
 
-CREATE TRIGGER tr_update_stock_used
-ON purchasing.stock_detail
-AFTER INSERT, UPDATE, DELETE
-AS
-BEGIN
-  -- Update data di tabel stocks
-  UPDATE s
-  SET s.stock_used = 
-    (SELECT COUNT(*)
-     FROM purchasing.stock_detail sd
-     WHERE sd.stod_status = 4 AND s.stock_id = sd.stod_stock_id)
-  FROM purchasing.stocks s;
-END;
-GO
+--CREATE TRIGGER tr_update_stock_used
+--ON purchasing.stock_detail
+--AFTER INSERT, UPDATE, DELETE
+--AS
+--BEGIN
+--  -- Update data di tabel stocks
+--  UPDATE s
+--  SET s.stock_used = 
+--    (SELECT COUNT(*)
+--     FROM purchasing.stock_detail sd
+--     WHERE sd.stod_status = 4 AND s.stock_id = sd.stod_stock_id)
+--  FROM purchasing.stocks s;
+--END;
+--GO
 
 -- DROP TRIGGER purchasing.tr_update_stock_quantity;
 
-CREATE TRIGGER tr_update_stock_quantity
-ON purchasing.purchase_order_header
-AFTER INSERT, UPDATE, DELETE
-AS
-BEGIN
-  -- Update data di tabel stocks
-  UPDATE s
-  SET s.stock_quantity = ISNULL((SELECT SUM(pod.pode_stocked_qty) 
-                                FROM purchasing.purchase_order_detail pod
-                                JOIN purchasing.purchase_order_header poh ON poh.pohe_id = pod.pode_pohe_id
-                                WHERE s.stock_id = pod.pode_stock_id and poh.pohe_status = 4), 0)
-  FROM purchasing.stocks s;
-END;
-GO
+--CREATE TRIGGER tr_update_stock_quantity
+--ON purchasing.purchase_order_header
+--AFTER INSERT, UPDATE, DELETE
+--AS
+--BEGIN
+--  -- Update data di tabel stocks
+--  UPDATE s
+--  SET s.stock_quantity = ISNULL((SELECT SUM(pod.pode_stocked_qty) 
+--                                FROM purchasing.purchase_order_detail pod
+--                                JOIN purchasing.purchase_order_header poh ON poh.pohe_id = pod.pode_pohe_id
+--                                WHERE s.stock_id = pod.pode_stock_id and poh.pohe_status = 4), 0)
+--  FROM purchasing.stocks s;
+--END;
+--GO
 
 DROP PROCEDURE IF EXISTS spUpdateVendor;
 GO
@@ -291,7 +307,7 @@ BEGIN
               pode_order_qty = @PodeOrderQty, 
               pode_price = @PodePrice, 
               pode_received_qty = @PodeReceivedQty,
-              pode_rejected=@PodeRejectedQty,
+              pode_rejected_qty=@PodeRejectedQty,
               pode_stock_id =@PodeStockId
             WHERE pode_id = @PodeId
       COMMIT TRANSACTION

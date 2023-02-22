@@ -785,13 +785,13 @@ SET IDENTITY_INSERT purchasing.vendor_product OFF;
 -- UPDATE purchasing.vendor SET vendor_priority = 0 where vendor_id=1
 SELECT*FROM Purchasing.vendor_product;
 
-INSERT INTO purchasing.purchase_order_header (pohe_number, pohe_status, pohe_tax, pohe_refund, pohe_arrival_date, pohe_pay_type, pohe_emp_id, pohe_vendor_id)
+INSERT INTO purchasing.purchase_order_header (pohe_number, pohe_status, pohe_refund, pohe_pay_type, pohe_emp_id, pohe_vendor_id)
 VALUES
-  ('PO-001', 1, 150000, 0, GETDATE() + 10, 'CA', 1, 16),
-  ('PO-002', 1, 300000, 0, GETDATE() + 15, 'CA', 1, 17),
-  ('PO-003', 1, 450000, 0, GETDATE() + 20, 'TR', 1, 18),
-  ('PO-004', 1, 600000, 0, GETDATE() + 25, 'TR', 1, 19),
-  ('PO-005', 1, 750000, 0, GETDATE() + 30, 'CA', 1, 16);
+  ('PO-20230115-001', 1, 0, 'CA', 1, 16),
+  ('PO-20230115-002', 1, 0, 'CA', 1, 17),
+  ('PO-20230115-003', 1, 0, 'TR', 1, 18),
+  ('PO-20230115-004', 1, 0, 'TR', 1, 19),
+  ('PO-20230115-005', 1, 0, 'CA', 1, 16);
 SELECT*FROM Purchasing.purchase_order_header;
 select * from information_schema.Columns where table_name = 'stocks';
 

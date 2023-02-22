@@ -1,6 +1,7 @@
 USE Northwind;
 GO
 
+--ALTER DATABASE Hotel_Realta SET SINGLE_USER;
 DROP DATABASE IF EXISTS Hotel_Realta;
 GO
 
@@ -722,9 +723,9 @@ CREATE TABLE purchasing.purchase_order_header(
     pohe_status TINYINT DEFAULT 1,
     pohe_order_date DATETIME NOT NULL DEFAULT GETDATE(),
     pohe_subtotal MONEY,
-    pohe_tax MONEY,
-    pohe_total_amount AS pohe_subtotal+pohe_tax,
-    pohe_refund MONEY DEFAULT NULL,
+    pohe_tax MONEY NOT NULL DEFAULT 0.1,
+    pohe_total_amount AS pohe_subtotal+(pohe_tax*pohe_subtotal),
+    pohe_refund MONEY DEFAULT 0,
     pohe_arrival_date DATETIME,
     pohe_pay_type NCHAR(2) NOT NULL,
     pohe_emp_id INT,

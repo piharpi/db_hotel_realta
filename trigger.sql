@@ -16,7 +16,8 @@ DROP PROCEDURE IF EXISTS purchasing.spUpdateStocks;
 DROP PROCEDURE IF EXISTS purchasing.spUpdateStockPhoto;
 DROP PROCEDURE IF EXISTS purchasing.spUpdatePohe;
 DROP PROCEDURE IF EXISTS purchasing.spUpdatePode;
-
+DROP PROCEDURE IF EXISTS purchasing.spInsertPurchaseOrder;
+DROP PROCEDURE IF EXISTS purchasing.spDeletePurchaseOrder;
 GO
 
 CREATE TRIGGER tr_delete_header_if_no_detail
@@ -299,7 +300,7 @@ CREATE PROCEDURE [Purchasing].[spUpdatePode]
 AS
 BEGIN
   SET NOCOUNT ON;
-    
+		
     BEGIN TRY
       BEGIN TRANSACTION
         UPDATE purchasing.purchase_order_detail
@@ -319,6 +320,179 @@ BEGIN
     END CATCH
 END
 GO
+
+--USE Northwind
+--GO
+--USE Hotel_Realta;
+--GO
+
+--DROP PROCEDURE IF EXISTS purchasing.spInsertPurchaseOrder;
+--GO
+
+CREATE PROCEDURE purchasing.spInsertPurchaseOrder
+    @pohe_emp_id INT,
+    @pohe_vendor_id INT,
+	@pohe_pay_type NCHAR(2),
+    @pode_order_qty SMALLINT,
+    @pode_price MONEY,
+    @pode_stock_id INT
+AS
+BEGIN
+    SET NOCOUNT ON;
+    SET XACT_ABORT ON;
+
+	BEGIN TRY
+		BEGIN TRANSACTION
+			DECLARE @pohe_id INT;
+			DECLARE @pode_id INT;
+			DECLARE @pohe_status TINYINT;
+	
+			DECLARE @pode_rejected_qty INT = 0;
+			DECLARE @pode_received_qty INT = 0;
+
+			--DECLARE @pohe_number NVARCHAR(20);
+			DECLARE @pohe_number NVARCHAR(20) = 'PO-' + CONVERT(NVARCHAR(8), GETDATE(), 112) + '-001';
+
+			IF EXISTS (
+				SELECT TOP 1 1
+				FROM purchasing.purchase_order_header
+				WHERE pohe_number LIKE 'PO-' + CONVERT(NVARCHAR(8), GETDATE(), 112) + '-%'
+				ORDER BY pohe_number DESC
+			)
+			BEGIN
+				SELECT TOP 1 @pohe_number = 'PO-' + CONVERT(NVARCHAR(8), GETDATE(), 112) + '-' + RIGHT('000' + CAST(CAST(RIGHT(pohe_number, 3) AS INT) + 1 AS NVARCHAR(3)), 3)
+				FROM purchasing.purchase_order_header
+				WHERE pohe_number LIKE 'PO-' + CONVERT(NVARCHAR(8), GETDATE(), 112) + '-%'
+				ORDER BY pohe_number DESC;
+			END
+
+			-- Check if the vendor exists and has an active PO
+			SELECT @pohe_id = pohe_id, @pohe_status = pohe_status
+			FROM purchasing.purchase_order_header
+			WHERE pohe_vendor_id = @pohe_vendor_id
+			AND pohe_status = 1;
+
+			IF @pohe_id IS NOT NULL
+			BEGIN 
+				-- Vendor has an active PO, check if stock exists in PO
+				SELECT @pode_id = pode_id
+				FROM purchasing.purchase_order_detail
+				WHERE pode_pohe_id = @pohe_id
+				AND pode_stock_id = @pode_stock_id;
+
+				IF @pode_id IS NOT NULL
+				BEGIN
+					-- Stock exists in PO, update order quantity
+					UPDATE purchasing.purchase_order_detail
+					SET pode_order_qty = pode_order_qty + @pode_order_qty
+					WHERE pode_id = @pode_id;
+				END
+				ELSE
+				BEGIN
+					-- Stock does not exist in PO, insert new detail
+					INSERT INTO purchasing.purchase_order_detail (
+						pode_pohe_id,
+						pode_order_qty,
+						pode_price,
+						pode_stock_id,
+						pode_rejected_qty,
+						pode_received_qty
+					)
+					VALUES (
+						@pohe_id,
+						@pode_order_qty,
+						@pode_price,
+						@pode_stock_id,
+						@pode_rejected_qty,
+						@pode_received_qty
+					);
+				END
+			END
+			ELSE
+			BEGIN
+				-- Vendor does not have an active PO, create new PO
+				INSERT INTO purchasing.purchase_order_header (
+					pohe_number,
+					pohe_emp_id,
+					pohe_vendor_id,
+					pohe_pay_type
+				)
+				VALUES (
+					@pohe_number,
+					@pohe_emp_id,
+					@pohe_vendor_id,
+					@pohe_pay_type
+				);
+
+				SET @pohe_id = SCOPE_IDENTITY();
+
+				-- Insert detail
+				INSERT INTO purchasing.purchase_order_detail (
+					pode_pohe_id,
+					pode_order_qty,
+					pode_price,
+					pode_stock_id,
+					pode_rejected_qty,
+					pode_received_qty
+				)
+				VALUES (
+					@pohe_id,
+					@pode_order_qty,
+					@pode_price,
+					@pode_stock_id,
+					@pode_rejected_qty,
+					@pode_received_qty
+				);
+			END
+		COMMIT TRANSACTION
+	END TRY
+    BEGIN CATCH
+		IF @@TRANCOUNT > 0
+			ROLLBACK TRANSACTION
+		THROW;
+    END CATCH
+END
+GO
+
+CREATE PROCEDURE purchasing.spDeletePurchaseOrder
+    @pohe_number NVARCHAR(20)
+AS
+BEGIN
+    SET NOCOUNT ON;
+    
+    BEGIN TRY
+        BEGIN TRANSACTION
+        
+        DECLARE @pohe_id INT
+        
+        -- Get pohe_id from pohe_number
+        SELECT @pohe_id = pohe_id
+        FROM purchasing.purchase_order_header
+        WHERE pohe_number = @pohe_number
+        
+        IF @pohe_id IS NOT NULL
+        BEGIN
+            -- Delete detail records
+            DELETE FROM purchasing.purchase_order_detail
+            WHERE pode_pohe_id = @pohe_id
+            
+            -- Delete header record
+            DELETE FROM purchasing.purchase_order_header
+            WHERE pohe_id = @pohe_id
+        END
+        
+        COMMIT TRANSACTION
+    END TRY
+    
+    BEGIN CATCH
+        IF @@TRANCOUNT > 0
+            ROLLBACK TRANSACTION
+        -- Throw error message
+        THROW;
+    END CATCH
+END
+GO
+
 
 
 -- purchasing.spUpdateVendor @id = 15, @name = "abcde", @active = false, @priority = true, @weburl = NULL

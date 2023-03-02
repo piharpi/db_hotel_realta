@@ -1,6 +1,11 @@
 USE Northwind;
 GO
 
+--sp_who2;
+--KILL 52;
+--KILL 56;
+--KILL 57;
+--KILL 52;
 --ALTER DATABASE Hotel_Realta SET SINGLE_USER;
 DROP DATABASE IF EXISTS Hotel_Realta;
 GO

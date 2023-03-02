@@ -8,5 +8,7 @@ GO
 --SELECT DATA_TYPE, COLUMN_NAME FROM information_schema.columns WHERE table_name ='purchase_order_header';
 SELECT * from purchasing.purchase_order_header;
 SELECT * from purchasing.purchase_order_detail;
-SELECT * from purchasing.stocks;
+SELECT MAX(pohe_number)FROM purchasing.purchase_order_header WHERE pohe_number LIKE 'PO-%-%'
+--SELECT * from purchasing.stocks;
+--delete from purchasing.purchase_order_header where pohe_number = 'PO-20230223-002';
 --SELECT * FROM purchasing.purchase_order_header where pohe_number='PO-20230222-001';

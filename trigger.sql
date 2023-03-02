@@ -139,371 +139,67 @@ GO
 --END;
 --GO
 
-DROP PROCEDURE IF EXISTS spUpdateVendor;
+-- TRIGGER MODULE PAYMENT
+SET ANSI_NULLS ON
 GO
-
-CREATE PROCEDURE purchasing.spUpdateVendor
-(
-  @id INT,
-  @name NVARCHAR(55),
-  @active BIT,
-  @priority BIT,
-  @weburl NVARCHAR(1025)
-)
-AS
+SET QUOTED_IDENTIFIER ON
+GO
+-- =============================================
+-- Author:		Harpi
+-- Create date: 8 January 2023
+-- Description:	Create identity in Entity table and insert bank 
+-- =============================================
+CREATE TRIGGER Payment.InsertBankEntityId
+   ON  Payment.bank 
+   INSTEAD OF INSERT
+AS 
 BEGIN
-  BEGIN TRY
-    BEGIN TRANSACTION
+	-- SET NOCOUNT ON added to prevent extra result sets from
+	-- interfering with SELECT statements.
+	SET NOCOUNT ON
+		DECLARE @bank_code As nvarchar(10)
+		DECLARE @bank_name As nvarchar(55)
 
-    UPDATE purchasing.vendor
-    SET
-      vendor_name = @name,
-      vendor_active = @active,
-      vendor_priority = @priority,
-      vendor_modified_date = GETDATE(),
-      vendor_weburl = @weburl
-    WHERE
-      vendor_entity_id = @id;
+		SELECT @bank_code = bank_code FROM inserted;
+		SELECT @bank_name = bank_name FROM inserted;
 
-    COMMIT TRANSACTION
-  END TRY
-  BEGIN CATCH
-    IF @@TRANCOUNT > 0
-      ROLLBACK TRANSACTION
-    THROW;
-  END CATCH
+    -- Insert statements for trigger here
+		 INSERT 
+			 INTO Payment.entity 
+		DEFAULT VALUES
+
+		INSERT 
+			INTO Payment.bank (bank_entity_id, bank_code, bank_name, bank_modified_date) 
+		VALUES (SCOPE_IDENTITY(), @bank_code, @bank_name, GETDATE())  
+END
+GO  
+
+-- =============================================
+-- Author:		Harpi
+-- Create date: 8 January 2023
+-- Description:	Create identity in Entity table and insert payment 
+-- =============================================
+CREATE TRIGGER Payment.InsertPaymentEntityId
+   ON  Payment.payment_gateway 
+   INSTEAD OF INSERT
+AS 
+BEGIN
+	-- SET NOCOUNT ON added to prevent extra result sets from
+	-- interfering with SELECT statements.
+	SET NOCOUNT ON
+		DECLARE @paga_code As nvarchar(10)
+		DECLARE @paga_name As nvarchar(55)
+
+		SELECT @paga_code = paga_code FROM inserted;
+		SELECT @paga_name = paga_name FROM inserted;
+
+    -- Insert statements for trigger here
+		 INSERT 
+			 INTO Payment.entity 
+		DEFAULT VALUES
+
+		INSERT 
+			INTO Payment.payment_gateway (paga_entity_id, paga_code, paga_name, paga_modified_date) 
+		VALUES (SCOPE_IDENTITY(), @paga_code, @paga_name, GETDATE())
 END
 GO
-
-DROP PROCEDURE IF EXISTS spUpdateStocks;
-GO
-
-CREATE PROCEDURE purchasing.spUpdateStocks
-  @id INT,
-  @name NVARCHAR(255),
-  @description NVARCHAR(255),
-  @size NVARCHAR(25),
-  @color NVARCHAR(15)
-AS
-BEGIN
-  SET NOCOUNT ON;
-
-  BEGIN TRY
-      BEGIN TRANSACTION
-          UPDATE purchasing.stocks
-          SET stock_name = @name,
-              stock_description = @description,
-              stock_size = @size,
-              stock_color = @color,
-              stock_modified_date = GETDATE()
-          WHERE stock_id = @id
-      COMMIT TRANSACTION
-  END TRY
-  BEGIN CATCH
-    IF @@TRANCOUNT > 0
-      ROLLBACK TRANSACTION
-    THROW;
-  END CATCH
-END
-GO
-
-
-DROP PROCEDURE IF EXISTS spUpdateStockPhoto;
-GO
-
-CREATE PROCEDURE purchasing.spUpdateStockPhoto
-  @id INT,
-  @thumbnail NVARCHAR(50),
-  @photo NVARCHAR(50),
-  @primary BIT,
-  @url NVARCHAR(255),
-  @stockId INT
-AS
-BEGIN
-  SET NOCOUNT ON;
-
-  BEGIN TRY
-      BEGIN TRANSACTION
-          UPDATE purchasing.stock_photo
-          SET spho_thumbnail_filename = @thumbnail,
-              spho_photo_filename = @photo,
-              spho_primary = @primary,
-              spho_url = @url,
-              spho_stock_id = @stockId
-          WHERE spho_id = @id
-      COMMIT TRANSACTION
-  END TRY
-  BEGIN CATCH
-    IF @@TRANCOUNT > 0
-      ROLLBACK TRANSACTION
-    THROW;
-  END CATCH
-END
-GO
-
-
------create Store Procedure Update For Table 'Purchase Order Header'
-
-DROP PROCEDURE IF EXISTS SpUpdatePohe;
-GO
-
-CREATE PROCEDURE [Purchasing].[spUpdatePohe]
-    @ID int,
-    @Number nvarchar(20),
-    @PoheStatus tinyint,
-    @PoheTax decimal(10,2),
-    @PoheRefund decimal(10,2),
-    @PoheArrivalDate date,
-    @PohePayType nchar(2),
-    @PoheEmpID int,
-    @PoheVendorID int
-AS
-BEGIN
-  SET NOCOUNT ON;
-    
-    BEGIN TRY
-      BEGIN TRANSACTION
-        UPDATE purchasing.purchase_order_header
-        SET pohe_number = @Number,
-            pohe_status = @PoheStatus,
-            pohe_tax = @PoheTax,
-            pohe_refund = @PoheRefund,
-            pohe_arrival_date = @PoheArrivalDate,
-            pohe_pay_type = @PohePayType,
-            pohe_emp_id = @PoheEmpID,
-            pohe_vendor_id = @PoheVendorID
-        WHERE pohe_id = @ID
-      COMMIT TRANSACTION
-    END TRY
-      BEGIN CATCH
-      IF @@TRANCOUNT > 0
-        ROLLBACK TRANSACTION
-      THROW;
-    END CATCH
-END
-GO
-
-
------create Store Procedure Update For Table 'Purchase Order Detail'
-
-DROP PROCEDURE IF EXISTS spUpdatePode;
-GO
-
-CREATE PROCEDURE [Purchasing].[spUpdatePode]
-      @PodeId int,
-      @podePoheId int, 
-      @PodeOrderQty smallint, 
-      @PodePrice money,
-      @PodeReceivedQty decimal(8,2),
-      @PodeRejectedQty decimal (8,2),
-      @PodeStockId int
-AS
-BEGIN
-  SET NOCOUNT ON;
-		
-    BEGIN TRY
-      BEGIN TRANSACTION
-        UPDATE purchasing.purchase_order_detail
-            SET pode_pohe_id = @podePoheId, 
-              pode_order_qty = @PodeOrderQty, 
-              pode_price = @PodePrice, 
-              pode_received_qty = @PodeReceivedQty,
-              pode_rejected_qty=@PodeRejectedQty,
-              pode_stock_id =@PodeStockId
-            WHERE pode_id = @PodeId
-      COMMIT TRANSACTION
-    END TRY
-      BEGIN CATCH
-      IF @@TRANCOUNT > 0
-        ROLLBACK TRANSACTION
-      THROW;
-    END CATCH
-END
-GO
-
---USE Northwind
---GO
---USE Hotel_Realta;
---GO
-
---DROP PROCEDURE IF EXISTS purchasing.spInsertPurchaseOrder;
---GO
-
-CREATE PROCEDURE purchasing.spInsertPurchaseOrder
-    @pohe_emp_id INT,
-    @pohe_vendor_id INT,
-	@pohe_pay_type NCHAR(2),
-    @pode_order_qty SMALLINT,
-    @pode_price MONEY,
-    @pode_stock_id INT
-AS
-BEGIN
-    SET NOCOUNT ON;
-    SET XACT_ABORT ON;
-
-	BEGIN TRY
-		BEGIN TRANSACTION
-			DECLARE @pohe_id INT;
-			DECLARE @pode_id INT;
-			DECLARE @pohe_status TINYINT;
-	
-			DECLARE @pode_rejected_qty INT = 0;
-			DECLARE @pode_received_qty INT = 0;
-
-			--DECLARE @pohe_number NVARCHAR(20);
-			DECLARE @pohe_number NVARCHAR(20) = 'PO-' + CONVERT(NVARCHAR(8), GETDATE(), 112) + '-001';
-
-			IF EXISTS (
-				SELECT TOP 1 1
-				FROM purchasing.purchase_order_header
-				WHERE pohe_number LIKE 'PO-' + CONVERT(NVARCHAR(8), GETDATE(), 112) + '-%'
-				ORDER BY pohe_number DESC
-			)
-			BEGIN
-				SELECT TOP 1 @pohe_number = 'PO-' + CONVERT(NVARCHAR(8), GETDATE(), 112) + '-' + RIGHT('000' + CAST(CAST(RIGHT(pohe_number, 3) AS INT) + 1 AS NVARCHAR(3)), 3)
-				FROM purchasing.purchase_order_header
-				WHERE pohe_number LIKE 'PO-' + CONVERT(NVARCHAR(8), GETDATE(), 112) + '-%'
-				ORDER BY pohe_number DESC;
-			END
-
-			-- Check if the vendor exists and has an active PO
-			SELECT @pohe_id = pohe_id, @pohe_status = pohe_status
-			FROM purchasing.purchase_order_header
-			WHERE pohe_vendor_id = @pohe_vendor_id
-			AND pohe_status = 1;
-
-			IF @pohe_id IS NOT NULL
-			BEGIN 
-				-- Vendor has an active PO, check if stock exists in PO
-				SELECT @pode_id = pode_id
-				FROM purchasing.purchase_order_detail
-				WHERE pode_pohe_id = @pohe_id
-				AND pode_stock_id = @pode_stock_id;
-
-				IF @pode_id IS NOT NULL
-				BEGIN
-					-- Stock exists in PO, update order quantity
-					UPDATE purchasing.purchase_order_detail
-					SET pode_order_qty = pode_order_qty + @pode_order_qty
-					WHERE pode_id = @pode_id;
-				END
-				ELSE
-				BEGIN
-					-- Stock does not exist in PO, insert new detail
-					INSERT INTO purchasing.purchase_order_detail (
-						pode_pohe_id,
-						pode_order_qty,
-						pode_price,
-						pode_stock_id,
-						pode_rejected_qty,
-						pode_received_qty
-					)
-					VALUES (
-						@pohe_id,
-						@pode_order_qty,
-						@pode_price,
-						@pode_stock_id,
-						@pode_rejected_qty,
-						@pode_received_qty
-					);
-				END
-			END
-			ELSE
-			BEGIN
-				-- Vendor does not have an active PO, create new PO
-				INSERT INTO purchasing.purchase_order_header (
-					pohe_number,
-					pohe_emp_id,
-					pohe_vendor_id,
-					pohe_pay_type
-				)
-				VALUES (
-					@pohe_number,
-					@pohe_emp_id,
-					@pohe_vendor_id,
-					@pohe_pay_type
-				);
-
-				SET @pohe_id = SCOPE_IDENTITY();
-
-				-- Insert detail
-				INSERT INTO purchasing.purchase_order_detail (
-					pode_pohe_id,
-					pode_order_qty,
-					pode_price,
-					pode_stock_id,
-					pode_rejected_qty,
-					pode_received_qty
-				)
-				VALUES (
-					@pohe_id,
-					@pode_order_qty,
-					@pode_price,
-					@pode_stock_id,
-					@pode_rejected_qty,
-					@pode_received_qty
-				);
-			END
-		COMMIT TRANSACTION
-	END TRY
-    BEGIN CATCH
-		IF @@TRANCOUNT > 0
-			ROLLBACK TRANSACTION
-		THROW;
-    END CATCH
-END
-GO
-
-CREATE PROCEDURE purchasing.spDeletePurchaseOrder
-    @pohe_number NVARCHAR(20)
-AS
-BEGIN
-    SET NOCOUNT ON;
-    
-    BEGIN TRY
-        BEGIN TRANSACTION
-        
-        DECLARE @pohe_id INT
-        
-        -- Get pohe_id from pohe_number
-        SELECT @pohe_id = pohe_id
-        FROM purchasing.purchase_order_header
-        WHERE pohe_number = @pohe_number
-        
-        IF @pohe_id IS NOT NULL
-        BEGIN
-            -- Delete detail records
-            DELETE FROM purchasing.purchase_order_detail
-            WHERE pode_pohe_id = @pohe_id
-            
-            -- Delete header record
-            DELETE FROM purchasing.purchase_order_header
-            WHERE pohe_id = @pohe_id
-        END
-        
-        COMMIT TRANSACTION
-    END TRY
-    
-    BEGIN CATCH
-        IF @@TRANCOUNT > 0
-            ROLLBACK TRANSACTION
-        -- Throw error message
-        THROW;
-    END CATCH
-END
-GO
-
-
-
--- purchasing.spUpdateVendor @id = 15, @name = "abcde", @active = false, @priority = true, @weburl = NULL
--- GO
--- purchasing.spUpdateStocks @id = 6, @name = "abcde", @description = "abc", @size = "abc", @color = "abc"
--- GO
-
--- select * from purchasing.vendor
--- select * from purchasing.stocks
--- select * from purchasing.stock_photo
-
---SELECT * from INFORMATION_SCHEMA.columns where table_name = 'stock_photo'
--- USE Northwind;
--- GO

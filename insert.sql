@@ -791,7 +791,7 @@ VALUES
   ('PO-20230115-002', 1, 0, 'CA', 1, 17),
   ('PO-20230115-003', 1, 0, 'TR', 1, 18),
   ('PO-20230115-004', 1, 0, 'TR', 1, 19),
-  ('PO-20230115-005', 1, 0, 'CA', 1, 16);
+  ('PO-20230115-005', 1, 0, 'CA', 1, 20);
 SELECT*FROM Purchasing.purchase_order_header;
 select * from information_schema.Columns where table_name = 'stocks';
 
@@ -822,4 +822,4 @@ VALUES
   (5, 110, 600000, 107, 3, 1);
 SELECT*FROM Purchasing.purchase_order_detail;
 
--- USE Northwind;
+USE tempdb;

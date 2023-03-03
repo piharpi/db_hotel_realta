@@ -1,17 +1,73 @@
--- DELETE MODULE Resto
-DELETE Resto.OrderMenus;
+USE Hotel_Realta;
 
--- DELETE MODULE Users
-DELETE Users.Users;
-
--- DELETE MODULE Booking
-DELETE Booking.BookingOrders;
+-- DELETE MODULE Purchasing
+DELETE Purchasing.purchase_order_detail;
+DELETE Purchasing.stock_detail;
+DELETE Purchasing.stock_photo;
+DELETE Purchasing.stocks;
+DELETE Purchasing.purchase_order_header;
+DELETE Purchasing.vendor;
 
 -- DELETE MODULE Payment 
-DELETE Payment.Entity;
-DELETE Payment.PaymentGateway;
-DELETE Payment.Bank;
-DELETE Payment.PaymentTransaction;
+DELETE Payment.payment_transaction;
+DELETE Payment.payment_gateway;
+DELETE Payment.entity;
+DELETE Payment.bank;
+
+-- DELETE MODULE Resto
+DELETE Resto.order_menus;
+DELETE Resto.resto_menu_photos;
+DELETE Resto.order_menu_detail;
+DELETE Resto.resto_menus;
+
+-- DELETE MODULE Booking
+DELETE Booking.user_breakfast;
+DELETE Booking.special_offers;
+DELETE Booking.booking_order_detail_extra;
+DELETE Booking.booking_order_detail;
+DELETE Booking.booking_orders;
+DELETE Booking.special_offer_coupons;
+
+-- DELETE MODULE HR
+DELETE HR.work_order_detail;
+DELETE HR.work_orders;
+DELETE HR.employee_pay_history;
+DELETE HR.employee_department_history;
+DELETE HR.department;
+DELETE HR.shift;
+DELETE HR.employee;
+DELETE HR.job_role;
+
+-- DELETE MODULE Hotel
+DELETE Hotel.hotels;
+DELETE Hotel.hotel_reviews;
+DELETE Hotel.facilities;
+DELETE Hotel.facility_photos;
+DELETE Hotel.facility_price_history;
+
+-- DELETE MODULE Users
+DELETE Users.roles;
+DELETE Users.user_roles;
+DELETE Users.bonus_points;
+DELETE Users.user_password;
+DELETE Users.users;
+DELETE Users.user_profiles;
+DELETE Users.user_members;
+
+-- DELETE MODULE Master
+DELETE Master.regions;
+DELETE Master.country;
+DELETE Master.provinces;
+DELETE Master.address;
+DELETE Master.price_items;
+DELETE Master.members;
+DELETE Master.service_task;
+DELETE Master.category_group;
+DELETE Master.policy;
+DELETE Master.policy_category_group;
+
+
+-- File insert 
 
 -- INSERT MASTER MODULE
 --REGION
@@ -99,27 +155,27 @@ ORDER BY cagro_id ASC
 
 --POLICY
 SET IDENTITY_INSERT Master.policy ON;
-insert into master.policy (poli_name, poli_description)
+insert into master.policy (poli_id, poli_name, poli_description)
 values
-('Pembatalan Gratis', 'Kebijakan pembatalan gratis yang memberikan kemudahan bagi tamu untuk membatalkan reservasi mereka hingga 24 jam sebelum tanggal check-in tanpa dikenakan biaya apapun'),
-('Check-in Awal', 'Kebijakan check-in awal yang memberikan kemudahan bagi tamu untuk melakukan check-in lebih awal dari waktu yang ditentukan, dengan biaya tambahan yang telah ditentukan'),
-('Check-out Terlambat', 'Kebijakan check-out terlambat yang memberikan kemudahan bagi tamu untuk melakukan check-out lebih lambat dari waktu yang ditentukan, dengan biaya tambahan yang telah ditentukan'),
-('Fasilitas Anak-anak', 'Kebijakan fasilitas anak-anak yang memberikan kemudahan bagi tamu yang membawa anak-anak dengan fasilitas yang disesuaikan dengan kebutuhan anak-anak, seperti kamar yang lebih luas dan fasilitas bermain');
+(1,'Pembatalan Gratis', 'Kebijakan pembatalan gratis yang memberikan kemudahan bagi tamu untuk membatalkan reservasi mereka hingga 24 jam sebelum tanggal check-in tanpa dikenakan biaya apapun'),
+(2,'Check-in Awal', 'Kebijakan check-in awal yang memberikan kemudahan bagi tamu untuk melakukan check-in lebih awal dari waktu yang ditentukan, dengan biaya tambahan yang telah ditentukan'),
+(3,'Check-out Terlambat', 'Kebijakan check-out terlambat yang memberikan kemudahan bagi tamu untuk melakukan check-out lebih lambat dari waktu yang ditentukan, dengan biaya tambahan yang telah ditentukan'),
+(4,'Fasilitas Anak-anak', 'Kebijakan fasilitas anak-anak yang memberikan kemudahan bagi tamu yang membawa anak-anak dengan fasilitas yang disesuaikan dengan kebutuhan anak-anak, seperti kamar yang lebih luas dan fasilitas bermain');
 SET IDENTITY_INSERT Master.policy OFF;
 SELECT*FROM Master.policy
 ORDER BY poli_id ASC
 
 --PRICE_ITEM
-SET IDENTITY_INSERT Master.price_item ON;
-insert into master.price_item ( prit_name, prit_price, prit_description, prit_type, prit_modified_date)
+SET IDENTITY_INSERT Master.price_items ON;
+insert into master.price_items (prit_id, prit_name, prit_price, prit_description, prit_type, prit_modified_date)
 values
-('Kue Kering', 12000, 'Kue kering dengan beragam rasa yang enak dan lezat', 'SNACK', '2022-01-01'),
-('Kamar Standar', 500000, 'Kamar standar dengan fasilitas yang cukup lengkap', 'FACILITY', '2022-01-01'),
-('Aqua', 10000, 'Minuman bersoda dengan rasa jeruk yang segar', 'SOFTDRINK', '2022-01-01'),
-('Nasi Goreng', 35000, 'Nasi goreng dengan bahan-bahan yang berkualitas dan rasa yang nikmat', 'FOOD', '2022-01-01'),
-('Massage', 80000, 'Layanan massage yang dapat membantu mengurangi stres dan merelaksasi tubuh', 'SERVICE', '2022-01-01');
-SET IDENTITY_INSERT Master.price_item OFF;
-SELECT*FROM Master.price_item
+(1, 'Kue Kering', 12000, 'Kue kering dengan beragam rasa yang enak dan lezat', 'SNACK', '2022-01-01'),
+(2, 'Kamar Standar', 500000, 'Kamar standar dengan fasilitas yang cukup lengkap', 'FACILITY', '2022-01-01'),
+(3, 'Aqua', 10000, 'Minuman bersoda dengan rasa jeruk yang segar', 'SOFTDRINK', '2022-01-01'),
+(4, 'Nasi Goreng', 35000, 'Nasi goreng dengan bahan-bahan yang berkualitas dan rasa yang nikmat', 'FOOD', '2022-01-01'),
+(5, 'Massage', 80000, 'Layanan massage yang dapat membantu mengurangi stres dan merelaksasi tubuh', 'SERVICE', '2022-01-01');
+SET IDENTITY_INSERT Master.price_items OFF;
+SELECT*FROM Master.price_items
 ORDER BY prit_id ASC
 
 --MEMBER
@@ -142,43 +198,47 @@ values
 (5, 'Manager', 5);
 SET IDENTITY_INSERT Master.service_task OFF;
 SELECT*FROM Master.service_task
-ORDER BY seta_id ASC
+ORDER BY seta_id ASC;
 
 --- INSERT MODULE USERS
-INSERT INTO users.users (user_full_name, user_type, user_company_name, user_email, user_phone_number, user_modified_date)
-VALUES ('John Smith', 'T', 'Acme Inc.', 'john.smith@acme.com', '123-456-7890', GETDATE()),
-       ('Jane Doe', 'C', 'XYZ Corp.', 'jane.doe@xyz.com', '123-456-7891', GETDATE()),
-       ('Bob Johnson', 'I', 'ABC Inc.', 'bob.johnson@abc.com', '123-456-7892', GETDATE()),
-       ('Samantha Williams', 'T', 'Def Corp.', 'samantha.williams@def.com', '123-456-7893', GETDATE()),
-       ('Michael Brown', 'C', 'Ghi Inc.', 'michael.brown@ghi.com', '123-456-7894', GETDATE()),
-       ('Emily Davis', 'I', 'Jkl Ltd.', 'emily.davis@jkl.com', '123-456-7895', GETDATE()),
-       ('William Thompson', 'T', 'Mno Inc.', 'william.thompson@mno.com', '123-456-7896', GETDATE()),
-       ('Ashley Johnson', 'C', 'Pqr Corp.', 'ashley.johnson@pqr.com', '123-456-7897', GETDATE()),
-       ('David Anderson', 'I', 'Stu Inc.', 'david.anderson@stu.com', '123-456-7898', GETDATE()),
-       ('Jessica Smith', 'T', 'Vwx Corp.', 'jessica.smith@vwx.com', '123-456-7899', GETDATE()),
-	   ('David Brown', 'T', 'Example Co', 'david.brown@example.com', '555-555-1222', GETDATE()),
-	   ('Jessica Smith', 'C', 'Test Inc', 'jessica.smith@test.com', '555-555-1223', GETDATE()),
-	   ('James Johnson', 'I', 'Acme Inc', 'james.johnson@acme.com', '555-555-1224', GETDATE()),
-	   ('Samantha Williams', 'C', 'XYZ Corp', 'samantha.williams@xyz.com', '555-555-1225', GETDATE()),
-	   ('Robert Davis', 'T', 'Example Co', 'robert.davis@example.com', '555-555-1226', GETDATE());
+SET IDENTITY_INSERT Users.users ON;
+INSERT INTO users.users (user_id, user_full_name, user_type, user_company_name, user_email, user_phone_number, user_modified_date)
+VALUES (1,'John Smith', 'T', 'Acme Inc.', 'john.smith@acme.com', '123-456-7890', GETDATE()),
+       (2,'Jane Doe', 'C', 'XYZ Corp.', 'jane.doe@xyz.com', '123-456-7891', GETDATE()),
+       (3,'Bob Johnson', 'I', 'ABC Inc.', 'bob.johnson@abc.com', '123-456-7892', GETDATE()),
+       (4,'Samantha Williams', 'T', 'Def Corp.', 'samantha.williams@def.com', '123-456-7893', GETDATE()),
+       (5,'Michael Brown', 'C', 'Ghi Inc.', 'michael.brown@ghi.com', '123-456-7894', GETDATE()),
+       (6,'Emily Davis', 'I', 'Jkl Ltd.', 'emily.davis@jkl.com', '123-456-7895', GETDATE()),
+       (7,'William Thompson', 'T', 'Mno Inc.', 'william.thompson@mno.com', '123-456-7896', GETDATE()),
+       (8,'Ashley Johnson', 'C', 'Pqr Corp.', 'ashley.johnson@pqr.com', '123-456-7897', GETDATE()),
+       (9,'David Anderson', 'I', 'Stu Inc.', 'david.anderson@stu.com', '123-456-7898', GETDATE()),
+       (10,'Jessica Smith', 'T', 'Vwx Corp.', 'jessica.smith@vwx.com', '123-456-7899', GETDATE()),
+	   (11,'David Brown', 'T', 'Example Co', 'david.brown@example.com', '555-555-1222', GETDATE()),
+	   (12,'Jessica Smith', 'C', 'Test Inc', 'jessica.smith@test.com', '555-555-1223', GETDATE()),
+	   (13,'James Johnson', 'I', 'Acme Inc', 'james.johnson@acme.com', '555-555-1224', GETDATE()),
+	   (14,'Samantha Williams', 'C', 'XYZ Corp', 'samantha.williams@xyz.com', '555-555-1225', GETDATE()),
+	   (15,'Robert Davis', 'T', 'Example Co', 'robert.davis@example.com', '555-555-1226', GETDATE());
+SET IDENTITY_INSERT Users.users OFF;
+SELECT * FROM Users.users;
 
 -- Insert 15 rows into the users.user_members table
 INSERT INTO users.user_members (usme_user_id, usme_memb_name, usme_promote_date, usme_points, usme_type)
-VALUES (1, 'Silver', '2022-01-01', 100, 'Active'),
-       (2, 'Gold', '2022-02-01', 200, 'Active'),
+VALUES (1, 'SILVER', '2022-01-01', 100, 'Active'),
+       (2, 'GOLD', '2022-02-01', 200, 'Active'),
        (3, 'VIP', '2022-03-01', 300, 'Active'),
-       (4, 'Wizard', '2022-04-01', 400, 'Active'),
-       (5, 'Silver', '2022-05-01', 500, 'Active'),
-       (6, 'Gold', '2022-06-01', 600, 'Active'),
+       (4, 'WIZARD', '2022-04-01', 400, 'Active'),
+       (5, 'SILVER', '2022-05-01', 500, 'Active'),
+       (6, 'GOLD', '2022-06-01', 600, 'Active'),
        (7, 'VIP', '2022-07-01', 700, 'Active'),
-       (8, 'Wizard', '2022-08-01', 800, 'Active'),
-       (9, 'Silver', '2022-09-01', 900, 'Active'),
-       (10, 'Gold', '2022-10-01', 1000, 'Active'),
-	   (11, 'Silver', '2022-11-01', 1000, 'Expired'),
-	   (12, 'Gold', '2022-12-01', 1000, 'Expired'),
+       (8, 'WIZARD', '2022-08-01', 800, 'Active'),
+       (9, 'SILVER', '2022-09-01', 900, 'Active'),
+       (10, 'GOLD', '2022-10-01', 1000, 'Active'),
+	   (11, 'SILVER', '2022-11-01', 1000, 'Expired'),
+	   (12, 'GOLD', '2022-12-01', 1000, 'Expired'),
 	   (13, 'VIP', '2022-01-01', 1000, 'Expired'),
-	   (14, 'Wizard', '2022-02-01', 1000, 'Expired'),
-	   (15, 'Gold', '2022-03-01', 1000, 'Expired');
+	   (14, 'WIZARD', '2022-02-01', 1000, 'Expired'),
+	   (15, 'GOLD', '2022-03-01', 1000, 'Expired');
+SELECT * FROM Users.user_members;
 
 -- Insert 5 rows into the users.roles table
 SET IDENTITY_INSERT users.roles ON;
@@ -190,6 +250,7 @@ VALUES
 (4, 'Admin'),
 (5, 'User');
 SET IDENTITY_INSERT users.roles OFF;
+SELECT * FROM Users.roles;
 
 -- Insert 15 rows into the users.user_roles table
 INSERT INTO users.user_roles (usro_user_id, usro_role_id)
@@ -209,6 +270,7 @@ VALUES
 (13, 3),
 (14, 4),
 (15, 5);
+select * from users.user_roles;
 
 -- Insert 15 dummy rows into the users.user_profiles table
 SET IDENTITY_INSERT users.user_profiles ON;
@@ -229,6 +291,7 @@ VALUES (1, '123-45-6789', '1980-01-01', 'Manager', 'S', 'M', 1, 1),
 	   (14, '456-78-9012', '1980-01-01', 'Teacher', 'M', 'F', 14, 14),
 	   (15, '567-89-0123', '1985-01-01', 'Writer', 'S', 'M', 15, 15);
 SET IDENTITY_INSERT users.user_profiles OFF;
+select * from users.user_profiles;
 
 -- Insert 15 dummy rows into the users.user_password table
 SET IDENTITY_INSERT users.user_password ON;
@@ -250,6 +313,7 @@ VALUES
 (14, 'monkey1', 'abcdefg'),
 (15, 'password1', 'hijklmn');
 SET IDENTITY_INSERT users.user_password OFF;
+select * from users.user_password;
 
 -- Insert 15 dummy rows into the users.bonus_points table
 SET IDENTITY_INSERT users.bonus_points ON;
@@ -269,8 +333,43 @@ VALUES (1, 1, 1000, 'R', '2022-01-01'),
 	   (13, 13, 10000, 'P', '2022-01-01'),
 	   (14, 14, 10000, 'R', '2022-02-02'),
 	   (15, 15, 10000, 'P', '2022-03-03');
-
 SET IDENTITY_INSERT users.bonus_points OFF;
+select * from users.bonus_points;
+
+-- INSERT MODULE Hotel
+SET IDENTITY_INSERT Hotel.Hotels ON;
+INSERT INTO Hotel.Hotels (hotel_id, hotel_name, hotel_description, hotel_rating_star, hotel_phonenumber, hotel_modified_date, hotel_addr_id)
+VALUES
+(1,'Hotel Amaris Palembang', 'Hotel bintang 3 dengan fasilitas yang lengkap dan modern di Palembang', 3, '+62 823 3456 7891', '2022-01-01', 1),
+(2,'Grand Clarion Hotel Palembang', 'Hotel bintang 4 dengan kamar yang luas dan nyaman di Palembang', 4, '+62 823 1234 5678', '2022-02-01', 2),
+(3,'Aston Hotel Palembang', 'Hotel bintang 5 dengan fasilitas spa dan kolam renang di Palembang', 5, '+62 823 9012 3456', '2022-03-01', 3),
+(4,'Hotel Santika Palembang', 'Hotel bintang 3 dengan fasilitas kelas atas di Palembang', 3, '+62 823 7890 1234', '2022-04-01', 3),
+(5,'Ibis Hotel Palembang', 'Hotel bintang 3 dengan tarif terjangkau di Palembang', 3, '+62 823 4567 8901', '2022-05-01', 2),
+(6,'Grand Mercure Hotel Palembang', 'Hotel bintang 4 dengan fasilitas mewah di Palembang', 4, '+62 823 1234 5679', '2022-06-01', 5),
+(7,'Marriott Hotel Palembang', 'Hotel bintang 5 dengan fasilitas spa dan fitness center di Palembang', 5, '+62 823 9012 3457', '2022-07-01', 1),
+(8,'Zest Hotel Palembang', 'Hotel bintang 3 dengan desain modern dan nyaman di Palembang', 3, '+62 823 7890 1235', '2022-08-01', 4),
+(9,'The Westin Hotel Palembang', 'Hotel bintang 4 dengan fasilitas kelas atas di Palembang', 4, '+62 823 4567 8902', '2022-09-01', 5),
+(10,'Swiss-Belhotel Palembang', 'Hotel bintang 5 dengan fasilitas mewah di Palembang', 5, '+62 823 1234 5680', '2022-10-01', 4)
+SET IDENTITY_INSERT Hotel.Hotels OFF;
+select * from Hotel.hotels;
+
+SET IDENTITY_INSERT Hotel.Facilities ON;
+
+INSERT INTO Hotel.Facilities (faci_id, faci_name, faci_description, faci_max_number, faci_measure_unit, 
+faci_room_number, faci_startdate, faci_endate, faci_low_price, faci_high_price, faci_rate_price, 
+faci_discount, faci_tax_rate, faci_cagro_id, faci_hotel_id)
+VALUES
+(1,'Pool', 'Outdoor pool with sun loungers and parasols', 100, 'people', 'POOL01', '2022-01-01', '2022-12-31', 50000, 100000, 75000, 25000, 10000, 6, 1) -- POOL
+,(2,'Restaurant', 'Fine dining restaurant serving international cuisine', 100, 'people', 'REST01', '2022-01-01', '2022-12-31', 40000, 80000, 60000, 25000, 10000, 2, 1) -- RESTAURANT
+,(3,'Gym', 'Fully equipped gym with treadmills stationary bikes, and weights', 50, 'people', 'GYM01', '2022-01-01', '2022-12-31', 30000, 50000, 40000, 25000, 10000, 4, 1) -- GYM
+,(4,'Metting Room', 'Meeting room Luxury, and body treatments', 20, 'people', 'MTG01', '2022-01-01', '2022-12-31', 80000, 120000, 100000, 25000, 10000, 3, 1) -- MEETING
+,(5,'Deluxe Room', 'Kamar luas dengan fasilitas mewah, termasuk kamar mandi pribadi dengan shower dan bathtub', 2,'beds', 'DLR01', '2022-01-01', '2022-01-30', 200000, 250000, 230000, 25000, 10000, 1, 1)
+,(6,'Superior Room', 'Kamar standar dengan fasilitas lengkap, termasuk kamar mandi pribadi dengan shower', 2,'beds', 'SPR01', '2022-01-01', '2022-01-30', 150000, 180000, 160000, 25000, 10000, 1, 1)
+,(7,'Family Room', 'Kamar untuk keluarga, dengan 2 tempat tidur single dan 1 tempat tidur double, serta fasilitas lengkap', 4,'beds', 'FMR01', '2022-01-01', '2022-01-30', 250000, 300000, 270000, 25000, 10000, 1, 1)
+,(8,'Standard Room', 'Kamar standar dengan fasilitas sederhana, termasuk kamar mandi pribadi dengan shower', 2,'beds', 'STR01','2022-01-01', '2022-01-30', 100000, 125000, 115000, 25000, 10000, 1, 1)
+,(9,'Double Room', 'Kamar dengan 2 tempat tidur single, serta fasilitas lengkap', 2,'beds', 'DBR01', '2022-01-01', '2022-01-30', 150000, 175000, 160000, 25000, 10000, 1, 1);
+SET IDENTITY_INSERT Hotel.Facilities OFF;
+select * from Hotel.facilities;
 
 -- INSERT MODULE HR
 SET IDENTITY_INSERT hr.job_role ON
@@ -376,61 +475,193 @@ Insert into HR.work_orders (woro_id,woro_date, woro_status, woro_user_id) values
 Insert into HR.work_orders (woro_id,woro_date, woro_status, woro_user_id) values ('9','1995-12-23', 'CANCELLED' ,'5');
 Insert into HR.work_orders (woro_id,woro_date, woro_status, woro_user_id) values ('10','1995-12-27','CLOSED' , '4');
 SET IDENTITY_INSERT HR.work_orders OFF;
-SELECT*FROM hr.work_orders
+
+select * from hr.work_orders
 
 SET IDENTITY_INSERT HR.work_order_detail ON;
-Insert into HR.work_order_detail (wode_id, wode_task_name, wode_status, wode_start_date, wode_end_date, wode_notes, wode_emp_id, wode_seta_id, wode_faci_id, wode_woro_id) values ('1', 'work detail 1', 'INPROGRESS', '1995-01-14', '1995-03-14', 'Masih Bekerja', '2', '2', '1', '2');
-Insert into HR.work_order_detail (wode_id, wode_task_name, wode_status, wode_start_date, wode_end_date, wode_notes, wode_emp_id, wode_seta_id, wode_faci_id, wode_woro_id) values ('2', 'work detail 2', 'COMPLETED', '1995-01-14', '1995-03-14', 'Selesai', '3', '1', '2', '1');
-Insert into HR.work_order_detail (wode_id, wode_task_name, wode_status, wode_start_date, wode_end_date, wode_notes, wode_emp_id, wode_seta_id, wode_faci_id, wode_woro_id) values ('3', 'work detail 3', 'CANCELLED', '1995-01-14', '1995-03-14', 'Ada Kenadala', '4', '1', '5', '3');
-Insert into HR.work_order_detail (wode_id, wode_task_name, wode_status, wode_start_date, wode_end_date, wode_notes, wode_emp_id, wode_seta_id, wode_faci_id, wode_woro_id) values ('4', 'work detail 4', 'INPROGRESS', '1995-01-14', '1995-03-14', 'Masih Bekerja', '6', '3', '9', '5');
-Insert into HR.work_order_detail (wode_id, wode_task_name, wode_status, wode_start_date, wode_end_date, wode_notes, wode_emp_id, wode_seta_id, wode_faci_id, wode_woro_id) values ('5', 'work detail 5', 'COMPLETED', '1995-01-14', '1995-03-14', 'Selesai', '5', '4', '8', '6');
-Insert into HR.work_order_detail (wode_id, wode_task_name, wode_status, wode_start_date, wode_end_date, wode_notes, wode_emp_id, wode_seta_id, wode_faci_id, wode_woro_id) values ('6', 'work detail 6', 'CANCELLED', '1995-01-14', '1995-03-14', 'Ada Kenadala', '5', '5', '7', '7');
-Insert into HR.work_order_detail (wode_id, wode_task_name, wode_status, wode_start_date, wode_end_date, wode_notes, wode_emp_id, wode_seta_id, wode_faci_id, wode_woro_id) values ('7', 'work detail 7', 'COMPLETED', '1995-01-14', '1995-03-14', 'Selesai', '10', '4', '1', '10');
-Insert into HR.work_order_detail (wode_id, wode_task_name, wode_status, wode_start_date, wode_end_date, wode_notes, wode_emp_id, wode_seta_id, wode_faci_id, wode_woro_id) values ('8', 'work detail 8', 'CANCELLED', '1995-01-14', '1995-03-14', 'Ada Kenadala', '10', '1', '2', '1');
-Insert into HR.work_order_detail (wode_id, wode_task_name, wode_status, wode_start_date, wode_end_date, wode_notes, wode_emp_id, wode_seta_id, wode_faci_id, wode_woro_id) values ('9', 'work detail 9', 'COMPLETED', '1995-01-14', '1995-03-14', 'Selesai', '4', '3', '2', '5');
-Insert into HR.work_order_detail (wode_id, wode_task_name, wode_status, wode_start_date, wode_end_date, wode_notes, wode_emp_id, wode_seta_id, wode_faci_id, wode_woro_id) values ('10', 'work detail 10', 'INPROGRESS', '1995-01-14', '1995-03-14', 'Masih Bekerja', '4', '5', '6', '4');
+Insert into HR.work_order_detail (wode_id, wode_task_name, wode_status, wode_start_date, wode_end_date, wode_notes, wode_emp_id, wode_seta_id, wode_faci_id, wode_woro_id) values (1, 'work detail 1', 'INPROGRESS', '1995-01-14', '1995-03-14', 'Masih Bekerja', 2, 2, 1, 1);
+Insert into HR.work_order_detail (wode_id, wode_task_name, wode_status, wode_start_date, wode_end_date, wode_notes, wode_emp_id, wode_seta_id, wode_faci_id, wode_woro_id) values (2, 'work detail 2', 'COMPLETED', '1995-01-14', '1995-03-14', 'Selesai', 3, 1, 2, 4);
+Insert into HR.work_order_detail (wode_id, wode_task_name, wode_status, wode_start_date, wode_end_date, wode_notes, wode_emp_id, wode_seta_id, wode_faci_id, wode_woro_id) values (3, 'work detail 3', 'CANCELLED', '1995-01-14', '1995-03-14', 'Ada Kenadala', 4, 1, 5, 3);
+Insert into HR.work_order_detail (wode_id, wode_task_name, wode_status, wode_start_date, wode_end_date, wode_notes, wode_emp_id, wode_seta_id, wode_faci_id, wode_woro_id) values (4, 'work detail 4', 'INPROGRESS', '1995-01-14', '1995-03-14', 'Masih Bekerja', 6, 5, 9, 5);
+Insert into HR.work_order_detail (wode_id, wode_task_name, wode_status, wode_start_date, wode_end_date, wode_notes, wode_emp_id, wode_seta_id, wode_faci_id, wode_woro_id) values (5, 'work detail 5', 'COMPLETED', '1995-01-14', '1995-03-14', 'Selesai', 5, 3, 8, 1);
+Insert into HR.work_order_detail (wode_id, wode_task_name, wode_status, wode_start_date, wode_end_date, wode_notes, wode_emp_id, wode_seta_id, wode_faci_id, wode_woro_id) values (6, 'work detail 6', 'CANCELLED', '1995-01-14', '1995-03-14', 'Ada Kenadala', 5, 4, 7, 2);
+Insert into HR.work_order_detail (wode_id, wode_task_name, wode_status, wode_start_date, wode_end_date, wode_notes, wode_emp_id, wode_seta_id, wode_faci_id, wode_woro_id) values (7, 'work detail 7', 'COMPLETED', '1995-01-14', '1995-03-14', 'Selesai', 10, 4, 1, 8);
+Insert into HR.work_order_detail (wode_id, wode_task_name, wode_status, wode_start_date, wode_end_date, wode_notes, wode_emp_id, wode_seta_id, wode_faci_id, wode_woro_id) values (8, 'work detail 8', 'CANCELLED', '1995-01-14', '1995-03-14', 'Ada Kenadala', 10, 1, 2, 9);
+Insert into HR.work_order_detail (wode_id, wode_task_name, wode_status, wode_start_date, wode_end_date, wode_notes, wode_emp_id, wode_seta_id, wode_faci_id, wode_woro_id) values (9, 'work detail 9', 'COMPLETED', '1995-01-14', '1995-03-14', 'Selesai', 4, 3, 2, 1);
+Insert into HR.work_order_detail (wode_id, wode_task_name, wode_status, wode_start_date, wode_end_date, wode_notes, wode_emp_id, wode_seta_id, wode_faci_id, wode_woro_id) values (10, 'work detail 10', 'INPROGRESS', '1995-01-14', '1995-03-14', 'Masih Bekerja', 4, 5, 6, 10);
 SET IDENTITY_INSERT HR.work_order_detail OFF;
-SELECT*FROM hr.work_order_detail
+select * from hr.work_order_detail;
+
+-- INSERT MODULE Booking
+SET IDENTITY_INSERT Booking.special_offers ON
+INSERT INTO Booking.special_offers (spof_id, spof_name, spof_description, spof_type, spof_discount, spof_start_date, spof_end_date, spof_min_qty, spof_max_qty, spof_modified_date)
+VALUES (1, 'Winter Sale', 'Get 20% off your stay when you book a room during the winter months', 'T', 0.2, '2022-12-01', '2023-03-31', 1, 3, GETDATE()),
+       (2, 'Weekend Getaway Deal', 'Stay two nights on the weekend and get 20% for the next night', 'C', 0.2 , '2022-12-01', '2023-03-31', 3, 5, GETDATE()),
+       (3, 'Early Bird Special', 'Book at least 30 days in advance and save 15% on your stay', 'I', 0.15, '2022-12-01', '2023-03-31', 1, 2, GETDATE()),
+       (4, 'Family Fun Package', 'Book a family room and get free breakfast for the kids', 'T', 0, '2022-12-01', '2023-03-31', 4, 6, GETDATE()),
+       (5, 'Romance Package', 'Book a romantic getaway for two and get a bottle of champagne upon arrival', 'C', 0, '2022-12-01', '2023-03-31', 2, 5, GETDATE()),
+       (6, 'Last Minute Deal', 'Book within 48 hours of arrival and save 20% on your stay', 'I', 0.2, '2022-12-01', '2023-03-31', 1, 3, GETDATE()),
+       (7, 'AAA/CAA Discount', 'Show your AAA or CAA membership card and get 10% off your stay', 'T', 0.2 , '2022-12-01', '2023-03-31', 1, 3, GETDATE()),
+       (8, 'Senior Discount', 'Guests 65 and over receive 10% off their stay', 'C', 0.1, '2022-12-01', '2022-03-31', 1, 3, GETDATE()),
+       (9, 'Military Discount', 'Active duty military personnel receive 15% off their stay', 'I', 0.15, '2022-12-01', '2023-03-31', 1, 3, GETDATE())
+SET IDENTITY_INSERT Booking.special_offers OFF
+SELECT*FROM Booking.special_offers
+select * from Booking.special_offers;
+
+
+SET IDENTITY_INSERT Booking.booking_orders ON
+INSERT INTO Booking.booking_orders (boor_id, boor_order_number,boor_order_date, boor_total_room ,boor_pay_type, boor_is_paid, boor_type, boor_user_id, boor_hotel_id)
+VALUES (1, 'BO#20221127-0001', '2023-01-27', 4,'C', 'DP', 'T', 1, 1),
+       (2, 'BO#20221127-0002', '2023-01-27', 4,'C', 'P', 'C', 2, 2),
+       (3, 'BO#20221127-0003', '2023-01-27', 4,'D', 'R', 'I', 3, 3),
+       (4, 'BO#20221127-0004', '2023-01-27', 4,'C', 'DP', 'T', 4, 4),
+       (5, 'BO#20221127-0005', '2023-01-27', 4,'D', 'P', 'C', 5, 5),
+       (6, 'BO#20221127-0006', '2023-01-27', 4,'C', 'R', 'I', 6, 6),
+       (7, 'BO#20221127-0007', '2023-01-27', 4,'D', 'DP', 'T', 7, 7),
+       (8, 'BO#20221127-0008', '2023-01-27', 4,'C', 'P', 'C', 8, 8),
+       (9, 'BO#20221127-0009', '2023-01-27', 4,'C', 'R', 'I', 9, 9),
+       (10, 'BO#20221127-0010', '2023-01-27', 3,'C', 'DP', 'T', 10, 10),
+       (11, 'BO#20221127-0011', '2023-01-27', 3,'D', 'P', 'C', 11, 1),
+       (12, 'BO#20221127-0012', '2023-01-27', 3,'D', 'R', 'I', 12, 2),
+       (13, 'BO#20221127-0013', '2023-01-27', 3,'D', 'DP', 'T', 13, 3),
+       (14, 'BO#20221127-0014', '2023-01-27', 3,'C', 'P', 'C', 14, 4),
+       (15, 'BO#20221127-0015', '2023-01-27', 3,'D', 'R', 'I', 15, 5),
+       (16, 'BO#20221127-0016', '2023-01-27', 3,'D', 'DP', 'T', 1, 6),
+       (17, 'BO#20221127-0017', '2023-01-27', 3,'C', 'P', 'C', 2, 7)
+SET IDENTITY_INSERT Booking.booking_orders OFF
+SELECT*FROM Booking.booking_orders
+
+SET IDENTITY_INSERT Booking.booking_order_detail ON
+INSERT INTO Booking.booking_order_detail (borde_boor_id, borde_id, borde_checkin, borde_checkout, borde_adults, borde_kids, borde_price, borde_extra, borde_discount, borde_tax, borde_subtotal, borde_faci_id)
+VALUES (1, 1, '2022-11-27', '2022-11-28', 2, 0, 100, 0, 0, 10, 110, 1),
+       (2, 2, '2022-11-27', '2022-11-28', 2, 1, 120, 20, 10, 12, 138, 2),
+       (3, 3, '2022-11-27', '2022-11-28', 3, 0, 150, 30, 20, 15, 145, 3),
+       (4, 4, '2022-11-27', '2022-11-28', 2, 2, 200, 40, 30, 20, 190, 4),
+       (5, 5, '2022-11-27', '2022-11-28', 1, 1, 250, 50, 40, 25, 215, 5),
+       (6, 6, '2022-11-27', '2022-11-28', 4, 0, 300, 60, 50, 30, 270, 6),
+       (7, 7, '2022-11-27', '2022-11-28', 2, 3, 350, 70, 60, 35, 295, 7),
+       (8, 8, '2022-11-27', '2022-11-28', 3, 2, 400, 80, 70, 40, 330, 8),
+       (9, 9, '2022-11-27', '2022-11-28', 1, 4, 450, 90, 80, 45, 355, 9),
+       (10, 10, '2022-11-27', '2022-11-28', 4, 1, 500, 100, 90, 50, 390, 7),
+       (11, 11, '2022-11-27', '2022-11-28', 2, 0, 550, 110, 100, 55, 415, 1),
+       (12, 12, '2022-11-27', '2022-11-28', 3, 1, 600, 120, 110, 60, 450, 2),
+       (13, 13, '2022-11-27', '2022-11-28', 1, 2, 650, 130, 120, 65, 475, 3),
+       (14, 14, '2022-11-27', '2022-11-28', 4, 0, 700, 140, 130, 70, 510, 4),
+       (15, 15, '2022-11-27', '2022-11-28', 2, 3, 750, 150, 140, 75, 535, 5),
+       (16, 16, '2022-11-27', '2022-11-28', 3, 2, 800, 160, 150, 80, 570, 6)
+SET IDENTITY_INSERT Booking.booking_order_detail OFF
+SELECT*FROM Booking.booking_order_detail
+
+
+SET IDENTITY_INSERT Booking.booking_order_detail_extra ON
+INSERT INTO Booking.booking_order_detail_extra (boex_id, boex_price, boex_qty, boex_subtotal, boex_measure_unit, boex_borde_id, boex_prit_id)
+VALUES (1, 10, 2, 20, 'people', 1, 1),
+       (2, 15, 3, 45, 'unit', 2, 2),
+       (3, 20, 4, 80, 'kg', 3, 3),
+       (4, 25, 5, 125, 'people', 4, 4),
+       (5, 30, 6, 180, 'unit', 5, 5),
+       (6, 35, 7, 245, 'kg', 6, 4),
+       (7, 40, 8, 320, 'people', 7, 3),
+       (8, 45, 9, 405, 'unit', 8, 1),
+       (9, 50, 10, 500, 'kg', 9, 1),
+       (10, 55, 11, 605, 'people', 10, 4),
+       (11, 60, 12, 720, 'unit', 11, 1),
+       (12, 65, 13, 845, 'kg', 12, 2),
+       (13, 70, 14, 980, 'people', 13, 3),
+       (14, 75, 15, 1125, 'unit', 14, 4),
+       (15, 80, 16, 1280, 'kg', 15, 5),
+       (16, 85, 17, 1445, 'people', 16, 3),
+       (17, 90, 18, 1620, 'unit', 1, 2),
+       (18, 95, 19, 1805, 'kg', 2, 1),
+       (19, 100, 20, 2000, 'people', 3, 4),
+       (20, 105, 21, 2155, 'unit', 4, 3)
+SET IDENTITY_INSERT Booking.booking_order_detail_extra OFF
+SELECT*FROM Booking.booking_order_detail_extra
+
+SET IDENTITY_INSERT Booking.special_offer_coupons ON         
+INSERT INTO Booking.special_offer_coupons (soco_id, soco_borde_id, soco_spof_id)
+VALUES (1, 1, 1),
+       (2, 2, 2),
+       (3, 3, 3),
+       (4, 4, 4),
+       (5, 5, 5),
+       (6, 6, 6),
+       (7, 7, 7),
+       (8, 8, 8),
+       (9, 9, 9),
+       (10, 10, 1)
+SET IDENTITY_INSERT Booking.special_offer_coupons OFF
+SELECT*FROM Booking.special_offer_coupons
+
+INSERT INTO Booking.user_breakfast (usbr_borde_id, usbr_modified_date, usbr_total_vacant)
+VALUES
+    (1, '2022-11-27',1),
+    (2,'2022-11-27',  2),
+    (3,'2022-11-27',  3),
+    (4,'2022-11-27',  2),
+    (5,'2022-11-27',  1),
+    (6,'2022-11-27',  4),
+    (7,'2022-11-27',  2),
+    (8,'2022-11-27',  3),
+    (9,'2022-11-27',  1),
+    (10, '2022-11-27', 4),
+    (11, '2022-11-27', 2),
+    (12, '2022-11-27', 3),
+    (13, '2022-11-27', 1),
+    (14, '2022-11-27', 4),
+    (15, '2022-11-27', 2),
+    (16, '2022-11-27', 3)
+select * from Booking.user_breakfast
+
 
 -- INSERT MODULE RESTO 
 --resto.resto_menus
+SET IDENTITY_INSERT resto.resto_menus ON
 INSERT INTO resto.resto_menus
-    (reme_faci_id, reme_name, reme_description, reme_price, reme_status, reme_modified_date)
+    (reme_id, reme_faci_id, reme_name, reme_description, reme_price, reme_status, reme_modified_date)
 VALUES
-    (2, 'Nasi Goreng', 'Nasi goreng dengan bahan dasar nasi yang ditumis bersama telur dan sayuran', 15000, 'Available', GETDATE()),
-    (2, 'Soto Ayam', 'Soto ayam dengan kuah yang gurih dan daging ayam yang empuk', 20000, 'Available', GETDATE()),
-    (2, 'Gado-gado', 'Gado-gado dengan bahan dasar lontong dan sayuran-sayuran segar', 10000, 'Available', GETDATE()),
-    (2, 'Bakso', 'Bakso dengan daging sapi yang dipotong-potong dan dimasak dengan bumbu khusus', 15000, 'Available', GETDATE()),
-    (2, 'Ayam Goreng', 'Ayam goreng dengan tepung yang renyah dan daging ayam yang empuk', 25000, 'Available', GETDATE()),
-    (2, 'Sate Ayam', 'Sate ayam dengan bumbu kacang yang lezat', 20000, 'Available', GETDATE()),
-    (2, 'Nasi Kuning', 'Nasi kuning dengan bahan dasar nasi yang dicampur dengan telur dan kecap', 10000, 'Available', GETDATE()),
-    (2, 'Sop Buntut', 'Sop buntut dengan bahan dasar daging buntut yang empuk dan kuah yang gurih', 30000, 'Available', GETDATE()),
-    (2, 'Bubur Ayam', 'Bubur ayam dengan bahan dasar nasi yang dicampur dengan daging ayam dan sayuran', 10000, 'Available', GETDATE()),
-    (2, 'Mie Goreng', 'Mie goreng dengan bahan dasar mie yang ditumis bersama telur dan sayuran', 15000, 'Available', GETDATE()),
-    (2, 'Cap Cay', 'Cap cay dengan bahan dasar sayuran yang dicampur dengan daging sapi dan kuah kaldu', 20000, 'Available', GETDATE());
+    (1, 2, 'Nasi Goreng', 'Nasi goreng dengan bahan dasar nasi yang ditumis bersama telur dan sayuran', 15000, 'Available', GETDATE()),
+    (2, 2, 'Soto Ayam', 'Soto ayam dengan kuah yang gurih dan daging ayam yang empuk', 20000, 'Available', GETDATE()),
+    (3, 2, 'Gado-gado', 'Gado-gado dengan bahan dasar lontong dan sayuran-sayuran segar', 10000, 'Available', GETDATE()),
+    (4, 2, 'Bakso', 'Bakso dengan daging sapi yang dipotong-potong dan dimasak dengan bumbu khusus', 15000, 'Available', GETDATE()),
+    (5, 2, 'Ayam Goreng', 'Ayam goreng dengan tepung yang renyah dan daging ayam yang empuk', 25000, 'Available', GETDATE()),
+    (6, 2, 'Sate Ayam', 'Sate ayam dengan bumbu kacang yang lezat', 20000, 'Available', GETDATE()),
+    (7, 2, 'Nasi Kuning', 'Nasi kuning dengan bahan dasar nasi yang dicampur dengan telur dan kecap', 10000, 'Available', GETDATE()),
+    (8, 2, 'Sop Buntut', 'Sop buntut dengan bahan dasar daging buntut yang empuk dan kuah yang gurih', 30000, 'Available', GETDATE()),
+    (9, 2, 'Bubur Ayam', 'Bubur ayam dengan bahan dasar nasi yang dicampur dengan daging ayam dan sayuran', 10000, 'Available', GETDATE()),
+    (10, 2, 'Mie Goreng', 'Mie goreng dengan bahan dasar mie yang ditumis bersama telur dan sayuran', 15000, 'Available', GETDATE()),
+    (11, 2, 'Cap Cay', 'Cap cay dengan bahan dasar sayuran yang dicampur dengan daging sapi dan kuah kaldu', 20000, 'Available', GETDATE());
+SET IDENTITY_INSERT resto.resto_menus OFF
+SELECT*FROM resto.resto_menus;
 
 --resto.order_menu
-INSERT INTO resto.order_menus (orme_order_number, orme_order_date, orme_total_item, orme_total_discount, orme_total_amount, orme_pay_type, orme_cardnumber, orme_is_paid, orme_modified_date, orme_user_id)
-VALUES ('MENUS#2022-01-01-00001', '2022-01-01', 2, 0, 40000, 'CA', NULL, 'P', GETDATE(), 1),
-('MENUS#20220101-00002', '2022-01-01', 3, 5000, 75000, 'CR', '1234567890123456', 'P', GETDATE(), 2),
-('MENUS#20220101-00003', '2022-01-01', 4, 0, 80000, 'D', '9876543210987654', 'B', GETDATE(), 3),
-('MENUS#20220101-00004', '2022-01-01', 5, 0, 100000, 'CA', NULL, 'P', GETDATE(), 4),
-('MENUS#20220101-00005', '2022-01-01', 6, 0, 120000, 'CR', '1234567890123456', 'P', GETDATE(), 5),
-('MENUS#20220101-00006', '2022-01-01', 7, 0, 140000, 'D', '9876543210987654', 'B', GETDATE(), 6);
+SET IDENTITY_INSERT resto.order_menus ON
+INSERT INTO resto.order_menus (orme_id, orme_order_number, orme_order_date, orme_total_item, orme_total_discount, orme_total_amount, orme_pay_type, orme_cardnumber, orme_is_paid, orme_modified_date, orme_user_id)
+VALUES (1, 'MENUS#2022-01-01-00001', '2022-01-01', 2, 0, 40000, 'CA', NULL, 'P', GETDATE(), 1),
+(2,'MENUS#20220101-00002', '2022-01-01', 3, 5000, 75000, 'CR', '1234567890123456', 'P', GETDATE(), 2),
+(3,'MENUS#20220101-00003', '2022-01-01', 4, 0, 80000, 'D', '9876543210987654', 'B', GETDATE(), 3),
+(4,'MENUS#20220101-00004', '2022-01-01', 5, 0, 100000, 'CA', NULL, 'P', GETDATE(), 4),
+(5,'MENUS#20220101-00005', '2022-01-01', 6, 0, 120000, 'CR', '1234567890123456', 'P', GETDATE(), 5),
+(6,'MENUS#20220101-00006', '2022-01-01', 7, 0, 140000, 'D', '9876543210987654', 'B', GETDATE(), 6);
+SET IDENTITY_INSERT resto.order_menus OFF
+SELECT*FROM resto.order_menus;
 
 --resto order menu detail
-INSERT INTO resto.order_menu_detail (orme_price, orme_qty, orme_subtotal, orme_discount, omde_orme_id, omde_reme_id)
+SET IDENTITY_INSERT resto.order_menu_detail ON
+INSERT INTO resto.order_menu_detail (omde_id, orme_price, orme_qty, orme_subtotal, orme_discount, omde_orme_id, omde_reme_id)
 VALUES
-(10000, 2, 20000, 0, 1, 1),
-(12000, 3, 36000, 0, 1, 2),
-(15000, 2, 30000, 0, 2, 3),
-(20000, 4, 80000, 0, 2, 4),
-(10000, 3, 30000, 0, 3, 5),
-(15000, 1, 15000, 0, 3, 6),
-(20000, 3, 60000, 0, 4, 7),
-(12000, 2, 24000, 0, 4, 8),
-(10000, 4, 40000, 0, 5, 9),
-(15000, 2, 30000, 0, 5, 10);
+(1, 10000, 2, 20000, 0, 1, 1),
+(2, 12000, 3, 36000, 0, 1, 2),
+(3, 15000, 2, 30000, 0, 2, 3),
+(4, 20000, 4, 80000, 0, 2, 4),
+(5, 10000, 3, 30000, 0, 3, 5),
+(6, 15000, 1, 15000, 0, 3, 6),
+(7, 20000, 3, 60000, 0, 4, 11),
+(8, 12000, 2, 24000, 0, 4, 2),
+(9, 10000, 4, 40000, 0, 5, 3),
+(10, 15000, 2, 30000, 0, 5, 4);
+SET IDENTITY_INSERT resto.order_menu_detail OFF
+SELECT*FROM resto.order_menu_detail;
 
 --resto photos
 INSERT INTO resto.resto_menu_photos (remp_thumbnail_filename, remp_photo_filename, remp_primary, remp_url, remp_reme_id)
@@ -444,18 +675,20 @@ VALUES ('thumbnail1.jpg', 'photo1.jpg', 1, 'http://localhost/resto/menu/photo1.j
 ('thumbnail8.jpg', 'photo8.jpg', 0, 'http://localhost/resto/menu/photo8.jpg', 3),
 ('thumbnail9.jpg', 'photo9.jpg', 0, 'http://localhost/resto/menu/photo9.jpg', 3),
 ('thumbnail10.jpg', 'photo10.jpg', 1, 'http://localhost/resto/menu/photo10.jpg', 4);
+SELECT*FROM resto.resto_menu_photos;
 
 -- INSERT MODULE Payment
 -- insert entity
-SET IDENTITY_INSERT Payment.Entity ON
+SET IDENTITY_INSERT Payment.entity ON
 INSERT 
-  INTO Payment.Entity(entity_id) 
+  INTO Payment.entity(entity_id) 
 VALUES (1),(2),(3),(4),(5),(6),(7),(8),(9),(10),(11),(12),(13),(14),(15);
 SET IDENTITY_INSERT Payment.Entity OFF
+SELECT*FROM payment.entity;
 
 -- insert bank
 INSERT 
-  INTO Payment.Bank (bank_entity_id, bank_code, bank_name, bank_modified_date)
+  INTO Payment.bank (bank_entity_id, bank_code, bank_name, bank_modified_date)
 VALUES (1, 'BRI', 'PT BANK RAKYAT INDONESIA (PERSERO) Tbk', CURRENT_TIMESTAMP),
        (2, 'BNI', 'PT BANK NEGARA INDONESIA (PERSERO) Tbk', CURRENT_TIMESTAMP),
        (3, 'BCA', 'PT BANK CENTRAL ASIA Tbk', CURRENT_TIMESTAMP),
@@ -463,10 +696,11 @@ VALUES (1, 'BRI', 'PT BANK RAKYAT INDONESIA (PERSERO) Tbk', CURRENT_TIMESTAMP),
        (5, 'BTN', 'PT BANK TABUNGAN NEGARA (PERSERO) Tbk', CURRENT_TIMESTAMP),
        (6, 'MANDIRI', 'PT BANK MANDIRI (PERSERO) Tbk', CURRENT_TIMESTAMP),
        (7, 'MUAMALAT', 'PT BANK MUAMALAT INDONESIA Tbk', CURRENT_TIMESTAMP);
+SELECT*FROM payment.bank;
 
 -- insert payment_gateway
 INSERT 
-  INTO Payment.PaymentGateway(paga_entity_id, paga_code, paga_name, paga_modified_date)
+  INTO Payment.payment_gateway(paga_entity_id, paga_code, paga_name, paga_modified_date)
 VALUES (8, 'GOPAY', 'PT. Dompet Anak Bangsa', CURRENT_TIMESTAMP),
        (9, 'OVO', 'PT. Visionet Internasional', CURRENT_TIMESTAMP),
        (10, 'DANA', 'PT. Espay Debit Indonesia', CURRENT_TIMESTAMP),
@@ -475,10 +709,11 @@ VALUES (8, 'GOPAY', 'PT. Dompet Anak Bangsa', CURRENT_TIMESTAMP),
        (13, 'JENIUS', 'PT. Bank BTPN Tbk', CURRENT_TIMESTAMP),
        (14, 'JAGO', 'PT. Bank Jago Tbk', CURRENT_TIMESTAMP),
        (15, 'SAKUKU', 'PT. Bank Central Asia Tbk', CURRENT_TIMESTAMP);
+SELECT*FROM payment.payment_gateway;
        
 -- user_accounts
 INSERT
-  INTO Payment.UserAccounts(usac_entity_id, usac_user_id, usac_account_number, usac_saldo, usac_type, usac_expmonth, usac_expyear, usac_modified_date)
+  INTO Payment.user_accounts(usac_entity_id, usac_user_id, usac_account_number, usac_saldo, usac_type, usac_expmonth, usac_expyear, usac_modified_date)
 VALUES (1, 1, '6271263188999', 1000000, 'debet', 11, 22, CURRENT_TIMESTAMP),
        (2, 2, '8012372737662', 1000000, 'credit card', 12, 27, CURRENT_TIMESTAMP),
        (3, 3, '9712893896126', 1000000, 'debet', 03, 23, CURRENT_TIMESTAMP),
@@ -494,28 +729,33 @@ VALUES (1, 1, '6271263188999', 1000000, 'debet', 11, 22, CURRENT_TIMESTAMP),
        (13, 13, '809283222364', 1000000, 'payment', 0, 0, CURRENT_TIMESTAMP),
        (14, 14, '890128352546', 1000000, 'payment', 0, 0, CURRENT_TIMESTAMP),
        (15, 15, '856272837172', 1000000, 'payment', 0, 0, CURRENT_TIMESTAMP);
+SELECT*FROM payment.user_accounts;
 
 -- payment_transactions
-SET IDENTITY_INSERT Payment.PaymentTransaction ON
+SET IDENTITY_INSERT Payment.payment_transaction ON
 INSERT
-  INTO Payment.PaymentTransaction(patr_id, patr_trx_number, patr_debet, patr_credit, patr_type, patr_note, patr_modified_date, 
+  INTO Payment.payment_transaction(patr_id, patr_trx_number, patr_debet, patr_credit, patr_type, patr_note, patr_modified_date, 
                                   patr_order_number, patr_source_id, patr_target_id, patr_trx_number_ref, patr_user_id)
 VALUES (1, 'TRB#20221127-0001', 150000, 150000, 'TRB', NULL, CURRENT_TIMESTAMP, 'BO#20221127-0001', 1, 2, 'TRB#20221127-0001', 1),
        (2, 'TRB#20221127-0002', 150000, 150000, 'ORM', NULL, CURRENT_TIMESTAMP, 'MENUS#20221127-0001', 2, 1, 'TRB#20221127-0002', 2);
-SET IDENTITY_INSERT Payment.PaymentTransaction OFF
+SET IDENTITY_INSERT Payment.payment_transaction OFF
+SELECT*FROM payment.payment_transaction;
 
 -- PURCHASING INSERT
-INSERT INTO purchasing.vendor (vendor_name, vendor_active, vendor_priority, vendor_register_date, vendor_weburl, vendor_modifier_date)
-VALUES ('Global Equipment Co.', 1, 0, '2022-01-01', 'www.globalequipment.com', '2022-01-02'),
-       ('Sustainable Solutions Inc.', 1, 1, '2022-02-01', 'www.sustainablesolutions.com', '2022-02-02'),
-       ('Quality Parts LLC', 1, 0, '2022-03-01', 'www.qualityparts.com', '2022-03-02'),
-       ('Innovative Technologies Corp.', 0, 1, '2022-04-01', 'www.innovativetechnologies.com', '2022-04-02'),
-       ('Dynamic Enterprises Inc.', 1, 0, '2022-05-01', 'www.dynamicenterprises.com', '2022-05-02'),
-       ('Elite Supplies Co.', 1, 1, '2022-06-01', 'www.elitesupplies.com', '2022-06-02'),
-       ('Superior Products LLC', 0, 0, '2022-07-01', 'www.superiorproducts.com', '2022-07-02'),
-       ('Advanced Materials Inc.', 1, 1, '2022-08-01', 'www.advancedmaterials.com', '2022-08-02'),
-       ('Bright Ideas Inc.', 1, 0, '2022-09-01', 'www.brightideas.com', '2022-09-02'),
-       ('Progressive Solutions Inc.', 0, 1, '2022-10-01', 'www.progressivesolutions.com', '2022-10-02');
+SET IDENTITY_INSERT purchasing.vendor ON
+INSERT INTO purchasing.vendor (vendor_id, vendor_name, vendor_active, vendor_priority, vendor_register_date, vendor_weburl, vendor_modifier_date)
+VALUES (1,'Global Equipment Co.', 1, 0, '2022-01-01', 'www.globalequipment.com', '2022-01-02'),
+       (2,'Sustainable Solutions Inc.', 1, 1, '2022-02-01', 'www.sustainablesolutions.com', '2022-02-02'),
+       (3,'Quality Parts LLC', 1, 0, '2022-03-01', 'www.qualityparts.com', '2022-03-02'),
+       (4,'Innovative Technologies Corp.', 0, 1, '2022-04-01', 'www.innovativetechnologies.com', '2022-04-02'),
+       (5,'Dynamic Enterprises Inc.', 1, 0, '2022-05-01', 'www.dynamicenterprises.com', '2022-05-02'),
+       (6,'Elite Supplies Co.', 1, 1, '2022-06-01', 'www.elitesupplies.com', '2022-06-02'),
+       (7,'Superior Products LLC', 0, 0, '2022-07-01', 'www.superiorproducts.com', '2022-07-02'),
+       (8,'Advanced Materials Inc.', 1, 1, '2022-08-01', 'www.advancedmaterials.com', '2022-08-02'),
+       (9,'Bright Ideas Inc.', 1, 0, '2022-09-01', 'www.brightideas.com', '2022-09-02'),
+       (10,'Progressive Solutions Inc.', 0, 1, '2022-10-01', 'www.progressivesolutions.com', '2022-10-02');
+SET IDENTITY_INSERT purchasing.vendor OFF
+SELECT*FROM Purchasing.vendor;
 
 INSERT INTO purchasing.purchase_order_header (pohe_number, pohe_status, pohe_order_date, pohe_tax, pohe_refund, pohe_arrival_date, pohe_pay_type, pohe_emp_id, pohe_vendor_id)
 VALUES
@@ -524,8 +764,7 @@ VALUES
   ('PO-003', 1, GETDATE(), 450000, 0, GETDATE() + 20, 'TR', 1, 3),
   ('PO-004', 1, GETDATE(), 600000, 0, GETDATE() + 25, 'TR', 1, 4),
   ('PO-005', 1, GETDATE(), 750000, 0, GETDATE() + 30, 'CA', 1, 5);
- 
- 
+ SELECT*FROM Purchasing.purchase_order_header;
 
 INSERT INTO purchasing.stocks (stock_name, stock_description, stock_size, stock_color, stock_modified_date)
 VALUES
@@ -534,6 +773,7 @@ VALUES
   ('Handuk Hotel', 'Handuk dengan bahan yang nyaman dan tahan lama', 'Standard', 'Putih', GETDATE()),
   ('Gorden Hotel', 'Gorden dengan bahan yang tahan lama dan mudah dicuci', 'Standard', 'Putih', GETDATE()),
   ('Gelas Hotel', 'Gelas dengan bahan yang tahan lama dan mudah dicuci', 'Standard', 'Transparan', GETDATE());
+SELECT*FROM Purchasing.stocks;
 
 INSERT INTO purchasing.stock_detail (stod_stock_id, stod_barcode_number, stod_status, stod_notes, stod_faci_id, stod_pohe_id)
 VALUES
@@ -562,6 +802,7 @@ VALUES
   (5, 'Barcode Gelas 3', 1, 'Gelas di kamar 123', 5, 5),
   (5, 'Barcode Gelas 4', 1, 'Gelas di kamar 124', 5, 5),
   (5, 'Barcode Gelas 5', 1, 'Gelas di kamar 125', 5, 5);
+SELECT*FROM Purchasing.stock_detail;
 
 INSERT INTO purchasing.stock_photo (spho_thumbnail_filename, spho_photo_filename, spho_primary, spho_url, spho_stock_id)
 VALUES
@@ -570,7 +811,8 @@ VALUES
   ('thumbnail-3.jpg', 'photo-3.jpg', 0, 'https://stock-photos.com/thumbnail-3.jpg', 3),
   ('thumbnail-4.jpg', 'photo-4.jpg', 1, 'https://stock-photos.com/thumbnail-4.jpg', 4),
   ('thumbnail-5.jpg', 'photo-5.jpg', 0, 'https://stock-photos.com/thumbnail-5.jpg', 5);
-  
+SELECT*FROM Purchasing.stock_photo;
+
 INSERT INTO purchasing.purchase_order_detail (pode_pohe_id, pode_order_qty, pode_price, pode_received_qty, pode_rejected_qty, pode_modified_date, pode_stock_id)
 VALUES
   (1, 10, 100000, 9, 1, GETDATE(), 1),
@@ -586,5 +828,6 @@ VALUES
   (5, 110, 600000, 107, 3, GETDATE(), 1),
   (5, 120, 650000, 117, 3, GETDATE(), 2),
   (5, 130, 700000, 127, 3, GETDATE(), 3);
+SELECT*FROM Purchasing.purchase_order_detail;
 
--- USE tempdb;
+USE tempdb;

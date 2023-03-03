@@ -395,3 +395,118 @@ BEGIN
     END CATCH
 END
 GO
+
+-- =============================================
+-- Author:		Muh Fadel marzuki
+-- Create date: 3 March 2023
+-- Description:	Store Procedure Generate Barcode
+-- =============================================
+create or alter  procedure Purchasing.GenerateBarcode
+(
+-- Add the parameters for the stored procedure here
+	@PodeId int,
+	@PodeQyt int,
+	@PodeReceivedQty int,
+	@PodeRejectQty int
+) as
+	declare @i int = 1;
+	declare @stockID int;
+	declare @poheStatus int;
+	declare @OldpodeReceivedQty decimal;
+begin
+	-- Declare status Purchasing.purchase_order_header and declare Purchasing.purchase_order_detail
+	select @poheStatus=po.pohe_status, @OldpodeReceivedQty=FLOOR(pd.pode_received_qty) from Purchasing.purchase_order_detail pd 
+	inner join Purchasing.purchase_order_header po on pd.pode_pohe_id=po.pohe_id
+	where pd.pode_id = @PodeId
+	begin try
+		begin transaction
+		-- Generate must check this all condition
+		IF @PodeReceivedQty > 0 and @poheStatus = 4 
+			and @PodeReceivedQty > @OldpodeReceivedQty 
+			and @PodeQyt > @PodeReceivedQty
+			and (@PodeReceivedQty + @PodeRejectQty) = @PodeQyt
+		Begin
+		-- loop insert statement procedure Here
+			While @i <= @PodeReceivedQty
+			Begin
+				INSERT INTO purchasing.stock_detail (stod_stock_id, stod_barcode_number,
+				 stod_pohe_id) select pode_stock_id, 
+				CONCAT('BC' ,  substring(replace(convert(nvarchar(100), NEWID()), '-', ''), 1, 10) ),
+				pode_pohe_id from Purchasing.purchase_order_detail where pode_id = @PodeId;
+				set @i = @i +1;
+			End
+			begin
+				-- declare stock id
+				select @stockID=pode_stock_id from Purchasing.purchase_order_detail where pode_id = @PodeId;
+
+				-- update after insert statement
+				update Purchasing.stocks
+					set 
+						stock_quantity = (select count(case when stod_status = N'1' then 1 else null end) 
+							from Purchasing.stock_detail where stod_stock_id =@stockID),
+						stock_used = (select count(case when stod_status = N'2' then 1 else null end) 
+							from Purchasing.stock_detail where stod_stock_id =@stockID),
+						stock_scrap = (select count(case when stod_status = N'3' then 1 else null end) 
+							from Purchasing.stock_detail where stod_stock_id =@stockID)
+					where stock_id = @stockID;
+			end
+		End
+		Print 'Generate Barcode successfully';
+		commit transaction
+	end try
+	begin catch
+		rollback;
+		print 'Generate Barcode Is Failed';
+		throw;
+	end catch 
+end
+
+-- =============================================
+-- Author:		Muh Fadel marzuki
+-- Create date: 3 March 2023
+-- Description:	Store Procedure Update Stock Detail
+-- =============================================
+create or alter procedure [Purchasing].[spUpdateStockDetail]
+(
+	-- Add the parameters for the stored procedure here
+	@stodId int,
+	@stodStockId int, 
+	@stodStatus nchar,
+	@stodNotes text,
+	@stodFaciId int
+) as
+	declare @updateStatus int;
+	declare @stockID int;
+begin
+	begin try
+		begin transaction
+			-- updates statement 1 for procedure here
+			begin
+				UPDATE purchasing.stock_detail SET 
+                stod_stock_id=@stodStockId, stod_status=@stodStatus, 
+                stod_notes=@stodNotes, stod_faci_id=@stodFaciId 
+                WHERE stod_id=@stodId;
+			end
+
+			begin
+				select @stockID=stod_stock_id from Purchasing.stock_detail where stod_id = @stodId;
+				-- updates statement 2 for procedure here
+				update Purchasing.stocks
+					set 
+						stock_quantity = (select count(case when stod_status = N'1' then 1 else null end) 
+							from Purchasing.stock_detail where stod_stock_id =@stockID),
+						stock_used = (select count(case when stod_status = N'2' then 1 else null end) 
+							from Purchasing.stock_detail where stod_stock_id =@stockID),
+						stock_scrap = (select count(case when stod_status = N'3' then 1 else null end) 
+							from Purchasing.stock_detail where stod_stock_id =@stockID)
+				where stock_id = @stockID;
+			end
+			Print 'Update status for stod_id = '+ cast(@stodId as nvarchar(25))+' successfully';
+		commit transaction
+	end try
+	begin catch
+		rollback;
+		print 'Transaction Rollback for stod_id = ' + cast(@stodId as nvarchar(25));
+		throw;
+	end catch 
+end

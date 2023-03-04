@@ -442,7 +442,7 @@ begin
 				-- update after insert statement
 				update Purchasing.stocks
 					set 
-						stock_quantity = (select count(case when stod_status = N'1' then 1 else null end) 
+						stock_quantity = (select count(stod_id) 
 							from Purchasing.stock_detail where stod_stock_id =@stockID),
 						stock_used = (select count(case when stod_status = N'2' then 1 else null end) 
 							from Purchasing.stock_detail where stod_stock_id =@stockID),
@@ -493,7 +493,7 @@ begin
 				-- updates statement 2 for procedure here
 				update Purchasing.stocks
 					set 
-						stock_quantity = (select count(case when stod_status = N'1' then 1 else null end) 
+						stock_quantity = (select count(stod_id) 
 							from Purchasing.stock_detail where stod_stock_id =@stockID),
 						stock_used = (select count(case when stod_status = N'2' then 1 else null end) 
 							from Purchasing.stock_detail where stod_stock_id =@stockID),

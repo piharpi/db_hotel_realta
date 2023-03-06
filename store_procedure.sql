@@ -1,3 +1,6 @@
+USE Hotel_Realta
+GO
+
 -- STORE PROCEDURE MODULE PAYMENT
 SET ANSI_NULLS ON
 GO
@@ -19,7 +22,7 @@ BEGIN
 	-- interfering with SELECT statements.
 	SET NOCOUNT ON;
 
-    -- Insert statements for procedure here
+	-- Insert statements for procedure here
 		UPDATE [Payment].[bank] 
 			 SET [bank_code] = @code,
 					 [bank_name] = @name,
@@ -44,7 +47,7 @@ BEGIN
 	-- interfering with SELECT statements.
 	SET NOCOUNT ON;
 
-    -- Insert statements for procedure here
+	-- Insert statements for procedure here
 		UPDATE [Payment].[payment_gateway] 
 			 SET [paga_code] = @code,
 					 [paga_name] = @name,
@@ -78,7 +81,7 @@ BEGIN
 		
 		DECLARE @modified As datetime
 		SET @modified = GETDATE()
-    -- Insert statements for procedure here
+	-- Insert statements for procedure here
 		UPDATE [Payment].[user_accounts]
 			 SET [usac_entity_id] = @set_entity_id
 					,[usac_user_id] = @set_user_id
@@ -116,7 +119,7 @@ BEGIN
 	-- interfering with SELECT statements.
 	SET NOCOUNT ON;
 
-    -- Insert statements for procedure here
+	-- Insert statements for procedure here
 		UPDATE [Payment].[payment_transaction]
 		 SET [patr_trx_number] = @trx_number
 				,[patr_debet] = @debet
@@ -144,24 +147,24 @@ CREATE PROCEDURE purchasing.spUpdateVendor
 AS
 BEGIN
   BEGIN TRY
-    BEGIN TRANSACTION
+	BEGIN TRANSACTION
 
-    UPDATE purchasing.vendor
-    SET
-      vendor_name = @name,
-      vendor_active = @active,
-      vendor_priority = @priority,
-      vendor_modified_date = GETDATE(),
-      vendor_weburl = @weburl
-    WHERE
-      vendor_entity_id = @id;
+	UPDATE purchasing.vendor
+	SET
+	  vendor_name = @name,
+	  vendor_active = @active,
+	  vendor_priority = @priority,
+	  vendor_modified_date = GETDATE(),
+	  vendor_weburl = @weburl
+	WHERE
+	  vendor_entity_id = @id;
 
-    COMMIT TRANSACTION
+	COMMIT TRANSACTION
   END TRY
   BEGIN CATCH
-    IF @@TRANCOUNT > 0
-      ROLLBACK TRANSACTION
-    THROW;
+	IF @@TRANCOUNT > 0
+	  ROLLBACK TRANSACTION
+	THROW;
   END CATCH
 END
 GO
@@ -180,20 +183,20 @@ BEGIN
   SET NOCOUNT ON;
 
   BEGIN TRY
-      BEGIN TRANSACTION
-          UPDATE purchasing.stocks
-          SET stock_name = @name,
-              stock_description = @description,
-              stock_size = @size,
-              stock_color = @color,
-              stock_modified_date = GETDATE()
-          WHERE stock_id = @id
-      COMMIT TRANSACTION
+	  BEGIN TRANSACTION
+		  UPDATE purchasing.stocks
+		  SET stock_name = @name,
+			  stock_description = @description,
+			  stock_size = @size,
+			  stock_color = @color,
+			  stock_modified_date = GETDATE()
+		  WHERE stock_id = @id
+	  COMMIT TRANSACTION
   END TRY
   BEGIN CATCH
-    IF @@TRANCOUNT > 0
-      ROLLBACK TRANSACTION
-    THROW;
+	IF @@TRANCOUNT > 0
+	  ROLLBACK TRANSACTION
+	THROW;
   END CATCH
 END
 GO
@@ -214,35 +217,41 @@ BEGIN
   SET NOCOUNT ON;
 
   BEGIN TRY
-      BEGIN TRANSACTION
-          UPDATE purchasing.stock_photo
-          SET spho_thumbnail_filename = @thumbnail,
-              spho_photo_filename = @photo,
-              spho_primary = @primary,
-              spho_url = @url,
-              spho_stock_id = @stockId
-          WHERE spho_id = @id
-      COMMIT TRANSACTION
+	  BEGIN TRANSACTION
+		  UPDATE purchasing.stock_photo
+		  SET spho_thumbnail_filename = @thumbnail,
+			  spho_photo_filename = @photo,
+			  spho_primary = @primary,
+			  spho_url = @url,
+			  spho_stock_id = @stockId
+		  WHERE spho_id = @id
+	  COMMIT TRANSACTION
   END TRY
   BEGIN CATCH
-    IF @@TRANCOUNT > 0
-      ROLLBACK TRANSACTION
-    THROW;
+	IF @@TRANCOUNT > 0
+	  ROLLBACK TRANSACTION
+	THROW;
   END CATCH
 END
 GO
 
+-- ===========================================================
+-- Author:		Riyan
+-- Create date: 3 March 2023
+-- Description:	Store Procedure for Insert Purchase Order
+-- ===========================================================
+
 CREATE PROCEDURE purchasing.spInsertPurchaseOrder
-    @pohe_emp_id INT,
-    @pohe_vendor_id INT,
+	@pohe_emp_id INT,
+	@pohe_vendor_id INT,
 	@pohe_pay_type NCHAR(2),
-    @pode_order_qty SMALLINT,
-    @pode_price MONEY,
-    @pode_stock_id INT
+	@pode_order_qty SMALLINT,
+	@pode_price MONEY,
+	@pode_stock_id INT
 AS
 BEGIN
-    SET NOCOUNT ON;
-    SET XACT_ABORT ON;
+	SET NOCOUNT ON;
+	SET XACT_ABORT ON;
 
 	BEGIN TRY
 		BEGIN TRANSACTION
@@ -349,49 +358,60 @@ BEGIN
 			END
 		COMMIT TRANSACTION
 	END TRY
-    BEGIN CATCH
+	BEGIN CATCH
 		IF @@TRANCOUNT > 0
 			ROLLBACK TRANSACTION
 		THROW;
-    END CATCH
+	END CATCH
 END
 GO
 
+
+
+-- ===========================================================
+-- Author:		Riyan
+-- Create date: 3 March 2023
+-- Description:	Store Procedure for Delete Purchase Order
+-- ===========================================================
+
 CREATE PROCEDURE purchasing.spDeletePurchaseOrder
-    @pohe_number NVARCHAR(20)
+	@pohe_number NVARCHAR(20)
 AS
 BEGIN
-    SET NOCOUNT ON;
-    
-    BEGIN TRY
-        BEGIN TRANSACTION
-        
-        DECLARE @pohe_id INT
-        
-        -- Get pohe_id from pohe_number
-        SELECT @pohe_id = pohe_id
-        FROM purchasing.purchase_order_header
-        WHERE pohe_number = @pohe_number
-        
-        IF @pohe_id IS NOT NULL
-        BEGIN
-            -- Delete detail records
-            DELETE FROM purchasing.purchase_order_detail
-            WHERE pode_pohe_id = @pohe_id
-            
-            -- Delete header record
-            DELETE FROM purchasing.purchase_order_header
-            WHERE pohe_id = @pohe_id
-        END
-        
-        COMMIT TRANSACTION
-    END TRY
-    
-    BEGIN CATCH
-        IF @@TRANCOUNT > 0
-            ROLLBACK TRANSACTION
-        -- Throw error message
-        THROW;
-    END CATCH
+	SET NOCOUNT ON;
+	
+	BEGIN TRY
+		BEGIN TRANSACTION
+		
+		DECLARE @pohe_id INT
+		
+		-- Get pohe_id from pohe_number
+		SELECT @pohe_id = pohe_id
+		FROM purchasing.purchase_order_header
+		WHERE pohe_number = @pohe_number
+		
+		IF @pohe_id IS NOT NULL
+		BEGIN
+			-- Delete detail records
+			DELETE FROM purchasing.purchase_order_detail
+			WHERE pode_pohe_id = @pohe_id
+			
+			-- Delete header record
+			DELETE FROM purchasing.purchase_order_header
+			WHERE pohe_id = @pohe_id
+		END
+		
+		COMMIT TRANSACTION
+	END TRY
+	
+	BEGIN CATCH
+		IF @@TRANCOUNT > 0
+			ROLLBACK TRANSACTION
+		-- Throw error message
+		THROW;
+	END CATCH
 END
+GO
+
+USE tempdb
 GO

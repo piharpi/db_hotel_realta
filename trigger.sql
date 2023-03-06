@@ -18,25 +18,35 @@ DROP PROCEDURE IF EXISTS purchasing.spUpdatePohe;
 DROP PROCEDURE IF EXISTS purchasing.spUpdatePode;
 DROP PROCEDURE IF EXISTS purchasing.spInsertPurchaseOrder;
 DROP PROCEDURE IF EXISTS purchasing.spDeletePurchaseOrder;
+DROP PROCEDURE IF EXISTS purchasing.tr_cart_delete_and_modified_date;
 GO
 
-CREATE TRIGGER tr_delete_header_if_no_detail
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+-- =============================================
+-- Author:		Riyan
+-- Create date: 6 February 2023
+-- Description:	Delete PO Header if haven't Detail
+-- =============================================
+CREATE TRIGGER purchasing.tr_delete_header_if_no_detail
 ON purchasing.purchase_order_detail
 AFTER DELETE
 AS
 BEGIN
-    DECLARE @pode_pohe_id INT;
-    
-    SELECT @pode_pohe_id = pode_pohe_id FROM deleted;
-    
-    IF NOT EXISTS (SELECT 1 FROM purchasing.purchase_order_detail WHERE pode_pohe_id = @pode_pohe_id)
-    BEGIN
-        DELETE FROM purchasing.purchase_order_header WHERE pohe_id = @pode_pohe_id;
-    END
+	DECLARE @pode_pohe_id INT;
+	
+	SELECT @pode_pohe_id = pode_pohe_id FROM deleted;
+	
+	IF NOT EXISTS (SELECT 1 FROM purchasing.purchase_order_detail WHERE pode_pohe_id = @pode_pohe_id)
+	BEGIN
+		DELETE FROM purchasing.purchase_order_header WHERE pohe_id = @pode_pohe_id;
+	END
 END
 GO
 
-CREATE TRIGGER tr_vendor_modified_date
+CREATE TRIGGER purchasing.tr_vendor_modified_date
 ON purchasing.vendor
 AFTER UPDATE
 AS
@@ -47,7 +57,7 @@ BEGIN
 END;
 GO
 
-CREATE TRIGGER tr_stocks_modified_date
+CREATE TRIGGER purchasing.tr_stocks_modified_date
 ON purchasing.stocks
 AFTER UPDATE
 AS
@@ -58,7 +68,12 @@ BEGIN
 END;
 GO
 
-CREATE TRIGGER tr_pode_modified_date
+-- =============================================
+-- Author:		Riyan
+-- Create date: 6 February 2023
+-- Description:	Update Modified date
+-- =============================================
+CREATE TRIGGER purchasing.tr_pode_modified_date
 ON purchasing.purchase_order_detail
 AFTER UPDATE
 AS
@@ -69,7 +84,7 @@ BEGIN
 END;
 GO
 
-CREATE TRIGGER tr_update_sub_total
+CREATE TRIGGER purchasing.tr_update_sub_total
 ON purchasing.purchase_order_detail
 AFTER INSERT, UPDATE, DELETE
 AS
@@ -77,13 +92,68 @@ BEGIN
   SET NOCOUNT ON;
 
   UPDATE purchasing.purchase_order_header
-    SET pohe_subtotal = 
-      (SELECT SUM(pode_line_total) 
-        FROM purchasing.purchase_order_detail 
-        WHERE pode_pohe_id = pohe_id)
-    WHERE pohe_id IN 
-      (SELECT pode_pohe_id FROM inserted) 
-    OR pohe_id IN (SELECT pode_pohe_id FROM deleted);
+	SET pohe_subtotal = 
+	  (SELECT SUM(pode_line_total) 
+		FROM purchasing.purchase_order_detail 
+		WHERE pode_pohe_id = pohe_id)
+	WHERE pohe_id IN 
+	  (SELECT pode_pohe_id FROM inserted) 
+	OR pohe_id IN (SELECT pode_pohe_id FROM deleted);
+END;
+GO
+
+-- =============================================
+-- Author:		Riyan
+-- Create date: 6 February 2023
+-- Description:	Update cart_modified_date and delete cart if order qty < 1
+-- =============================================
+CREATE TRIGGER purchasing.tr_cart_delete_and_modified_date
+ON purchasing.cart
+FOR DELETE, UPDATE
+AS
+BEGIN
+  SET NOCOUNT ON;
+
+  -- hapus baris pada tabel jika cart_order_qty = 0
+  DELETE FROM purchasing.cart
+  WHERE cart_id IN (SELECT cart_id FROM inserted WHERE cart_order_qty = 0);
+
+  -- perbarui nilai pada kolom cart_modified_date saat ada perubahan pada baris
+  UPDATE purchasing.cart
+  SET cart_modified_date = GETDATE()
+  WHERE cart_id IN (SELECT cart_id FROM inserted);
+END;
+
+GO
+
+DROP trigger if exists purchasing.tr_cart_merge_quantity;
+GO
+-- =============================================
+-- Author:		Riyan
+-- Create date: 6 February 2023
+-- Description:	Check inserted cart
+-- =============================================
+CREATE TRIGGER purchasing.tr_cart_merge_quantity
+ON purchasing.cart
+INSTEAD OF INSERT
+AS
+BEGIN
+	-- update kuantitas (qty) jika item vepro sudah ada pada cart
+	UPDATE c
+	SET cart_order_qty = c.cart_order_qty + i.cart_order_qty,
+		cart_modified_date = GETDATE()
+	FROM purchasing.cart AS c
+	INNER JOIN inserted AS i ON c.cart_vepro_id = i.cart_vepro_id AND c.cart_emp_id = i.cart_emp_id;
+
+	-- tambahkan item baru pada cart jika item vepro belum ada pada cart
+	INSERT INTO purchasing.cart (cart_emp_id, cart_vepro_id, cart_order_qty)
+	SELECT i.cart_emp_id, i.cart_vepro_id, i.cart_order_qty
+	FROM inserted AS i
+	WHERE NOT EXISTS (
+		SELECT 1
+		FROM purchasing.cart AS c
+		WHERE c.cart_vepro_id = i.cart_vepro_id AND c.cart_emp_id = i.cart_emp_id
+	);
 END;
 GO
 
@@ -140,10 +210,8 @@ GO
 --GO
 
 -- TRIGGER MODULE PAYMENT
-SET ANSI_NULLS ON
-GO
-SET QUOTED_IDENTIFIER ON
-GO
+
+
 -- =============================================
 -- Author:		Harpi
 -- Create date: 8 January 2023
@@ -163,7 +231,7 @@ BEGIN
 		SELECT @bank_code = bank_code FROM inserted;
 		SELECT @bank_name = bank_name FROM inserted;
 
-    -- Insert statements for trigger here
+	-- Insert statements for trigger here
 		 INSERT 
 			 INTO Payment.entity 
 		DEFAULT VALUES
@@ -193,7 +261,7 @@ BEGIN
 		SELECT @paga_code = paga_code FROM inserted;
 		SELECT @paga_name = paga_name FROM inserted;
 
-    -- Insert statements for trigger here
+	-- Insert statements for trigger here
 		 INSERT 
 			 INTO Payment.entity 
 		DEFAULT VALUES
@@ -203,3 +271,5 @@ BEGIN
 		VALUES (SCOPE_IDENTITY(), @paga_code, @paga_name, GETDATE())
 END
 GO
+
+use tempdb;

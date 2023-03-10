@@ -142,20 +142,12 @@ BEGIN
 END
 GO
 
-USE [Hotel_Realta]
-GO
-/****** Object:  Trigger [Payment].[CalculateUserAccountCredit]    Script Date: 20/02/2023 21:49:17 ******/
-SET ANSI_NULLS ON
-GO
-SET QUOTED_IDENTIFIER ON
-GO
-
 -- =============================================
 -- Author:		Harpi
 -- Create date: 8 January 2023
 -- Description:	Create identity in Entity table and insert payment 
 -- =============================================
-ALTER TRIGGER [Payment].[CalculateUserAccountCredit]
+CREATE TRIGGER [Payment].[CalculateUserAccountCredit]
    ON  [Payment].[payment_transaction] 
    AFTER INSERT
 AS 

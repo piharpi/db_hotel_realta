@@ -1,6 +1,11 @@
 USE tempdb;
 GO
 
+IF EXISTS (SELECT name FROM master.sys.databases WHERE name = N'Hotel_Realta')
+BEGIN
+    ALTER DATABASE Hotel_Realta SET SINGLE_USER WITH ROLLBACK IMMEDIATE;
+END
+
 DROP DATABASE IF EXISTS Hotel_Realta;
 GO
 

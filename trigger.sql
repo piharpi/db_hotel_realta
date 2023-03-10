@@ -16,7 +16,70 @@ DROP PROCEDURE IF EXISTS purchasing.spDeletePurchaseOrder;
 DROP PROCEDURE IF EXISTS purchasing.tr_cart_delete_and_modified_date;
 GO
 
-CREATE TRIGGER tr_update_sub_total
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+-- =============================================
+-- Author:		Riyan
+-- Create date: 6 February 2023
+-- Description:	Delete PO Header if haven't Detail
+-- =============================================
+CREATE TRIGGER purchasing.tr_delete_header_if_no_detail
+ON purchasing.purchase_order_detail
+AFTER DELETE
+AS
+BEGIN
+	DECLARE @pode_pohe_id INT;
+
+	SELECT @pode_pohe_id = pode_pohe_id FROM deleted;
+
+	IF NOT EXISTS (SELECT 1 FROM purchasing.purchase_order_detail WHERE pode_pohe_id = @pode_pohe_id)
+	BEGIN
+		DELETE FROM purchasing.purchase_order_header WHERE pohe_id = @pode_pohe_id;
+	END
+END
+GO
+
+CREATE TRIGGER purchasing.tr_vendor_modified_date
+ON purchasing.vendor
+AFTER UPDATE
+AS
+BEGIN
+  UPDATE purchasing.vendor
+  SET vendor_modified_date = GETDATE()
+  WHERE vendor_entity_id IN(SELECT vendor_entity_id FROM inserted)
+END;
+GO
+
+CREATE TRIGGER purchasing.tr_stocks_modified_date
+ON purchasing.stocks
+AFTER UPDATE
+AS
+BEGIN
+  UPDATE purchasing.stocks
+  SET stock_modified_date = GETDATE()
+  WHERE stock_id IN(SELECT stock_id FROM inserted)
+END;
+GO
+
+-- =============================================
+-- Author:		Riyan
+-- Create date: 6 February 2023
+-- Description:	Update Modified date
+-- =============================================
+CREATE TRIGGER purchasing.tr_pode_modified_date
+ON purchasing.purchase_order_detail
+AFTER UPDATE
+AS
+BEGIN
+  UPDATE purchasing.purchase_order_detail
+  SET pode_modified_date = GETDATE()
+  WHERE pode_id IN(SELECT pode_id FROM inserted)
+END;
+GO
+
+CREATE TRIGGER purchasing.tr_update_sub_total
 ON purchasing.purchase_order_detail
 AFTER INSERT, UPDATE, DELETE
 AS
@@ -24,13 +87,13 @@ BEGIN
   SET NOCOUNT ON;
 
   UPDATE purchasing.purchase_order_header
-    SET pohe_subtotal = 
-      (SELECT SUM(pode_line_total) 
-        FROM purchasing.purchase_order_detail 
-        WHERE pode_pohe_id = pohe_id)
-    WHERE pohe_id IN 
-      (SELECT pode_pohe_id FROM inserted) 
-    OR pohe_id IN (SELECT pode_pohe_id FROM deleted);
+	SET pohe_subtotal =
+	  (SELECT SUM(pode_line_total)
+		FROM purchasing.purchase_order_detail
+		WHERE pode_pohe_id = pohe_id)
+	WHERE pohe_id IN
+	  (SELECT pode_pohe_id FROM inserted)
+	OR pohe_id IN (SELECT pode_pohe_id FROM deleted);
 END;
 GO
 
@@ -55,6 +118,7 @@ BEGIN
   SET cart_modified_date = GETDATE()
   WHERE cart_id IN (SELECT cart_id FROM inserted);
 END;
+
 GO
 
 DROP trigger if exists purchasing.tr_cart_merge_quantity;

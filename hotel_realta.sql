@@ -150,11 +150,11 @@ CREATE TABLE Users.user_members (
   usme_type nvarchar(15) DEFAULT 'Expired',
 	CONSTRAINT pk_usme_user_id PRIMARY KEY(usme_user_id),
 	CONSTRAINT fk_usme_user_id FOREIGN KEY(usme_user_id) REFERENCES Users.users (user_id)
-		ON DELETE CASCADE
-		ON UPDATE CASCADE,
+        ON DELETE CASCADE
+        ON UPDATE CASCADE,
 	CONSTRAINT fk_usme_memb_name FOREIGN KEY (usme_memb_name) REFERENCES Master.members(memb_name)
-	  ON DELETE CASCADE
-		ON UPDATE CASCADE
+        ON DELETE CASCADE
+        ON UPDATE CASCADE
 );
 
 CREATE TABLE Users.roles (
@@ -441,10 +441,10 @@ CREATE TABLE Booking.booking_orders(
 	CONSTRAINT pk_boor_id PRIMARY KEY (boor_id),
 	CONSTRAINT unique_boor_order_number UNIQUE (boor_order_number),
 	CONSTRAINT fk_boor_user_id FOREIGN KEY (boor_user_id) REFERENCES Users.users (user_id) 
-    ON DELETE CASCADE 
+    ON DELETE CASCADE
     ON UPDATE CASCADE,
 	CONSTRAINT fk_boor_hotel_id FOREIGN KEY (boor_hotel_id) REFERENCES Hotel.hotels (hotel_id) 
-    ON DELETE CASCADE 
+    ON DELETE CASCADE
     ON UPDATE CASCADE,
 );
 
@@ -465,7 +465,7 @@ CREATE TABLE Booking.booking_order_detail(
 	CONSTRAINT fk_border_boor_id FOREIGN KEY(borde_boor_id)	REFERENCES Booking.booking_orders(boor_id),
 	CONSTRAINT fk_borde_faci_id FOREIGN KEY(borde_faci_id) REFERENCES Hotel.facilities(faci_id) 
 		ON DELETE CASCADE 
-    ON UPDATE CASCADE 
+	ON UPDATE CASCADE
 );
 
 CREATE TABLE Booking.booking_order_detail_extra(
@@ -510,63 +510,63 @@ CREATE TABLE Booking.user_breakfast(
 
 -- MODULE RESTO --
 CREATE TABLE Resto.resto_menus(
-    reme_faci_id int,
-    reme_id int IDENTITY(1,1),
-    reme_name nvarchar(55) NOT NULL,
-    reme_description nvarchar(255),
-    reme_price money NOT NULL,
-    reme_status nvarchar(15) NOT NULL,
-    reme_modified_date datetime,
-    CONSTRAINT pk_reme_faci_id PRIMARY KEY (reme_id),
-    CONSTRAINT reme_faci_id FOREIGN KEY (reme_faci_id) REFERENCES Hotel.facilities(faci_id) 
-      ON DELETE CASCADE 
-      ON UPDATE CASCADE
+	reme_faci_id int,
+	reme_id int IDENTITY(1,1),
+	reme_name nvarchar(55) NOT NULL,
+	reme_description nvarchar(255),
+	reme_price money NOT NULL,
+	reme_status nvarchar(15) NOT NULL,
+	reme_modified_date datetime,
+	CONSTRAINT pk_reme_faci_id PRIMARY KEY (reme_id),
+	CONSTRAINT reme_faci_id FOREIGN KEY (reme_faci_id) REFERENCES Hotel.facilities(faci_id)
+	  ON DELETE CASCADE
+	  ON UPDATE CASCADE
 );
 
 CREATE TABLE Resto.order_menus(
-    orme_id int IDENTITY,
-    orme_order_number nvarchar (55) UNIQUE NOT NULL,
-    orme_order_date datetime NOT NULL,
-    orme_total_item smallint,
-    orme_total_discount smallmoney,
-    orme_total_amount money,
-    orme_pay_type nchar(2) NOT NULL,
-    orme_cardnumber nvarchar(25),
-    orme_is_paid nchar(2),
-    orme_modified_date datetime,
-    orme_user_id integer,
-    CONSTRAINT pk_orme_id PRIMARY KEY (orme_id),
-    CONSTRAINT fk_orme_user_id FOREIGN KEY (orme_user_id) REFERENCES Users.users(user_id) 
-      ON DELETE CASCADE 
-      ON UPDATE CASCADE
+	orme_id int IDENTITY,
+	orme_order_number nvarchar (55) UNIQUE NOT NULL,
+	orme_order_date datetime NOT NULL,
+	orme_total_item smallint,
+	orme_total_discount smallmoney,
+	orme_total_amount money,
+	orme_pay_type nchar(2) NOT NULL,
+	orme_cardnumber nvarchar(25),
+	orme_is_paid nchar(2),
+	orme_modified_date datetime,
+	orme_user_id integer,
+	CONSTRAINT pk_orme_id PRIMARY KEY (orme_id),
+	CONSTRAINT fk_orme_user_id FOREIGN KEY (orme_user_id) REFERENCES Users.users(user_id)
+	  ON DELETE CASCADE
+	  ON UPDATE CASCADE
 );
 
 CREATE TABLE Resto.order_menu_detail(
-    omde_id int IDENTITY,
-    orme_price money NOT NULL,
-    orme_qty smallint NOT NULL,
-    orme_subtotal money NOT NULL,
-    orme_discount smallmoney,
-    omde_orme_id integer,
-    omde_reme_id integer,
-    CONSTRAINT pk_omme_id PRIMARY KEY (omde_id),
-    CONSTRAINT fk_omde_orme_id FOREIGN KEY (omde_orme_id) REFERENCES Resto.order_menus(orme_id)
-      ON DELETE CASCADE 
-      ON UPDATE CASCADE,
-    CONSTRAINT fk_omde_reme_id FOREIGN KEY (omde_reme_id) REFERENCES Resto.resto_menus(reme_id)
-      ON DELETE CASCADE 
-      ON UPDATE CASCADE
+	omde_id int IDENTITY,
+	orme_price money NOT NULL,
+	orme_qty smallint NOT NULL,
+	orme_subtotal money NOT NULL,
+	orme_discount smallmoney,
+	omde_orme_id integer,
+	omde_reme_id integer,
+	CONSTRAINT pk_omme_id PRIMARY KEY (omde_id),
+	CONSTRAINT fk_omde_orme_id FOREIGN KEY (omde_orme_id) REFERENCES Resto.order_menus(orme_id)
+	  ON DELETE CASCADE
+	  ON UPDATE CASCADE,
+	CONSTRAINT fk_omde_reme_id FOREIGN KEY (omde_reme_id) REFERENCES Resto.resto_menus(reme_id)
+	  ON DELETE CASCADE
+	  ON UPDATE CASCADE
 );
 
 CREATE TABLE Resto.resto_menu_photos(
-    remp_id int IDENTITY,
+	remp_id int IDENTITY,
 	remp_thumbnail_filename nvarchar (50),
-    remp_photo_filename nvarchar (50),
-    remp_primary BIT,
-    remp_url nvarchar (255),
-    remp_reme_id int,
-    CONSTRAINT pk_remp_id PRIMARY KEY (remp_id),
-    CONSTRAINT fk_remp_reme_id FOREIGN KEY (remp_reme_id) REFERENCES Resto.resto_menus(reme_id)
+	remp_photo_filename nvarchar (50),
+	remp_primary BIT,
+	remp_url nvarchar (255),
+	remp_reme_id int,
+	CONSTRAINT pk_remp_id PRIMARY KEY (remp_id),
+	CONSTRAINT fk_remp_reme_id FOREIGN KEY (remp_reme_id) REFERENCES Resto.resto_menus(reme_id)
 );
 
 -- MODULE PAYMENT --
@@ -621,7 +621,7 @@ CREATE TABLE Payment.user_accounts(
 );
 
 CREATE TABLE Payment.payment_transaction(
-	patr_id int IDENTITY(1,1) PRIMARY KEY,
+  patr_id int IDENTITY(1,1) PRIMARY KEY,
 	patr_trx_number nvarchar(55) UNIQUE,
 	patr_debet money,
 	patr_credit money,
@@ -680,7 +680,7 @@ CREATE TABLE purchasing.stocks(
   stock_color NVARCHAR(15),
   stock_modified_date DATETIME NOT NULL DEFAULT GETDATE(),
 
-	CONSTRAINT pk_department_id PRIMARY KEY (stock_id)
+  CONSTRAINT pk_department_id PRIMARY KEY (stock_id)
 );
 
 CREATE TABLE purchasing.vendor_product(
@@ -708,11 +708,11 @@ CREATE TABLE purchasing.stock_photo(
   spho_url NVARCHAR(255) NOT NULL,
   spho_stock_id INT NOT NULL,
 
-	CONSTRAINT pk_spho_id PRIMARY KEY (spho_id),
+  CONSTRAINT pk_spho_id PRIMARY KEY (spho_id),
   CONSTRAINT fk_spho_stock_id FOREIGN KEY (spho_stock_id)
 	REFERENCES purchasing.stocks(stock_id)
-      ON DELETE CASCADE 
-      ON UPDATE CASCADE,
+	ON DELETE CASCADE
+	ON UPDATE CASCADE,
   CONSTRAINT ck_spho_primary CHECK (spho_primary IN (0,1))
 );
 
@@ -754,7 +754,7 @@ CREATE TABLE purchasing.purchase_order_detail (
   pode_modified_date DATETIME NOT NULL DEFAULT GETDATE(),
   pode_stock_id INT,
 
-    CONSTRAINT pk_pode_id PRIMARY KEY (pode_id),
+  CONSTRAINT pk_pode_id PRIMARY KEY (pode_id),
   CONSTRAINT fk_pode_pohe_id FOREIGN KEY (pode_pohe_id)
 	REFERENCES purchasing.purchase_order_header(pohe_id)
 	ON DELETE CASCADE ON UPDATE CASCADE,

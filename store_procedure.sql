@@ -1,9 +1,10 @@
-USE Hotel_Realta
+USE Hotel_Realta;
 GO
 
 -- STORE PROCEDURE MODULE PAYMENT
 SET ANSI_NULLS ON
 GO
+
 SET QUOTED_IDENTIFIER ON
 GO
 -- =============================================
@@ -538,7 +539,8 @@ begin
 		print 'Transaction Rollback for stod_id = ' + cast(@stodId as nvarchar(25));
 		throw;
 	end catch 
-end
+end;
+GO
 
 -- =============================================
 -- Author:		Harpi

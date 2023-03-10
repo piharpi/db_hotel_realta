@@ -794,7 +794,7 @@ VALUES (1, 3, 2, 1000000, 1, 25),
 	   (10, 2, 3, 10000000, 1, 16);
 SET IDENTITY_INSERT purchasing.vendor_product OFF;
 -- UPDATE purchasing.vendor SET vendor_priority = 0 where vendor_id=1
-SELECT*FROM Purchasing.vendor_product;
+-- SELECT*FROM Purchasing.vendor_product;
 
 SET IDENTITY_INSERT purchasing.purchase_order_header ON;
 INSERT INTO purchasing.purchase_order_header (pohe_id, pohe_number, pohe_status, pohe_refund, pohe_pay_type, pohe_emp_id, pohe_vendor_id)
@@ -806,8 +806,6 @@ VALUES
   (5, 'PO-20230115-005', 1, 0, 'CA', 1, 20);
 SET IDENTITY_INSERT purchasing.purchase_order_header OFF;
 -- SELECT*FROM Purchasing.purchase_order_header;
-
-select * from information_schema.Columns where table_name = 'stocks';
 
 INSERT INTO purchasing.stock_detail (stod_stock_id, stod_barcode_number, stod_status, stod_notes, stod_faci_id, stod_pohe_id)
 VALUES
@@ -839,14 +837,14 @@ VALUES
 SET IDENTITY_INSERT purchasing.purchase_order_detail OFF
 -- SELECT*FROM Purchasing.purchase_order_detail;
 
-SET IDENTITY_INSERT purchasing.cart ON
-INSERT INTO purchasing.cart (cart_id, cart_emp_id, cart_vepro_id, cart_order_qty)
-VALUES (1, 1, 1, 2),
-	   (2, 1, 2, 1),
-	   (3, 3, 3, 3),
-	   (4, 4, 4, 2),
-	   (5, 5, 5, 1)
+-- SET IDENTITY_INSERT purchasing.cart ON
+INSERT INTO purchasing.cart (cart_emp_id, cart_vepro_id, cart_order_qty)
+VALUES (1, 1, 2),
+	   (1, 2, 1),
+	   (3, 3, 3),
+	   (4, 4, 2),
+	   (5, 5, 1)
 SET IDENTITY_INSERT purchasing.cart OFF
-SELECT*FROM purchasing.cart;
+-- SELECT*FROM purchasing.cart;
 
 USE tempdb;

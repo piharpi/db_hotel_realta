@@ -3,6 +3,9 @@ SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
+
+USE Hotel_Realta;
+GO
 -- =============================================
 -- Author:		Harpi
 -- Create date: 8 January 2023

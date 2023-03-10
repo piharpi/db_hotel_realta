@@ -241,13 +241,10 @@ GO
 -- Description:	Store Procedure for Insert Purchase Order
 -- ===========================================================
 
+drop procedure purchasing.spInsertPurchaseOrder;
 CREATE PROCEDURE purchasing.spInsertPurchaseOrder
-	@pohe_emp_id INT,
-	@pohe_vendor_id INT,
-	@pohe_pay_type NCHAR(2),
-	@pode_order_qty SMALLINT,
-	@pode_price MONEY,
-	@pode_stock_id INT
+	@pay_type NCHAR(2),
+	@cart_id INT
 AS
 BEGIN
 	SET NOCOUNT ON;
@@ -261,6 +258,21 @@ BEGIN
 	
 			DECLARE @pode_rejected_qty INT = 0;
 			DECLARE @pode_received_qty INT = 0;
+			
+			DECLARE @vendor_id INT;
+			DECLARE @emp_id INT;
+			DECLARE @stock_id INT;
+			DECLARE @price MONEY;
+			DECLARE @order_qty INT;
+
+			SELECT @vendor_id = vp.vepro_vendor_id, 
+					@stock_id = vp.venpro_stock_id, 
+					@price = vp.vepro_price,
+					@order_qty = c.cart_order_qty,
+					@emp_id = c.cart_emp_id
+			FROM purchasing.cart AS c 
+			JOIN purchasing.vendor_product as vp ON vp.vepro_id = c.cart_vepro_id
+			WHERE cart_id = @cart_id;
 
 			--DECLARE @pohe_number NVARCHAR(20);
 			DECLARE @pohe_number NVARCHAR(20) = 'PO-' + CONVERT(NVARCHAR(8), GETDATE(), 112) + '-001';
@@ -281,7 +293,7 @@ BEGIN
 			-- Check if the vendor exists and has an active PO
 			SELECT @pohe_id = pohe_id, @pohe_status = pohe_status
 			FROM purchasing.purchase_order_header
-			WHERE pohe_vendor_id = @pohe_vendor_id
+			WHERE pohe_vendor_id = @vendor_id
 			AND pohe_status = 1;
 
 			IF @pohe_id IS NOT NULL
@@ -290,13 +302,13 @@ BEGIN
 				SELECT @pode_id = pode_id
 				FROM purchasing.purchase_order_detail
 				WHERE pode_pohe_id = @pohe_id
-				AND pode_stock_id = @pode_stock_id;
+				AND pode_stock_id = @stock_id;
 
 				IF @pode_id IS NOT NULL
 				BEGIN
 					-- Stock exists in PO, update order quantity
 					UPDATE purchasing.purchase_order_detail
-					SET pode_order_qty = pode_order_qty + @pode_order_qty
+					SET pode_order_qty = pode_order_qty + @order_qty
 					WHERE pode_id = @pode_id;
 				END
 				ELSE
@@ -312,9 +324,9 @@ BEGIN
 					)
 					VALUES (
 						@pohe_id,
-						@pode_order_qty,
-						@pode_price,
-						@pode_stock_id,
+						@order_qty,
+						@price,
+						@stock_id,
 						@pode_rejected_qty,
 						@pode_received_qty
 					);
@@ -331,9 +343,9 @@ BEGIN
 				)
 				VALUES (
 					@pohe_number,
-					@pohe_emp_id,
-					@pohe_vendor_id,
-					@pohe_pay_type
+					@emp_id,
+					@vendor_id,
+					@pay_type
 				);
 
 				SET @pohe_id = SCOPE_IDENTITY();
@@ -349,13 +361,14 @@ BEGIN
 				)
 				VALUES (
 					@pohe_id,
-					@pode_order_qty,
-					@pode_price,
-					@pode_stock_id,
+					@order_qty,
+					@price,
+					@stock_id,
 					@pode_rejected_qty,
 					@pode_received_qty
 				);
 			END
+			DELETE FROM purchasing.cart WHERE cart_id = @cart_id;
 		COMMIT TRANSACTION
 	END TRY
 	BEGIN CATCH
@@ -501,9 +514,9 @@ begin
 			-- updates statement 1 for procedure here
 			begin
 				UPDATE purchasing.stock_detail SET 
-                stod_stock_id=@stodStockId, stod_status=@stodStatus, 
-                stod_notes=@stodNotes, stod_faci_id=@stodFaciId 
-                WHERE stod_id=@stodId;
+				stod_stock_id=@stodStockId, stod_status=@stodStatus, 
+				stod_notes=@stodNotes, stod_faci_id=@stodFaciId 
+				WHERE stod_id=@stodId;
 			end
 
 			begin

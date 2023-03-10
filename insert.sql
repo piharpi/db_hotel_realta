@@ -528,60 +528,60 @@ VALUES (1, 'BO#20221127-0001', '2023-01-27', 4,'C', 'DP', 'T', 1, 1),
        (8, 'BO#20221127-0008', '2023-01-27', 4,'C', 'P', 'C', 8, 8),
        (9, 'BO#20221127-0009', '2023-01-27', 4,'C', 'R', 'I', 9, 9),
        (10, 'BO#20221127-0010', '2023-01-27', 3,'C', 'DP', 'T', 10, 10),
-       (11, 'BO#20221127-0011', '2023-01-27', 3,'D', 'P', 'C', 11, 11),
-       (12, 'BO#20221127-0012', '2023-01-27', 3,'D', 'R', 'I', 12, 12),
-       (13, 'BO#20221127-0013', '2023-01-27', 3,'D', 'DP', 'T', 13, 13),
-       (14, 'BO#20221127-0014', '2023-01-27', 3,'C', 'P', 'C', 14, 14),
-       (15, 'BO#20221127-0015', '2023-01-27', 3,'D', 'R', 'I', 15, 15),
-       (16, 'BO#20221127-0016', '2023-01-27', 3,'D', 'DP', 'T', 16, 16),
-       (17, 'BO#20221127-0017', '2023-01-27', 3,'C', 'P', 'C', 17, 17)
+       (11, 'BO#20221127-0011', '2023-01-27', 3,'D', 'P', 'C', 9, 9),
+       (12, 'BO#20221127-0012', '2023-01-27', 3,'D', 'R', 'I', 10, 10),
+       (13, 'BO#20221127-0013', '2023-01-27', 3,'D', 'DP', 'T', 7, 7),
+       (14, 'BO#20221127-0014', '2023-01-27', 3,'C', 'P', 'C', 2, 1),
+       (15, 'BO#20221127-0015', '2023-01-27', 3,'D', 'R', 'I', 8, 5),
+       (16, 'BO#20221127-0016', '2023-01-27', 3,'D', 'DP', 'T', 7, 6),
+       (17, 'BO#20221127-0017', '2023-01-27', 3,'C', 'P', 'C', 1, 7)
 SET IDENTITY_INSERT Booking.booking_orders OFF
 -- SELECT*FROM Booking.booking_orders
 
 SET IDENTITY_INSERT Booking.booking_order_detail ON
-INSERT INTO Booking.booking_order_detail (borde_boor_id, borde_id, borde_checkin, borde_checkout, borde_adults, borde_kids, borde_price, borde_extra, borde_discount, borde_tax, borde_subtotal, borde_faci_id)
-VALUES (1, 1, '2022-11-27', '2022-11-28', 2, 0, 100, 0, 0, 10, 110, 1),
-       (2, 2, '2022-11-27', '2022-11-28', 2, 1, 120, 20, 10, 12, 138, 2),
-       (3, 3, '2022-11-27', '2022-11-28', 3, 0, 150, 30, 20, 15, 145, 3),
-       (4, 4, '2022-11-27', '2022-11-28', 2, 2, 200, 40, 30, 20, 190, 4),
-       (5, 5, '2022-11-27', '2022-11-28', 1, 1, 250, 50, 40, 25, 215, 5),
-       (6, 6, '2022-11-27', '2022-11-28', 4, 0, 300, 60, 50, 30, 270, 6),
-       (7, 7, '2022-11-27', '2022-11-28', 2, 3, 350, 70, 60, 35, 295, 7),
-       (8, 8, '2022-11-27', '2022-11-28', 3, 2, 400, 80, 70, 40, 330, 8),
-       (9, 9, '2022-11-27', '2022-11-28', 1, 4, 450, 90, 80, 45, 355, 9),
-       (10, 10, '2022-11-27', '2022-11-28', 4, 1, 500, 100, 90, 50, 390, 10),
-       (11, 11, '2022-11-27', '2022-11-28', 2, 0, 550, 110, 100, 55, 415, 11),
-       (12, 12, '2022-11-27', '2022-11-28', 3, 1, 600, 120, 110, 60, 450, 12),
-       (13, 13, '2022-11-27', '2022-11-28', 1, 2, 650, 130, 120, 65, 475, 13),
-       (14, 14, '2022-11-27', '2022-11-28', 4, 0, 700, 140, 130, 70, 510, 14),
-       (15, 15, '2022-11-27', '2022-11-28', 2, 3, 750, 150, 140, 75, 535, 15),
-       (16, 16, '2022-11-27', '2022-11-28', 3, 2, 800, 160, 150, 80, 570, 16)
+INSERT INTO Booking.booking_order_detail (borde_boor_id, borde_id, borde_checkin, borde_checkout, borde_adults, borde_kids, borde_price, borde_extra, borde_discount, borde_tax, borde_faci_id)
+VALUES (1, 1, '2022-11-27', '2022-11-28', 2, 0, 100, 0, 0, 10, 1),
+       (2, 2, '2022-11-27', '2022-11-28', 2, 1, 120, 20, 10, 12, 2),
+       (3, 3, '2022-11-27', '2022-11-28', 3, 0, 150, 30, 20, 15, 3),
+       (4, 4, '2022-11-27', '2022-11-28', 2, 2, 200, 40, 30, 20, 4),
+       (5, 5, '2022-11-27', '2022-11-28', 1, 1, 250, 50, 40, 25, 5),
+       (6, 6, '2022-11-27', '2022-11-28', 4, 0, 300, 60, 50, 30, 6),
+       (7, 7, '2022-11-27', '2022-11-28', 2, 3, 350, 70, 60, 35, 7),
+       (8, 8, '2022-11-27', '2022-11-28', 3, 2, 400, 80, 70, 40, 8),
+       (9, 9, '2022-11-27', '2022-11-28', 1, 4, 450, 90, 80, 45, 9),
+       (10, 10, '2022-11-27', '2022-11-28', 4, 1, 500, 100, 90, 50, 1),
+       (11, 11, '2022-11-27', '2022-11-28', 2, 0, 550, 110, 100, 55, 1),
+       (12, 12, '2022-11-27', '2022-11-28', 3, 1, 600, 120, 110, 60, 2),
+       (13, 13, '2022-11-27', '2022-11-28', 1, 2, 650, 130, 120, 65, 3),
+       (14, 14, '2022-11-27', '2022-11-28', 4, 0, 700, 140, 130, 70, 4),
+       (15, 15, '2022-11-27', '2022-11-28', 2, 3, 750, 150, 140, 75, 5),
+       (16, 16, '2022-11-27', '2022-11-28', 3, 2, 800, 160, 150, 80, 6)
 SET IDENTITY_INSERT Booking.booking_order_detail OFF
 -- SELECT*FROM Booking.booking_order_detail
 
 
 SET IDENTITY_INSERT Booking.booking_order_detail_extra ON
-INSERT INTO Booking.booking_order_detail_extra (boex_id, boex_price, boex_qty, boex_subtotal, boex_measure_unit, boex_borde_id, boex_prit_id)
-VALUES (1, 10, 2, 20, 'people', 1, 1),
-       (2, 15, 3, 45, 'unit', 2, 2),
-       (3, 20, 4, 80, 'kg', 3, 3),
-       (4, 25, 5, 125, 'people', 4, 4),
-       (5, 30, 6, 180, 'unit', 5, 5),
-       (6, 35, 7, 245, 'kg', 6, 6),
-       (7, 40, 8, 320, 'people', 7, 7),
-       (8, 45, 9, 405, 'unit', 8, 8),
-       (9, 50, 10, 500, 'kg', 9, 9),
-       (10, 55, 11, 605, 'people', 10, 10),
-       (11, 60, 12, 720, 'unit', 11, 1),
-       (12, 65, 13, 845, 'kg', 12, 2),
-       (13, 70, 14, 980, 'people', 13, 3),
-       (14, 75, 15, 1125, 'unit', 14, 4),
-       (15, 80, 16, 1280, 'kg', 15, 5),
-       (16, 85, 17, 1445, 'people', 16, 6),
-       (17, 90, 18, 1620, 'unit', 1, 7),
-       (18, 95, 19, 1805, 'kg', 2, 8),
-       (19, 100, 20, 2000, 'people', 3, 9),
-       (20, 105, 21, 2155, 'unit', 4, 10)
+INSERT INTO Booking.booking_order_detail_extra (boex_id, boex_price, boex_qty, boex_measure_unit, boex_borde_id, boex_prit_id)
+VALUES (1, 10, 2, 'people', 1, 1),
+       (2, 15, 3, 'unit', 2, 2),
+       (3, 20, 4, 'kg', 3, 3),
+       (4, 25, 5, 'people', 4, 4),
+       (5, 30, 6, 'unit', 5, 5),
+       (6, 35, 7, 'kg', 6, 5),
+       (7, 40, 8, 'people', 7, 3),
+       (8, 45, 9, 'unit', 8, 4),
+       (9, 50, 10, 'kg', 9, 3),
+       (10, 55, 11, 'people', 10, 2),
+       (11, 60, 12, 'unit', 11, 1),
+       (12, 65, 13, 'kg', 12, 2),
+       (13, 70, 14, 'people', 13, 3),
+       (14, 75, 15, 'unit', 14, 4),
+       (15, 80, 16, 'kg', 15, 5),
+       (16, 85, 17, 'people', 16, 2),
+       (17, 90, 18, 'unit', 1, 1),
+       (18, 95, 19, 'kg', 2, 2),
+       (19, 100, 20, 'people', 3, 2),
+       (20, 105, 21, 'unit', 4, 3)
 SET IDENTITY_INSERT Booking.booking_order_detail_extra OFF
 -- SELECT*FROM Booking.booking_order_detail_extra
 
@@ -705,7 +705,6 @@ VALUES (1, '002', 'BRI', CURRENT_TIMESTAMP),
        (7, '147', 'MUAMALAT', CURRENT_TIMESTAMP);
 ENABLE TRIGGER [Payment].[InsertBankEntityId] ON [Payment].bank;
 
-GO;
 -- SELECT*FROM payment.bank;
 
 -- insert payment_gateway
@@ -751,10 +750,11 @@ INSERT
                                   patr_order_number, patr_source_id, patr_target_id, patr_trx_number_ref, patr_user_id)
 VALUES (1, 'TRB#20221127-0001', 150000, 150000, 'TRB', 'Tranfer Booking', CURRENT_TIMESTAMP, 'BO#20221127-0001', '6271263188999', '8012372737662', 'TRB#20221127-0001', 1),
        (2, 'TRB#20221127-0002', 150000, 150000, 'ORM', 'Order Menu', CURRENT_TIMESTAMP, 'MENUS#20221127-0001', '8012372737662', '6271263188999', 'TRB#20221127-0002', 2);
-SET IDENTITY_INSERT Payment.payment_transaction OFF
+SET IDENTITY_INSERT Payment.payment_transaction OFF;
 -- SELECT*FROM payment.payment_transaction;
 
 -- PURCHASING INSERT
+DISABLE TRIGGER [Purchasing].[InsertVendorEntityId] ON [Purchasing].vendor;
 INSERT INTO purchasing.vendor (vendor_entity_id, vendor_name, vendor_active, vendor_priority, vendor_weburl)
 VALUES (16,'Global Equipment Co.', 1, 0, 'www.globalequipment.com'),
 	   (17,'Sustainable Solutions Inc.', 1, 1, 'www.sustainablesolutions.com'),
@@ -766,6 +766,7 @@ VALUES (16,'Global Equipment Co.', 1, 0, 'www.globalequipment.com'),
 	   (23,'Advanced Materials Inc.', 1, 1, 'www.advancedmaterials.com'),
 	   (24,'Bright Ideas Inc.', 1, 0, 'www.brightideas.com'),
 	   (25,'Progressive Solutions Inc.', 0, 1, 'www.progressivesolutions.com');
+ENABLE TRIGGER [Purchasing].[InsertVendorEntityId] ON [Purchasing].vendor;
 -- UPDATE purchasing.vendor SET vendor_priority = 0 where vendor_id=1
 -- SELECT*FROM Purchasing.vendor;
 

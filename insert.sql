@@ -705,7 +705,6 @@ VALUES (1, '002', 'BRI', CURRENT_TIMESTAMP),
        (7, '147', 'MUAMALAT', CURRENT_TIMESTAMP);
 ENABLE TRIGGER [Payment].[InsertBankEntityId] ON [Payment].bank;
 
-GO;
 -- SELECT*FROM payment.bank;
 
 -- insert payment_gateway
@@ -751,10 +750,11 @@ INSERT
                                   patr_order_number, patr_source_id, patr_target_id, patr_trx_number_ref, patr_user_id)
 VALUES (1, 'TRB#20221127-0001', 150000, 150000, 'TRB', 'Tranfer Booking', CURRENT_TIMESTAMP, 'BO#20221127-0001', '6271263188999', '8012372737662', 'TRB#20221127-0001', 1),
        (2, 'TRB#20221127-0002', 150000, 150000, 'ORM', 'Order Menu', CURRENT_TIMESTAMP, 'MENUS#20221127-0001', '8012372737662', '6271263188999', 'TRB#20221127-0002', 2);
-SET IDENTITY_INSERT Payment.payment_transaction OFF
+SET IDENTITY_INSERT Payment.payment_transaction OFF;
 -- SELECT*FROM payment.payment_transaction;
 
 -- PURCHASING INSERT
+DISABLE TRIGGER [Purchasing].[InsertVendorEntityId] ON [Purchasing].vendor;
 INSERT INTO purchasing.vendor (vendor_entity_id, vendor_name, vendor_active, vendor_priority, vendor_weburl)
 VALUES (16,'Global Equipment Co.', 1, 0, 'www.globalequipment.com'),
 	   (17,'Sustainable Solutions Inc.', 1, 1, 'www.sustainablesolutions.com'),
@@ -766,6 +766,7 @@ VALUES (16,'Global Equipment Co.', 1, 0, 'www.globalequipment.com'),
 	   (23,'Advanced Materials Inc.', 1, 1, 'www.advancedmaterials.com'),
 	   (24,'Bright Ideas Inc.', 1, 0, 'www.brightideas.com'),
 	   (25,'Progressive Solutions Inc.', 0, 1, 'www.progressivesolutions.com');
+ENABLE TRIGGER [Purchasing].[InsertVendorEntityId] ON [Purchasing].vendor;
 -- UPDATE purchasing.vendor SET vendor_priority = 0 where vendor_id=1
 -- SELECT*FROM Purchasing.vendor;
 

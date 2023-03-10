@@ -1,6 +1,3 @@
-USE Northwind
-GO
-
 USE Hotel_Realta;
 GO
 
@@ -13,7 +10,13 @@ DELETE Purchasing.purchase_order_header;
 DELETE Purchasing.vendor;
 DELETE Purchasing.cart;
 
--- DELETE MODULE Payment 
+DBCC CHECKIDENT ('Purchasing.stocks', RESEED, 1);
+GO
+
+DBCC CHECKIDENT ('Purchasing.purchase_order_header', RESEED, 1);
+GO
+
+-- DELETE MODULE Payment
 DELETE Payment.payment_transaction;
 DELETE Payment.payment_gateway;
 DELETE Payment.entity;
@@ -86,11 +89,11 @@ VALUES ('1', 'Region 1'), ('2', 'Region 2'), ('3', 'Region 3'),
 	   ('16', 'Region 16'), ('17', 'Region 17'), ('18', 'Region 18'),
 	   ('19', 'Region 19'), ('20', 'Region 20');
 SET IDENTITY_INSERT Master.Regions OFF;
-SELECT*FROM Master.Regions
-ORDER by region_code ASC
+-- SELECT*FROM Master.Regions
+-- ORDER by region_code ASC
 
 SET IDENTITY_INSERT Master.Country ON;
-INSERT INTO .Master.Country (country_id, country_name, country_region_id)
+INSERT INTO Master.Country (country_id, country_name, country_region_id)
 VALUES (1, 'France', 1), (2, 'Germany', 2), (3, 'Spain', 3),
 	   (4, 'Italy', 4), (5, 'United Kingdom', 5), (6, 'Netherlands', 6),
 	   (7, 'Belgium', 7), (8, 'Denmark', 8), (9, 'Sweden', 9),
@@ -99,8 +102,8 @@ VALUES (1, 'France', 1), (2, 'Germany', 2), (3, 'Spain', 3),
 	   (16, 'Pakistan', 16), (17, 'Bangladesh', 17), (18, 'Nepal', 18),
 	   (19, 'Bhutan', 19), (20, 'Sri Lanka', 20);
 SET IDENTITY_INSERT Master.Country OFF;
-SELECT*FROM Master.Country
-ORDER by country_id ASC
+-- SELECT*FROM Master.Country
+-- ORDER by country_id ASC
 
 SET IDENTITY_INSERT Master.Provinces ON;
 INSERT INTO Master.Provinces (prov_id, prov_name, prov_country_id)
@@ -111,9 +114,10 @@ VALUES (1, 'Ontario', 1), (2, 'Quebec', 1), (3, 'British Columbia', 1),
 	   (13, 'Baden-Württemberg', 2), (14, 'North Rhine-Westphalia', 2), (15, 'Lower Saxony', 2),
 	   (16, 'Andalusia', 3), (17, 'Catalonia', 3), (18, 'Valencia', 3),
 	   (19, 'Galicia', 3), (20, 'Castilla y León', 3);
-SET IDENTITY_INSERT Master.provinces OFF;
-SELECT*FROM Master.provinces
-ORDER BY prov_id
+SET IDENTITY_INSERT Master.Provinces OFF;
+
+-- SELECT*FROM Master.provinces
+-- ORDER BY prov_id
 
 
 SET IDENTITY_INSERT Master.Address ON;
@@ -139,13 +143,13 @@ VALUES (1, '123 Main Street', '', 'A1AA1', geography::Point(43.65, -79.38, 4326)
 	(19, 'Calle del Arenal, 12', '', '41001', geography::Point(37.38, -6.00, 4326), 16),
 	(20, 'Calle de la Ribera, 25', '', '41001', geography::Point(37.38, -6.00, 4326), 16);
 SET IDENTITY_INSERT Master.Address OFF;
-SELECT*FROM Master.Address
-ORDER BY addr_id ASC
+-- SELECT*FROM Master.Address
+-- ORDER BY addr_id ASC
 
 
 --CATEGORY_GROUP
 SET IDENTITY_INSERT Master.category_group ON;
-INSERT INTO master.category_group (cagro_id, cagro_name, cagro_description, cagro_type, cagro_icon, cagro_icon_url)
+INSERT INTO Master.category_group (cagro_id, cagro_name, cagro_description, cagro_type, cagro_icon, cagro_icon_url)
 VALUES
   (1, 'ROOM', 'Rooms for guests to stay in', 'category', 'room.png', 'https://example.com/room.png'),
   (2, 'RESTAURANT', 'On-site restaurant for guests to dine in', 'service', 'restaurant.png', 'https://example.com/restaurant.png'),
@@ -155,8 +159,9 @@ VALUES
   (6, 'SWIMMING POOL', 'Outdoor swimming pool for guests to use', 'facility', 'swimming_pool.png', 'https://example.com/swimming_pool.png'),
   (7, 'BALROOM', 'Ballroom for events and parties', 'facility', 'balroom.png', 'https://example.com/balroom.png');
 SET IDENTITY_INSERT Master.category_group OFF;
-SELECT*FROM Master.category_group
-ORDER BY cagro_id ASC
+
+-- SELECT*FROM Master.category_group
+-- ORDER BY cagro_id ASC
 
 --POLICY
 SET IDENTITY_INSERT Master.policy ON;
@@ -167,8 +172,8 @@ values
 (3,'Check-out Terlambat', 'Kebijakan check-out terlambat yang memberikan kemudahan bagi tamu untuk melakukan check-out lebih lambat dari waktu yang ditentukan, dengan biaya tambahan yang telah ditentukan'),
 (4,'Fasilitas Anak-anak', 'Kebijakan fasilitas anak-anak yang memberikan kemudahan bagi tamu yang membawa anak-anak dengan fasilitas yang disesuaikan dengan kebutuhan anak-anak, seperti kamar yang lebih luas dan fasilitas bermain');
 SET IDENTITY_INSERT Master.policy OFF;
-SELECT*FROM Master.policy
-ORDER BY poli_id ASC
+-- SELECT*FROM Master.policy
+-- ORDER BY poli_id ASC
 
 --PRICE_ITEM
 SET IDENTITY_INSERT Master.price_items ON;
@@ -180,8 +185,8 @@ values
 (4, 'Nasi Goreng', 35000, 'Nasi goreng dengan bahan-bahan yang berkualitas dan rasa yang nikmat', 'FOOD', '2022-01-01'),
 (5, 'Massage', 80000, 'Layanan massage yang dapat membantu mengurangi stres dan merelaksasi tubuh', 'SERVICE', '2022-01-01');
 SET IDENTITY_INSERT Master.price_items OFF;
-SELECT*FROM Master.price_items
-ORDER BY prit_id ASC
+-- SELECT*FROM Master.price_items
+-- ORDER BY prit_id ASC
 
 --MEMBER
 insert into master.members (memb_name, memb_description)
@@ -190,7 +195,7 @@ values
 ('GOLD', 'Keanggotaan GOLD memberikan diskon 20% pada semua layanan hotel dan fasilitas gratis late check-out hingga pukul 12 siang'),
 ('VIP', 'Keanggotaan VIP memberikan diskon 30% pada semua layanan hotel, fasilitas gratis late check-out hingga pukul 12 siang, dan akses ke VIP lounge'),
 ('WIZARD', 'Keanggotaan WIZARD memberikan diskon 50% pada semua layanan hotel, fasilitas gratis late check-out hingga pukul 12 siang, akses ke VIP lounge, dan fasilitas gratis upgrade kamar');
-SELECT*FROM Master.members
+-- SELECT*FROM Master.members
 
 --SERVICE_TASK
 SET IDENTITY_INSERT Master.service_task ON;
@@ -202,8 +207,8 @@ values
 (4, 'Security', 4),
 (5, 'Manager', 5);
 SET IDENTITY_INSERT Master.service_task OFF;
-SELECT*FROM Master.service_task
-ORDER BY seta_id ASC;
+-- SELECT*FROM Master.service_task
+-- ORDER BY seta_id ASC;
 
 --- INSERT MODULE USERS
 SET IDENTITY_INSERT Users.users ON;
@@ -224,7 +229,7 @@ VALUES (1,'John Smith', 'T', 'Acme Inc.', 'john.smith@acme.com', '123-456-7890',
 	   (14,'Samantha Williams', 'C', 'XYZ Corp', 'samantha.williams@xyz.com', '555-555-1225', GETDATE()),
 	   (15,'Robert Davis', 'T', 'Example Co', 'robert.davis@example.com', '555-555-1226', GETDATE());
 SET IDENTITY_INSERT Users.users OFF;
-SELECT * FROM Users.users;
+-- SELECT * FROM Users.users;
 
 -- Insert 15 rows into the users.user_members table
 INSERT INTO users.user_members (usme_user_id, usme_memb_name, usme_promote_date, usme_points, usme_type)
@@ -243,7 +248,7 @@ VALUES (1, 'SILVER', '2022-01-01', 100, 'Active'),
 	   (13, 'VIP', '2022-01-01', 1000, 'Expired'),
 	   (14, 'WIZARD', '2022-02-01', 1000, 'Expired'),
 	   (15, 'GOLD', '2022-03-01', 1000, 'Expired');
-SELECT * FROM Users.user_members;
+-- SELECT * FROM Users.user_members;
 
 -- Insert 5 rows into the users.roles table
 SET IDENTITY_INSERT users.roles ON;
@@ -255,7 +260,7 @@ VALUES
 (4, 'Admin'),
 (5, 'User');
 SET IDENTITY_INSERT users.roles OFF;
-SELECT * FROM Users.roles;
+-- SELECT * FROM Users.roles;
 
 -- Insert 15 rows into the users.user_roles table
 INSERT INTO users.user_roles (usro_user_id, usro_role_id)
@@ -275,28 +280,28 @@ VALUES
 (13, 3),
 (14, 4),
 (15, 5);
-select * from users.user_roles;
+-- select * from users.user_roles;
 
 -- Insert 15 dummy rows into the users.user_profiles table
 SET IDENTITY_INSERT users.user_profiles ON;
 INSERT INTO users.user_profiles (uspro_id, uspro_national_id, uspro_birth_date, uspro_job_title, uspro_marital_status, uspro_gender, uspro_addr_id, uspro_user_id)
 VALUES (1, '123-45-6789', '1980-01-01', 'Manager', 'S', 'M', 1, 1),
-	   (2, '234-56-7890', '1985-02-02', 'Developer', 'M', 'F', 2, 2),
-	   (3, '345-67-8901', '1990-03-03', 'Designer', 'S', 'M', 3, 3),
-	   (4, '456-78-9012', '1995-04-04', 'Tester', 'M', 'F', 4, 4),
-	   (5, '567-89-0123', '2000-05-05', 'Analyst', 'S', 'M', 5, 5),
-	   (6, '678-90-1234', '2005-06-06', 'Consultant', 'M', 'F', 6, 6),
-	   (7, '789-01-2345', '2010-07-07', 'Salesperson', 'S', 'M', 7, 7),
-	   (8, '890-12-3456', '2015-08-08', 'HR Manager', 'M', 'F', 8, 8),
-	   (9, '901-23-4567', '2020-09-09', 'Project Manager', 'S', 'M', 9, 9),
-	   (10, '012-34-5678', '2025-10-10', 'Marketing Manager', 'M', 'F', 10, 10),
+       (2, '234-56-7890', '1985-02-02', 'Developer', 'M', 'F', 2, 2),
+       (3, '345-67-8901', '1990-03-03', 'Designer', 'S', 'M', 3, 3),
+       (4, '456-78-9012', '1995-04-04', 'Tester', 'M', 'F', 4, 4),
+       (5, '567-89-0123', '2000-05-05', 'Analyst', 'S', 'M', 5, 5),
+       (6, '678-90-1234', '2005-06-06', 'Consultant', 'M', 'F', 6, 6),
+       (7, '789-01-2345', '2010-07-07', 'Salesperson', 'S', 'M', 7, 7),
+       (8, '890-12-3456', '2015-08-08', 'HR Manager', 'M', 'F', 8, 8),
+       (9, '901-23-4567', '2020-09-09', 'Project Manager', 'S', 'M', 9, 9),
+       (10, '012-34-5678', '2025-10-10', 'Marketing Manager', 'M', 'F', 10, 10),
 	   (11, '123-45-6789', '1985-01-01', 'Engineer', 'S', 'M', 11, 11),
 	   (12, '234-56-7890', '1990-01-01', 'Designer', 'S', 'F', 12, 12),
 	   (13, '345-67-8901', '1995-01-01', 'Journalist', 'S', 'M', 13, 13),
 	   (14, '456-78-9012', '1980-01-01', 'Teacher', 'M', 'F', 14, 14),
 	   (15, '567-89-0123', '1985-01-01', 'Writer', 'S', 'M', 15, 15);
 SET IDENTITY_INSERT users.user_profiles OFF;
-select * from users.user_profiles;
+-- select * from users.user_profiles;
 
 -- Insert 15 dummy rows into the users.user_password table
 SET IDENTITY_INSERT users.user_password ON;
@@ -318,7 +323,7 @@ VALUES
 (14, 'monkey1', 'abcdefg'),
 (15, 'password1', 'hijklmn');
 SET IDENTITY_INSERT users.user_password OFF;
-select * from users.user_password;
+-- select * from users.user_password;
 
 -- Insert 15 dummy rows into the users.bonus_points table
 SET IDENTITY_INSERT users.bonus_points ON;
@@ -339,11 +344,10 @@ VALUES (1, 1, 1000, 'R', '2022-01-01'),
 	   (14, 14, 10000, 'R', '2022-02-02'),
 	   (15, 15, 10000, 'P', '2022-03-03');
 SET IDENTITY_INSERT users.bonus_points OFF;
-select * from users.bonus_points;
+-- select * from users.bonus_points;
 
 -- INSERT MODULE Hotel
 SET IDENTITY_INSERT Hotel.Hotels ON;
-
 INSERT INTO Hotel.Hotels (hotel_id, hotel_name, hotel_description, hotel_rating_star, hotel_phonenumber, hotel_modified_date, hotel_addr_id)
 VALUES
 (1,'Hotel Amaris Palembang', 'Hotel bintang 3 dengan fasilitas yang lengkap dan modern di Palembang', 3, '+62 823 3456 7891', '2022-01-01', 1),
@@ -357,7 +361,7 @@ VALUES
 (9,'The Westin Hotel Palembang', 'Hotel bintang 4 dengan fasilitas kelas atas di Palembang', 4, '+62 823 4567 8902', '2022-09-01', 5),
 (10,'Swiss-Belhotel Palembang', 'Hotel bintang 5 dengan fasilitas mewah di Palembang', 5, '+62 823 1234 5680', '2022-10-01', 4)
 SET IDENTITY_INSERT Hotel.Hotels OFF;
-select * from Hotel.hotels;
+-- select * from Hotel.hotels;
 
 SET IDENTITY_INSERT Hotel.Facilities ON;
 INSERT INTO Hotel.Facilities (faci_id, faci_name, faci_description, faci_max_number, faci_measure_unit, 
@@ -374,7 +378,7 @@ VALUES
 ,(8,'Standard Room', 'Kamar standar dengan fasilitas sederhana, termasuk kamar mandi pribadi dengan shower', 2,'beds', 'STR01','2022-01-01', '2022-01-30', 100000, 125000, 115000, 25000, 10000, 1, 1)
 ,(9,'Double Room', 'Kamar dengan 2 tempat tidur single, serta fasilitas lengkap', 2,'beds', 'DBR01', '2022-01-01', '2022-01-30', 150000, 175000, 160000, 25000, 10000, 1, 1);
 SET IDENTITY_INSERT Hotel.Facilities OFF;
-select * from Hotel.facilities;
+-- select * from Hotel.facilities;
 
 -- INSERT MODULE HR
 SET IDENTITY_INSERT hr.job_role ON
@@ -392,10 +396,9 @@ insert into hr.job_role (joro_id, joro_name, joro_modified_date) values
 	(11,'Purchasing', GETDATE()),
 	(12,'Sales & Marketing', GETDATE()),
 	(13,'Event Planner', GETDATE()),
-	(14,'Akuntan', GETDATE())
-;
+	(14,'Akuntan', GETDATE());
 SET IDENTITY_INSERT hr.job_role OFF
-select * from hr.job_role;
+-- select * from hr.job_role;
 
 SET IDENTITY_INSERT hr.employee ON
 insert into hr.employee (emp_id, emp_national_id, emp_birth_date, emp_marital_status, emp_gender, emp_hire_date,
@@ -412,7 +415,7 @@ insert into hr.employee (emp_id, emp_national_id, emp_birth_date, emp_marital_st
 	(10, 'j219483945782893873249573', '2001-10-01', 'M', 'F', GETDATE(), '0', 10)
 ;
 SET IDENTITY_INSERT hr.employee OFF
-select * from hr.employee;
+-- select * from hr.employee;
 
 SET IDENTITY_INSERT hr.shift ON
 insert into hr.shift(shift_id, shift_name, shift_start_time, shift_end_time) values
@@ -421,7 +424,7 @@ insert into hr.shift(shift_id, shift_name, shift_start_time, shift_end_time) val
 	(3,'Shift 3', '00:00:00', '08:00:00')
 ;
 SET IDENTITY_INSERT hr.shift OFF
-select * from hr.shift;
+-- select * from hr.shift;
 
 SET IDENTITY_INSERT hr.department ON
 insert into hr.department(dept_id, dept_name, dept_modified_date)values 
@@ -436,7 +439,7 @@ insert into hr.department(dept_id, dept_name, dept_modified_date)values
 	(9, 'Personalia (HRD)', GETDATE())
 ;
 SET IDENTITY_INSERT hr.department OFF
-select * from hr.department;
+-- select * from hr.department;
 
 SET IDENTITY_INSERT hr.employee_department_history ON
 insert into hr.employee_department_history(edhi_id, edhi_emp_id, edhi_dept_id, edhi_shift_id) values 
@@ -452,7 +455,7 @@ insert into hr.employee_department_history(edhi_id, edhi_emp_id, edhi_dept_id, e
 	(10,10, 2, 1)
 ;
 SET IDENTITY_INSERT hr.employee_department_history OFF
-select * from hr.employee_department_history;
+-- select * from hr.employee_department_history;
 
 insert into hr.employee_pay_history (ephi_emp_id, ephi_rate_change_date) values
 	(1, GETDATE()),
@@ -466,7 +469,7 @@ insert into hr.employee_pay_history (ephi_emp_id, ephi_rate_change_date) values
 	(9, GETDATE()),
 	(10, GETDATE())
 ;
-select * from hr.employee_pay_history;
+-- select * from hr.employee_pay_history;
 
 SET IDENTITY_INSERT HR.work_orders ON;
 Insert into HR.work_orders (woro_id,woro_date, woro_status, woro_user_id) values ('1','1995-01-14', 'OPEN' ,'2');
@@ -480,7 +483,7 @@ Insert into HR.work_orders (woro_id,woro_date, woro_status, woro_user_id) values
 Insert into HR.work_orders (woro_id,woro_date, woro_status, woro_user_id) values ('9','1995-12-23', 'CANCELLED' ,'5');
 Insert into HR.work_orders (woro_id,woro_date, woro_status, woro_user_id) values ('10','1995-12-27','CLOSED' , '4');
 SET IDENTITY_INSERT HR.work_orders OFF;
-select * from hr.work_orders;
+-- select * from hr.work_orders
 
 SET IDENTITY_INSERT HR.work_order_detail ON;
 Insert into HR.work_order_detail (wode_id, wode_task_name, wode_status, wode_start_date, wode_end_date, wode_notes, wode_emp_id, wode_seta_id, wode_faci_id, wode_woro_id) values ('1', 'work detail 1', 'INPROGRESS', '1995-01-14', '1995-03-14', 'Masih Bekerja', '2', '2', '1', '2');
@@ -494,7 +497,7 @@ Insert into HR.work_order_detail (wode_id, wode_task_name, wode_status, wode_sta
 Insert into HR.work_order_detail (wode_id, wode_task_name, wode_status, wode_start_date, wode_end_date, wode_notes, wode_emp_id, wode_seta_id, wode_faci_id, wode_woro_id) values ('9', 'work detail 9', 'COMPLETED', '1995-01-14', '1995-03-14', 'Selesai', '4', '3', '2', '5');
 Insert into HR.work_order_detail (wode_id, wode_task_name, wode_status, wode_start_date, wode_end_date, wode_notes, wode_emp_id, wode_seta_id, wode_faci_id, wode_woro_id) values ('10', 'work detail 10', 'INPROGRESS', '1995-01-14', '1995-03-14', 'Masih Bekerja', '4', '5', '6', '4');
 SET IDENTITY_INSERT HR.work_order_detail OFF;
-select * from hr.work_order_detail;
+-- select * from hr.work_order_detail;
 
 -- INSERT MODULE Booking
 SET IDENTITY_INSERT Booking.special_offers ON
@@ -509,8 +512,8 @@ VALUES (1, 'Winter Sale', 'Get 20% off your stay when you book a room during the
 	   (8, 'Senior Discount', 'Guests 65 and over receive 10% off their stay', 'C', 0.1, '2022-12-01', '2022-03-31', 1, 3, GETDATE()),
 	   (9, 'Military Discount', 'Active duty military personnel receive 15% off their stay', 'I', 0.15, '2022-12-01', '2023-03-31', 1, 3, GETDATE())
 SET IDENTITY_INSERT Booking.special_offers OFF
-SELECT*FROM Booking.special_offers
-select * from Booking.special_offers;
+-- SELECT*FROM Booking.special_offers
+-- select * from Booking.special_offers;
 
 
 SET IDENTITY_INSERT Booking.booking_orders ON
@@ -533,7 +536,7 @@ VALUES (1, 'BO#20221127-0001', '2023-01-27', 4,'C', 'DP', 'T', 1, 1),
 	   (16, 'BO#20221127-0016', '2023-01-27', 3,'D', 'DP', 'T', 1, 6),
 	   (17, 'BO#20221127-0017', '2023-01-27', 3,'C', 'P', 'C', 2, 7)
 SET IDENTITY_INSERT Booking.booking_orders OFF
-SELECT*FROM Booking.booking_orders
+-- SELECT*FROM Booking.booking_orders
 
 SET IDENTITY_INSERT Booking.booking_order_detail ON
 INSERT INTO Booking.booking_order_detail (borde_boor_id, borde_id, borde_checkin, borde_checkout, borde_adults, borde_kids, borde_price, borde_extra, borde_discount, borde_tax, borde_subtotal, borde_faci_id)
@@ -554,7 +557,7 @@ VALUES (1, 1, '2022-11-27', '2022-11-28', 2, 0, 100, 0, 0, 10, 110, 1),
 	   (15, 15, '2022-11-27', '2022-11-28', 2, 3, 750, 150, 140, 75, 535, 5),
 	   (16, 16, '2022-11-27', '2022-11-28', 3, 2, 800, 160, 150, 80, 570, 6)
 SET IDENTITY_INSERT Booking.booking_order_detail OFF
-SELECT*FROM Booking.booking_order_detail
+-- SELECT*FROM Booking.booking_order_detail
 
 
 SET IDENTITY_INSERT Booking.booking_order_detail_extra ON
@@ -580,7 +583,7 @@ VALUES (1, 10, 2, 20, 'people', 1, 1),
 	   (19, 100, 20, 2000, 'people', 3, 4),
 	   (20, 105, 21, 2155, 'unit', 4, 3)
 SET IDENTITY_INSERT Booking.booking_order_detail_extra OFF
-SELECT*FROM Booking.booking_order_detail_extra
+-- SELECT*FROM Booking.booking_order_detail_extra
 
 SET IDENTITY_INSERT Booking.special_offer_coupons ON         
 INSERT INTO Booking.special_offer_coupons (soco_id, soco_borde_id, soco_spof_id)
@@ -595,7 +598,7 @@ VALUES (1, 1, 1),
 	   (9, 9, 9),
 	   (10, 10, 1)
 SET IDENTITY_INSERT Booking.special_offer_coupons OFF
-SELECT*FROM Booking.special_offer_coupons
+-- SELECT*FROM Booking.special_offer_coupons
 
 INSERT INTO Booking.user_breakfast (usbr_borde_id, usbr_modified_date, usbr_total_vacant)
 VALUES
@@ -615,7 +618,7 @@ VALUES
 	(14, '2022-11-27', 4),
 	(15, '2022-11-27', 2),
 	(16, '2022-11-27', 3)
-select * from Booking.user_breakfast
+-- select * from Booking.user_breakfast
 
 -- INSERT MODULE RESTO 
 --resto.resto_menus
@@ -635,7 +638,7 @@ VALUES
 	(10, 2, 'Mie Goreng', 'Mie goreng dengan bahan dasar mie yang ditumis bersama telur dan sayuran', 15000, 'Available', GETDATE()),
 	(11, 2, 'Cap Cay', 'Cap cay dengan bahan dasar sayuran yang dicampur dengan daging sapi dan kuah kaldu', 20000, 'Available', GETDATE());
 SET IDENTITY_INSERT resto.resto_menus OFF
-SELECT*FROM resto.resto_menus;
+-- SELECT*FROM resto.resto_menus;
 
 --resto.order_menu
 SET IDENTITY_INSERT resto.order_menus ON
@@ -647,7 +650,7 @@ VALUES (1, 'MENUS#2022-01-01-00001', '2022-01-01', 2, 0, 40000, 'CA', NULL, 'P',
 (5,'MENUS#20220101-00005', '2022-01-01', 6, 0, 120000, 'CR', '1234567890123456', 'P', GETDATE(), 5),
 (6,'MENUS#20220101-00006', '2022-01-01', 7, 0, 140000, 'D', '9876543210987654', 'B', GETDATE(), 6);
 SET IDENTITY_INSERT resto.order_menus OFF
-SELECT*FROM resto.order_menus;
+-- SELECT*FROM resto.order_menus;
 
 --resto order menu detail
 SET IDENTITY_INSERT resto.order_menu_detail ON
@@ -664,7 +667,7 @@ VALUES
 (9, 10000, 4, 40000, 0, 5, 3),
 (10, 15000, 2, 30000, 0, 5, 4);
 SET IDENTITY_INSERT resto.order_menu_detail OFF
-SELECT*FROM resto.order_menu_detail;
+-- SELECT*FROM resto.order_menu_detail;
 
 --resto photos
 INSERT INTO resto.resto_menu_photos (remp_thumbnail_filename, remp_photo_filename, remp_primary, remp_url, remp_reme_id)
@@ -678,7 +681,7 @@ VALUES ('thumbnail1.jpg', 'photo1.jpg', 1, 'http://localhost/resto/menu/photo1.j
 ('thumbnail8.jpg', 'photo8.jpg', 0, 'http://localhost/resto/menu/photo8.jpg', 3),
 ('thumbnail9.jpg', 'photo9.jpg', 0, 'http://localhost/resto/menu/photo9.jpg', 3),
 ('thumbnail10.jpg', 'photo10.jpg', 1, 'http://localhost/resto/menu/photo10.jpg', 4);
-SELECT*FROM resto.resto_menu_photos;
+-- SELECT*FROM resto.resto_menu_photos;
 
 -- INSERT MODULE Payment
 -- insert entity
@@ -686,63 +689,70 @@ SET IDENTITY_INSERT Payment.entity ON
 INSERT 
   INTO Payment.entity(entity_id) 
 VALUES (1),(2),(3),(4),(5),(6),(7),(8),(9),(10),(11),(12),(13),(14),(15),(16),(17),(18),(19),(20),(21),(22),(23),(24),(25);
-SET IDENTITY_INSERT Payment.Entity OFF
-SELECT*FROM payment.entity;
+SET IDENTITY_INSERT Payment.Entity OFF;
+-- SELECT*FROM payment.entity;
 
 -- insert bank
-INSERT 
+DISABLE TRIGGER [Payment].[InsertBankEntityId] ON [Payment].bank;
+INSERT
   INTO Payment.bank (bank_entity_id, bank_code, bank_name, bank_modified_date)
-VALUES (1, 'BRI', 'PT BANK RAKYAT INDONESIA (PERSERO) Tbk', CURRENT_TIMESTAMP),
-	   (2, 'BNI', 'PT BANK NEGARA INDONESIA (PERSERO) Tbk', CURRENT_TIMESTAMP),
-	   (3, 'BCA', 'PT BANK CENTRAL ASIA Tbk', CURRENT_TIMESTAMP),
-	   (4, 'BSI', 'PT BANK SYARIAH INDONESIA Tbk ', CURRENT_TIMESTAMP),
-	   (5, 'BTN', 'PT BANK TABUNGAN NEGARA (PERSERO) Tbk', CURRENT_TIMESTAMP),
-	   (6, 'MANDIRI', 'PT BANK MANDIRI (PERSERO) Tbk', CURRENT_TIMESTAMP),
-	   (7, 'MUAMALAT', 'PT BANK MUAMALAT INDONESIA Tbk', CURRENT_TIMESTAMP);
-SELECT*FROM payment.bank;
+VALUES (1, '002', 'BRI', CURRENT_TIMESTAMP),
+       (2, '009', 'BNI', CURRENT_TIMESTAMP),
+       (3, '014', 'BCA', CURRENT_TIMESTAMP),
+       (4, '427', 'BSI', CURRENT_TIMESTAMP),
+       (5, '200', 'BTN', CURRENT_TIMESTAMP),
+       (6, '008', 'MANDIRI', CURRENT_TIMESTAMP),
+       (7, '147', 'MUAMALAT', CURRENT_TIMESTAMP);
+ENABLE TRIGGER [Payment].[InsertBankEntityId] ON [Payment].bank;
+
+GO;
+-- SELECT*FROM payment.bank;
 
 -- insert payment_gateway
-INSERT 
+DISABLE TRIGGER [Payment].[InsertPaymentEntityId] ON [Payment].payment_gateway;
+INSERT
   INTO Payment.payment_gateway(paga_entity_id, paga_code, paga_name, paga_modified_date)
 VALUES (8, 'GOPAY', 'PT. Dompet Anak Bangsa', CURRENT_TIMESTAMP),
-	   (9, 'OVO', 'PT. Visionet Internasional', CURRENT_TIMESTAMP),
-	   (10, 'DANA', 'PT. Espay Debit Indonesia', CURRENT_TIMESTAMP),
-	   (11, 'SHOPEEPAY', 'Shopee', CURRENT_TIMESTAMP),
-	   (12, 'FLIP', 'Fintek Karya Nusantara', CURRENT_TIMESTAMP),
-	   (13, 'JENIUS', 'PT. Bank BTPN Tbk', CURRENT_TIMESTAMP),
-	   (14, 'JAGO', 'PT. Bank Jago Tbk', CURRENT_TIMESTAMP),
-	   (15, 'SAKUKU', 'PT. Bank Central Asia Tbk', CURRENT_TIMESTAMP);
-SELECT*FROM payment.payment_gateway;
-	   
+       (9, 'OVO', 'PT. Visionet Internasional', CURRENT_TIMESTAMP),
+       (10, 'DANA', 'PT. Espay Debit Indonesia', CURRENT_TIMESTAMP),
+       (11, 'SHOPEEPAY', 'Shopee', CURRENT_TIMESTAMP),
+       (12, 'FLIP', 'Fintek Karya Nusantara', CURRENT_TIMESTAMP),
+       (13, 'JENIUS', 'PT. Bank BTPN Tbk', CURRENT_TIMESTAMP),
+       (14, 'JAGO', 'PT. Bank Jago Tbk', CURRENT_TIMESTAMP),
+       (15, 'SAKUKU', 'PT. Bank Central Asia Tbk', CURRENT_TIMESTAMP);
+ENABLE TRIGGER [Payment].[InsertPaymentEntityId] ON [Payment].payment_gateway;
+
+-- SELECT*FROM payment.payment_gateway;
+       
 -- user_accounts
 INSERT
   INTO Payment.user_accounts(usac_entity_id, usac_user_id, usac_account_number, usac_saldo, usac_type, usac_expmonth, usac_expyear, usac_modified_date)
 VALUES (1, 1, '6271263188999', 1000000, 'debet', 11, 22, CURRENT_TIMESTAMP),
-	   (2, 2, '8012372737662', 1000000, 'credit card', 12, 27, CURRENT_TIMESTAMP),
-	   (3, 3, '9712893896126', 1000000, 'debet', 03, 23, CURRENT_TIMESTAMP),
-	   (4, 4, '8129387462674', 1000000, 'debet', 08, 24, CURRENT_TIMESTAMP),
-	   (5, 5, '7781236462762', 1000000, 'debet', 09, 28, CURRENT_TIMESTAMP),
-	   (6, 6, '1278287363663', 1000000, 'credit card', 02, 25, CURRENT_TIMESTAMP),
-	   (7, 7, '6326361273712', 1000000, 'debet', 01, 26, CURRENT_TIMESTAMP),
-	   (8, 8, '812327176263', 1000000, 'payment', 0, 0, CURRENT_TIMESTAMP),
-	   (9, 9, '827363525152', 1000000, 'payment', 0, 0, CURRENT_TIMESTAMP),
-	   (10, 10, '829283525152', 1000000, 'payment', 0, 0, CURRENT_TIMESTAMP),
-	   (11, 11, '872363155421', 1000000, 'payment', 0, 0, CURRENT_TIMESTAMP),
-	   (12, 12, '873652901212', 1000000, 'payment', 0, 0, CURRENT_TIMESTAMP),
-	   (13, 13, '809283222364', 1000000, 'payment', 0, 0, CURRENT_TIMESTAMP),
-	   (14, 14, '890128352546', 1000000, 'payment', 0, 0, CURRENT_TIMESTAMP),
-	   (15, 15, '856272837172', 1000000, 'payment', 0, 0, CURRENT_TIMESTAMP);
-SELECT*FROM payment.user_accounts;
+       (2, 2, '8012372737662', 1000000, 'credit card', 12, 27, CURRENT_TIMESTAMP),
+       (3, 3, '9712893896126', 1000000, 'debet', 03, 23, CURRENT_TIMESTAMP),
+       (4, 4, '8129387462674', 1000000, 'debet', 08, 24, CURRENT_TIMESTAMP),
+       (5, 5, '7781236462762', 1000000, 'debet', 09, 28, CURRENT_TIMESTAMP),
+       (6, 6, '1278287363663', 1000000, 'credit card', 02, 25, CURRENT_TIMESTAMP),
+       (7, 7, '6326361273712', 1000000, 'debet', 01, 26, CURRENT_TIMESTAMP),
+       (8, 8, '812327176263', 1000000, 'payment', 0, 0, CURRENT_TIMESTAMP),
+       (9, 9, '827363525152', 1000000, 'payment', 0, 0, CURRENT_TIMESTAMP),
+       (10, 10, '829283525152', 1000000, 'payment', 0, 0, CURRENT_TIMESTAMP),
+       (11, 11, '872363155421', 1000000, 'payment', 0, 0, CURRENT_TIMESTAMP),
+       (12, 12, '873652901212', 1000000, 'payment', 0, 0, CURRENT_TIMESTAMP),
+       (13, 13, '809283222364', 1000000, 'payment', 0, 0, CURRENT_TIMESTAMP),
+       (14, 14, '890128352546', 1000000, 'payment', 0, 0, CURRENT_TIMESTAMP),
+       (15, 15, '856272837172', 1000000, 'payment', 0, 0, CURRENT_TIMESTAMP);
+-- SELECT*FROM payment.user_accounts;
 
 -- payment_transactions
-SET IDENTITY_INSERT Payment.payment_transaction ON;
+SET IDENTITY_INSERT Payment.payment_transaction ON
 INSERT
   INTO Payment.payment_transaction(patr_id, patr_trx_number, patr_debet, patr_credit, patr_type, patr_note, patr_modified_date, 
-								  patr_order_number, patr_source_id, patr_target_id, patr_trx_number_ref, patr_user_id)
-VALUES (1, 'TRB#20221127-0001', 150000, 150000, 'TRB', NULL, CURRENT_TIMESTAMP, 'BO#20221127-0001', 1, 2, 'TRB#20221127-0001', 1),
-	   (2, 'TRB#20221127-0002', 150000, 150000, 'ORM', NULL, CURRENT_TIMESTAMP, 'MENUS#20221127-0001', 2, 1, 'TRB#20221127-0002', 2);
-SET IDENTITY_INSERT Payment.payment_transaction OFF;
-SELECT*FROM payment.payment_transaction;
+                                  patr_order_number, patr_source_id, patr_target_id, patr_trx_number_ref, patr_user_id)
+VALUES (1, 'TRB#20221127-0001', 150000, 150000, 'TRB', 'Tranfer Booking', CURRENT_TIMESTAMP, 'BO#20221127-0001', '6271263188999', '8012372737662', 'TRB#20221127-0001', 1),
+       (2, 'TRB#20221127-0002', 150000, 150000, 'ORM', 'Order Menu', CURRENT_TIMESTAMP, 'MENUS#20221127-0001', '8012372737662', '6271263188999', 'TRB#20221127-0002', 2);
+SET IDENTITY_INSERT Payment.payment_transaction OFF
+-- SELECT*FROM payment.payment_transaction;
 
 -- PURCHASING INSERT
 INSERT INTO purchasing.vendor (vendor_entity_id, vendor_name, vendor_active, vendor_priority, vendor_weburl)
@@ -757,7 +767,7 @@ VALUES (16,'Global Equipment Co.', 1, 0, 'www.globalequipment.com'),
 	   (24,'Bright Ideas Inc.', 1, 0, 'www.brightideas.com'),
 	   (25,'Progressive Solutions Inc.', 0, 1, 'www.progressivesolutions.com');
 -- UPDATE purchasing.vendor SET vendor_priority = 0 where vendor_id=1
-SELECT*FROM Purchasing.vendor;
+-- SELECT*FROM Purchasing.vendor;
 
 SET IDENTITY_INSERT purchasing.stocks ON;
 INSERT INTO purchasing.stocks (stock_id, stock_name, stock_description, stock_size, stock_color)
@@ -768,7 +778,7 @@ VALUES
   (4, 'Gorden Hotel', 'Gorden dengan bahan yang tahan lama dan mudah dicuci', 'Standard', 'Putih'),
   (5, 'Gelas Hotel', 'Gelas dengan bahan yang tahan lama dan mudah dicuci', 'Standard', 'Transparan');
 SET IDENTITY_INSERT purchasing.stocks OFF;
-SELECT*FROM purchasing.stocks;
+--  SELECT*FROM purchasing.stocks;
 
 SET IDENTITY_INSERT purchasing.vendor_product ON;
 INSERT INTO purchasing.vendor_product (vepro_id, vepro_qty_stocked, vepro_qty_remaining, vepro_price, venpro_stock_id, vepro_vendor_id)
@@ -795,7 +805,7 @@ VALUES
   (4, 'PO-20230115-004', 1, 0, 'TR', 1, 19),
   (5, 'PO-20230115-005', 1, 0, 'CA', 1, 20);
 SET IDENTITY_INSERT purchasing.purchase_order_header OFF;
-SELECT*FROM Purchasing.purchase_order_header;
+-- SELECT*FROM Purchasing.purchase_order_header;
 
 select * from information_schema.Columns where table_name = 'stocks';
 
@@ -806,7 +816,7 @@ VALUES
   (3, 'Barcode Handuk 10', 1, 'Handuk di kamar 115', 3, 3),
   (4, 'Barcode Gorden 5', 1, 'Gorden di kamar 120', 4, 4),
   (5, 'Barcode Gelas 5', 1, 'Gelas di kamar 125', 5, 5);
-SELECT*FROM Purchasing.stock_detail;
+-- SELECT*FROM Purchasing.stock_detail;
 
 INSERT INTO purchasing.stock_photo (spho_thumbnail_filename, spho_photo_filename, spho_primary, spho_url, spho_stock_id)
 VALUES
@@ -815,7 +825,7 @@ VALUES
   ('thumbnail-3.jpg', 'photo-3.jpg', 0, 'https://stock-photos.com/thumbnail-3.jpg', 3),
   ('thumbnail-4.jpg', 'photo-4.jpg', 1, 'https://stock-photos.com/thumbnail-4.jpg', 4),
   ('thumbnail-5.jpg', 'photo-5.jpg', 0, 'https://stock-photos.com/thumbnail-5.jpg', 5);
-SELECT*FROM Purchasing.stock_photo;
+-- SELECT*FROM Purchasing.stock_photo;
 
 
 SET IDENTITY_INSERT purchasing.purchase_order_detail ON
@@ -827,7 +837,7 @@ VALUES
   (4, 4, 100, 550000, 97, 3, 5),
   (5, 5, 110, 600000, 107, 3, 1);
 SET IDENTITY_INSERT purchasing.purchase_order_detail OFF
-SELECT*FROM Purchasing.purchase_order_detail;
+-- SELECT*FROM Purchasing.purchase_order_detail;
 
 SET IDENTITY_INSERT purchasing.cart ON
 INSERT INTO purchasing.cart (cart_id, cart_emp_id, cart_vepro_id, cart_order_qty)

@@ -280,6 +280,7 @@ VALUES
 (13, 3),
 (14, 4),
 (15, 5);
+-- select * from users.user_roles;
 
 -- Insert 15 dummy rows into the users.user_profiles table
 SET IDENTITY_INSERT users.user_profiles ON;

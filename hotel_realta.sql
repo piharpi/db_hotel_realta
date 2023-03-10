@@ -465,7 +465,7 @@ CREATE TABLE Booking.booking_order_detail(
 	CONSTRAINT fk_border_boor_id FOREIGN KEY(borde_boor_id)	REFERENCES Booking.booking_orders(boor_id),
 	CONSTRAINT fk_borde_faci_id FOREIGN KEY(borde_faci_id) REFERENCES Hotel.facilities(faci_id) 
 		ON DELETE CASCADE 
-    ON UPDATE CASCADE
+	ON UPDATE CASCADE
 );
 
 CREATE TABLE Booking.booking_order_detail_extra(
@@ -480,7 +480,7 @@ CREATE TABLE Booking.booking_order_detail_extra(
 	CONSTRAINT fk_boex_borde_id FOREIGN KEY (boex_borde_id) REFERENCES Booking.booking_order_detail (borde_id) 
 		ON DELETE CASCADE 
     ON UPDATE CASCADE,
-	CONSTRAINT fk_boex_prit_id FOREIGN KEY (boex_prit_id) REFERENCES Master.price_items(prit_id) 
+	CONSTRAINT fk_boex_prit_id FOREIGN KEY (boex_prit_id) REFERENCES Master.price_items(prit_id)
 		ON DELETE CASCADE 
     ON UPDATE CASCADE
 )
@@ -709,7 +709,7 @@ CREATE TABLE purchasing.stock_photo(
   spho_stock_id INT NOT NULL,
 
   CONSTRAINT pk_spho_id PRIMARY KEY (spho_id),
-  CONSTRAINT fk_spho_stock_id FOREIGN KEY (spho_stock_id) 
+  CONSTRAINT fk_spho_stock_id FOREIGN KEY (spho_stock_id)
 	REFERENCES purchasing.stocks(stock_id)
 	ON DELETE CASCADE
 	ON UPDATE CASCADE,
@@ -755,10 +755,10 @@ CREATE TABLE purchasing.purchase_order_detail (
   pode_stock_id INT,
 
   CONSTRAINT pk_pode_id PRIMARY KEY (pode_id),
-  CONSTRAINT fk_pode_pohe_id FOREIGN KEY (pode_pohe_id) 
+  CONSTRAINT fk_pode_pohe_id FOREIGN KEY (pode_pohe_id)
 	REFERENCES purchasing.purchase_order_header(pohe_id)
 	ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT fk_pode_stock_id FOREIGN KEY (pode_stock_id) 
+  CONSTRAINT fk_pode_stock_id FOREIGN KEY (pode_stock_id)
 	REFERENCES purchasing.stocks(stock_id)
 	ON DELETE CASCADE ON UPDATE CASCADE
 );
@@ -774,13 +774,13 @@ CREATE TABLE purchasing.stock_detail (
 
   CONSTRAINT pk_stod_id PRIMARY KEY (stod_id),
   CONSTRAINT uq_stod_barcode_number UNIQUE (stod_barcode_number),
-  CONSTRAINT fk_stod_stock_id FOREIGN KEY (stod_stock_id) 
+  CONSTRAINT fk_stod_stock_id FOREIGN KEY (stod_stock_id)
 	REFERENCES purchasing.stocks(stock_id)
 	ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT fk_stod_pohe_id FOREIGN KEY (stod_pohe_id) 
+  CONSTRAINT fk_stod_pohe_id FOREIGN KEY (stod_pohe_id)
 	REFERENCES purchasing.purchase_order_header(pohe_id)
 	ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT fk_stod_faci_id FOREIGN KEY (stod_faci_id) 
+  CONSTRAINT fk_stod_faci_id FOREIGN KEY (stod_faci_id)
 	REFERENCES hotel.facilities(faci_id)
 	ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT ck_stod_status CHECK (stod_status IN(1, 2, 3, 4))

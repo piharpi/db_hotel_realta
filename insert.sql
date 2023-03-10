@@ -82,12 +82,12 @@ DELETE Master.policy_category_group;
 SET IDENTITY_INSERT Master.Regions ON;
 INSERT INTO Master.Regions (region_code, region_name)
 VALUES ('1', 'Region 1'), ('2', 'Region 2'), ('3', 'Region 3'),
-       ('4', 'Region 4'), ('5', 'Region 5'), ('6', 'Region 6'),
-       ('7', 'Region 7'), ('8', 'Region 8'), ('9', 'Region 9'),
-       ('10', 'Region 10'), ('11', 'Region 11'), ('12', 'Region 12'),
-       ('13', 'Region 13'), ('14', 'Region 14'), ('15', 'Region 15'),
-       ('16', 'Region 16'), ('17', 'Region 17'), ('18', 'Region 18'),
-       ('19', 'Region 19'), ('20', 'Region 20');
+	   ('4', 'Region 4'), ('5', 'Region 5'), ('6', 'Region 6'),
+	   ('7', 'Region 7'), ('8', 'Region 8'), ('9', 'Region 9'),
+	   ('10', 'Region 10'), ('11', 'Region 11'), ('12', 'Region 12'),
+	   ('13', 'Region 13'), ('14', 'Region 14'), ('15', 'Region 15'),
+	   ('16', 'Region 16'), ('17', 'Region 17'), ('18', 'Region 18'),
+	   ('19', 'Region 19'), ('20', 'Region 20');
 SET IDENTITY_INSERT Master.Regions OFF;
 -- SELECT*FROM Master.Regions
 -- ORDER by region_code ASC
@@ -95,12 +95,12 @@ SET IDENTITY_INSERT Master.Regions OFF;
 SET IDENTITY_INSERT Master.Country ON;
 INSERT INTO Master.Country (country_id, country_name, country_region_id)
 VALUES (1, 'France', 1), (2, 'Germany', 2), (3, 'Spain', 3),
-       (4, 'Italy', 4), (5, 'United Kingdom', 5), (6, 'Netherlands', 6),
-       (7, 'Belgium', 7), (8, 'Denmark', 8), (9, 'Sweden', 9),
-       (10, 'Norway', 10), (11, 'China', 11), (12, 'Japan', 12),
-       (13, 'South Korea', 13), (14, 'North Korea', 14), (15, 'India', 15),
-       (16, 'Pakistan', 16), (17, 'Bangladesh', 17), (18, 'Nepal', 18),
-       (19, 'Bhutan', 19), (20, 'Sri Lanka', 20);
+	   (4, 'Italy', 4), (5, 'United Kingdom', 5), (6, 'Netherlands', 6),
+	   (7, 'Belgium', 7), (8, 'Denmark', 8), (9, 'Sweden', 9),
+	   (10, 'Norway', 10), (11, 'China', 11), (12, 'Japan', 12),
+	   (13, 'South Korea', 13), (14, 'North Korea', 14), (15, 'India', 15),
+	   (16, 'Pakistan', 16), (17, 'Bangladesh', 17), (18, 'Nepal', 18),
+	   (19, 'Bhutan', 19), (20, 'Sri Lanka', 20);
 SET IDENTITY_INSERT Master.Country OFF;
 -- SELECT*FROM Master.Country
 -- ORDER by country_id ASC
@@ -108,12 +108,12 @@ SET IDENTITY_INSERT Master.Country OFF;
 SET IDENTITY_INSERT Master.Provinces ON;
 INSERT INTO Master.Provinces (prov_id, prov_name, prov_country_id)
 VALUES (1, 'Ontario', 1), (2, 'Quebec', 1), (3, 'British Columbia', 1),
-       (4, 'Alberta', 1), (5, 'Manitoba', 1), (6, 'Saskatchewan', 1),
-       (7, 'New Brunswick', 1), (8, 'Nova Scotia', 1), (9, 'Prince Edward Island', 1),
-       (10, 'Newfoundland and Labrador', 1), (11, 'Hesse', 2), (12, 'Bavaria', 2),
-       (13, 'Baden-Württemberg', 2), (14, 'North Rhine-Westphalia', 2), (15, 'Lower Saxony', 2),
-       (16, 'Andalusia', 3), (17, 'Catalonia', 3), (18, 'Valencia', 3),
-       (19, 'Galicia', 3), (20, 'Castilla y León', 3);
+	   (4, 'Alberta', 1), (5, 'Manitoba', 1), (6, 'Saskatchewan', 1),
+	   (7, 'New Brunswick', 1), (8, 'Nova Scotia', 1), (9, 'Prince Edward Island', 1),
+	   (10, 'Newfoundland and Labrador', 1), (11, 'Hesse', 2), (12, 'Bavaria', 2),
+	   (13, 'Baden-Württemberg', 2), (14, 'North Rhine-Westphalia', 2), (15, 'Lower Saxony', 2),
+	   (16, 'Andalusia', 3), (17, 'Catalonia', 3), (18, 'Valencia', 3),
+	   (19, 'Galicia', 3), (20, 'Castilla y León', 3);
 SET IDENTITY_INSERT Master.Provinces OFF;
 
 -- SELECT*FROM Master.provinces
@@ -123,25 +123,25 @@ SET IDENTITY_INSERT Master.Provinces OFF;
 SET IDENTITY_INSERT Master.Address ON;
 INSERT INTO Master.Address (addr_id, addr_line1, addr_line2, addr_postal_code, addr_spatial_location, addr_prov_id)
 VALUES (1, '123 Main Street', '', 'A1AA1', geography::Point(43.65, -79.38, 4326), 1),
-    (2, '456 Maple Avenue', '', 'B2BB2', geography::Point(43.65, -79.38, 4326), 1),
-    (3, '789 Oak Boulevard', '', 'C3CC3', geography::Point(43.65, -79.38, 4326), 1),
-    (4, '321 Pine Street', '', 'D4DD4', geography::Point(43.65, -79.38, 4326), 1),
-    (5, '654 Cedar Road', '', 'E5EE5', geography::Point(43.65, -79.38, 4326), 1),
-    (6, '987 Spruce Lane', '', 'F6FF6', geography::Point(43.65, -79.38, 4326), 1),
-    (7, '246 Fir Avenue', '', 'G77G7', geography::Point(43.65, -79.38, 4326), 1),
-    (8, '369 Hemlock Drive', '', 'H8HH8', geography::Point(43.65, -79.38, 4326), 1),
-    (9, '159 Willow Way', '', 'I9II9', geography::Point(43.65, -79.38, 4326), 1),
-    (10, '753 Maple Street', '', 'J0JJ0', geography::Point(43.65, -79.38, 4326), 1),
-    (11, '1 Parliament Hill', '', 'K1KA6', geography::Point(45.42, -75.70, 4326), 2),
-    (12, '2 Sussex Drive', '', 'K1NK1', geography::Point(45.42, -75.70, 4326), 2),
-    (13, '3 Rideau Street', '', 'K1NJ9', geography::Point(45.42, -75.70, 4326), 2),
-    (14, '4 Wellington Street', '', 'K1PJ9', geography::Point(45.42, -75.70, 4326), 2),
-    (15, '5 Elgin Street', '', 'K1PK7', geography::Point(45.42, -75.70, 4326), 2),
-    (16, 'Avenida de la Constitución, 3', '', '41001', geography::Point(37.38, -6.00, 4326), 16),
-    (17, 'Plaza de Santo Domingo, 3', '', '41001', geography::Point(37.38, -6.00, 4326), 16),
-    (18, 'Calle de la Ribera, 15', '', '41001', geography::Point(37.38, -6.00, 4326), 16),
-    (19, 'Calle del Arenal, 12', '', '41001', geography::Point(37.38, -6.00, 4326), 16),
-    (20, 'Calle de la Ribera, 25', '', '41001', geography::Point(37.38, -6.00, 4326), 16);
+	(2, '456 Maple Avenue', '', 'B2BB2', geography::Point(43.65, -79.38, 4326), 1),
+	(3, '789 Oak Boulevard', '', 'C3CC3', geography::Point(43.65, -79.38, 4326), 1),
+	(4, '321 Pine Street', '', 'D4DD4', geography::Point(43.65, -79.38, 4326), 1),
+	(5, '654 Cedar Road', '', 'E5EE5', geography::Point(43.65, -79.38, 4326), 1),
+	(6, '987 Spruce Lane', '', 'F6FF6', geography::Point(43.65, -79.38, 4326), 1),
+	(7, '246 Fir Avenue', '', 'G77G7', geography::Point(43.65, -79.38, 4326), 1),
+	(8, '369 Hemlock Drive', '', 'H8HH8', geography::Point(43.65, -79.38, 4326), 1),
+	(9, '159 Willow Way', '', 'I9II9', geography::Point(43.65, -79.38, 4326), 1),
+	(10, '753 Maple Street', '', 'J0JJ0', geography::Point(43.65, -79.38, 4326), 1),
+	(11, '1 Parliament Hill', '', 'K1KA6', geography::Point(45.42, -75.70, 4326), 2),
+	(12, '2 Sussex Drive', '', 'K1NK1', geography::Point(45.42, -75.70, 4326), 2),
+	(13, '3 Rideau Street', '', 'K1NJ9', geography::Point(45.42, -75.70, 4326), 2),
+	(14, '4 Wellington Street', '', 'K1PJ9', geography::Point(45.42, -75.70, 4326), 2),
+	(15, '5 Elgin Street', '', 'K1PK7', geography::Point(45.42, -75.70, 4326), 2),
+	(16, 'Avenida de la Constitución, 3', '', '41001', geography::Point(37.38, -6.00, 4326), 16),
+	(17, 'Plaza de Santo Domingo, 3', '', '41001', geography::Point(37.38, -6.00, 4326), 16),
+	(18, 'Calle de la Ribera, 15', '', '41001', geography::Point(37.38, -6.00, 4326), 16),
+	(19, 'Calle del Arenal, 12', '', '41001', geography::Point(37.38, -6.00, 4326), 16),
+	(20, 'Calle de la Ribera, 25', '', '41001', geography::Point(37.38, -6.00, 4326), 16);
 SET IDENTITY_INSERT Master.Address OFF;
 -- SELECT*FROM Master.Address
 -- ORDER BY addr_id ASC
@@ -235,11 +235,11 @@ SET IDENTITY_INSERT Users.users OFF;
 INSERT INTO users.user_members (usme_user_id, usme_memb_name, usme_promote_date, usme_points, usme_type)
 VALUES (1, 'SILVER', '2022-01-01', 100, 'Active'),
 	   (2, 'GOLD', '2022-02-01', 200, 'Active'),
-       (3, 'VIP', '2022-03-01', 300, 'Active'),
+	   (3, 'VIP', '2022-03-01', 300, 'Active'),
 	   (4, 'WIZARD', '2022-04-01', 400, 'Active'),
 	   (5, 'SILVER', '2022-05-01', 500, 'Active'),
 	   (6, 'GOLD', '2022-06-01', 600, 'Active'),
-       (7, 'VIP', '2022-07-01', 700, 'Active'),
+	   (7, 'VIP', '2022-07-01', 700, 'Active'),
 	   (8, 'WIZARD', '2022-08-01', 800, 'Active'),
 	   (9, 'SILVER', '2022-09-01', 900, 'Active'),
 	   (10, 'GOLD', '2022-10-01', 1000, 'Active'),
@@ -252,9 +252,8 @@ VALUES (1, 'SILVER', '2022-01-01', 100, 'Active'),
 
 -- Insert 5 rows into the users.roles table
 SET IDENTITY_INSERT users.roles ON;
-
 INSERT INTO users.roles (role_id, role_name)
-VALUES 
+VALUES
 (1, 'Guest'),
 (2, 'Manager'),
 (3, 'OfficeBoy'),
@@ -265,7 +264,7 @@ SET IDENTITY_INSERT users.roles OFF;
 
 -- Insert 15 rows into the users.user_roles table
 INSERT INTO users.user_roles (usro_user_id, usro_role_id)
-VALUES 
+VALUES
 (1, 1),
 (2, 2),
 (3, 3),
@@ -285,7 +284,6 @@ VALUES
 
 -- Insert 15 dummy rows into the users.user_profiles table
 SET IDENTITY_INSERT users.user_profiles ON;
-
 INSERT INTO users.user_profiles (uspro_id, uspro_national_id, uspro_birth_date, uspro_job_title, uspro_marital_status, uspro_gender, uspro_addr_id, uspro_user_id)
 VALUES (1, '123-45-6789', '1980-01-01', 'Manager', 'S', 'M', 1, 1),
        (2, '234-56-7890', '1985-02-02', 'Developer', 'M', 'F', 2, 2),
@@ -307,7 +305,6 @@ SET IDENTITY_INSERT users.user_profiles OFF;
 
 -- Insert 15 dummy rows into the users.user_password table
 SET IDENTITY_INSERT users.user_password ON;
-
 INSERT INTO users.user_password (uspa_user_id, uspa_passwordHash, uspa_passwordSalt)
 VALUES
 (1, '123456', 'abcdef'),
@@ -330,24 +327,22 @@ SET IDENTITY_INSERT users.user_password OFF;
 
 -- Insert 15 dummy rows into the users.bonus_points table
 SET IDENTITY_INSERT users.bonus_points ON;
-
 INSERT INTO users.bonus_points (ubpo_id, ubpo_user_id, ubpo_total_points, ubpo_bonus_type, ubpo_created_on)
 VALUES (1, 1, 1000, 'R', '2022-01-01'),
-       (2, 2, 2000, 'P', '2022-02-02'),
-       (3, 3, 3000, 'P', '2022-03-03'),
-       (4, 4, 4000, 'R', '2022-04-04'),
-       (5, 5, 5000, 'P', '2022-05-05'),
-       (6, 6, 6000, 'P', '2022-06-06'),
-       (7, 7, 7000, 'R', '2022-07-07'),
-       (8, 8, 8000, 'P', '2022-08-08'),
-       (9, 9, 9000, 'P', '2022-09-09'),
-       (10, 10, 10000, 'R', '2022-10-10'),
+	   (2, 2, 2000, 'P', '2022-02-02'),
+	   (3, 3, 3000, 'P', '2022-03-03'),
+	   (4, 4, 4000, 'R', '2022-04-04'),
+	   (5, 5, 5000, 'P', '2022-05-05'),
+	   (6, 6, 6000, 'P', '2022-06-06'),
+	   (7, 7, 7000, 'R', '2022-07-07'),
+	   (8, 8, 8000, 'P', '2022-08-08'),
+	   (9, 9, 9000, 'P', '2022-09-09'),
+	   (10, 10, 10000, 'R', '2022-10-10'),
 	   (11, 11, 10000, 'P', '2022-11-11'),
 	   (12, 12, 10000, 'R', '2022-12-12'),
 	   (13, 13, 10000, 'P', '2022-01-01'),
 	   (14, 14, 10000, 'R', '2022-02-02'),
 	   (15, 15, 10000, 'P', '2022-03-03');
-
 SET IDENTITY_INSERT users.bonus_points OFF;
 -- select * from users.bonus_points;
 

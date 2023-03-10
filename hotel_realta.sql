@@ -22,7 +22,7 @@ CREATE SCHEMA Master;
 GO
 
 CREATE SCHEMA Hotel;
-GO 
+GO
 
 CREATE SCHEMA HR;
 GO
@@ -52,18 +52,18 @@ CREATE TABLE Master.country (
   country_name nvarchar(55) UNIQUE NOT NULL,
   country_region_id int,
   CONSTRAINT pk_country_id PRIMARY KEY (country_id),
-  CONSTRAINT fk_country_region_id FOREIGN KEY(country_region_id) REFERENCES Master.regions(region_code) 
-    ON DELETE CASCADE 
-    ON UPDATE CASCADE
+  CONSTRAINT fk_country_region_id FOREIGN KEY(country_region_id) REFERENCES Master.regions(region_code)
+	ON DELETE CASCADE
+	ON UPDATE CASCADE
 );
 
 CREATE TABLE Master.provinces (
   prov_id int IDENTITY (1, 1),
   prov_name nvarchar(85) NOT NULL,
   prov_country_id int CONSTRAINT pk_prov_id PRIMARY KEY(prov_id),
-  CONSTRAINT fk_prov_country_name FOREIGN KEY(prov_country_id) REFERENCES Master.country(country_id) 
-    ON DELETE CASCADE 
-    ON UPDATE CASCADE
+  CONSTRAINT fk_prov_country_name FOREIGN KEY(prov_country_id) REFERENCES Master.country(country_id)
+	ON DELETE CASCADE
+	ON UPDATE CASCADE
 );
 
 CREATE TABLE Master.address (
@@ -74,9 +74,9 @@ CREATE TABLE Master.address (
   addr_spatial_location geography,
   addr_prov_id int,
   CONSTRAINT pk_addr_id PRIMARY KEY(addr_id),
-  CONSTRAINT fk_addr_prov_id FOREIGN KEY(addr_prov_id) REFERENCES Master.provinces(prov_id) 
-    ON DELETE CASCADE 
-    ON UPDATE CASCADE
+  CONSTRAINT fk_addr_prov_id FOREIGN KEY(addr_prov_id) REFERENCES Master.provinces(prov_id)
+	ON DELETE CASCADE
+	ON UPDATE CASCADE
 );
 
 
@@ -100,12 +100,12 @@ CREATE TABLE Master.policy (
 CREATE TABLE Master.policy_category_group (
   poca_poli_id int NOT NULL,
   poca_cagro_id int NOT NULL,
-  CONSTRAINT fk_poca_poli_id FOREIGN KEY(poca_poli_id) REFERENCES Master.policy(poli_id) 
-    ON DELETE CASCADE 
-    ON UPDATE CASCADE,
-  CONSTRAINT fk_poca_cagro_id FOREIGN KEY(poca_cagro_id) REFERENCES Master.category_group(cagro_id) 
-    ON DELETE CASCADE 
-    ON UPDATE CASCADE
+  CONSTRAINT fk_poca_poli_id FOREIGN KEY(poca_poli_id) REFERENCES Master.policy(poli_id)
+	ON DELETE CASCADE
+	ON UPDATE CASCADE,
+  CONSTRAINT fk_poca_cagro_id FOREIGN KEY(poca_cagro_id) REFERENCES Master.category_group(cagro_id)
+	ON DELETE CASCADE
+	ON UPDATE CASCADE
 );
 
 CREATE TABLE Master.price_items (
@@ -150,11 +150,11 @@ CREATE TABLE Users.user_members (
   usme_type nvarchar(15) DEFAULT 'Expired',
 	CONSTRAINT pk_usme_user_id PRIMARY KEY(usme_user_id),
 	CONSTRAINT fk_usme_user_id FOREIGN KEY(usme_user_id) REFERENCES Users.users (user_id)
-		ON DELETE CASCADE 
-		ON UPDATE CASCADE,
+        ON DELETE CASCADE
+        ON UPDATE CASCADE,
 	CONSTRAINT fk_usme_memb_name FOREIGN KEY (usme_memb_name) REFERENCES Master.members(memb_name)
-	  ON DELETE CASCADE 
-    ON UPDATE CASCADE
+        ON DELETE CASCADE
+        ON UPDATE CASCADE
 );
 
 CREATE TABLE Users.roles (
@@ -167,12 +167,12 @@ CREATE TABLE Users.user_roles (
   usro_user_id int,
   usro_role_id int,
 	CONSTRAINT pk_usro_user_id PRIMARY KEY(usro_user_id),
-	CONSTRAINT fk_usro_user_id FOREIGN KEY (usro_user_id) REFERENCES Users.users(user_id) 
-	  ON DELETE CASCADE 
-    ON UPDATE CASCADE,
-	CONSTRAINT fk_usro_role_id FOREIGN KEY (usro_role_id) REFERENCES Users.roles(role_id) 
-	  ON DELETE CASCADE 
-    ON UPDATE CASCADE
+	CONSTRAINT fk_usro_user_id FOREIGN KEY (usro_user_id) REFERENCES Users.users(user_id)
+	  ON DELETE CASCADE
+	ON UPDATE CASCADE,
+	CONSTRAINT fk_usro_role_id FOREIGN KEY (usro_role_id) REFERENCES Users.roles(role_id)
+	  ON DELETE CASCADE
+	ON UPDATE CASCADE
 );
 
 CREATE TABLE Users.user_profiles (
@@ -185,12 +185,12 @@ CREATE TABLE Users.user_profiles (
   uspro_addr_id int,
   uspro_user_id int,
 	CONSTRAINT pk_usro_id PRIMARY KEY(uspro_id),
-	CONSTRAINT fk_uspro_user_id FOREIGN KEY (uspro_user_id) REFERENCES Users.users (user_id) 
-    ON DELETE CASCADE 
-    ON UPDATE CASCADE,
-	CONSTRAINT fk_uspro_addr_id FOREIGN KEY (uspro_addr_id) REFERENCES Master.address (addr_id) 
-    ON DELETE CASCADE 
-    ON UPDATE CASCADE
+	CONSTRAINT fk_uspro_user_id FOREIGN KEY (uspro_user_id) REFERENCES Users.users (user_id)
+	ON DELETE CASCADE
+	ON UPDATE CASCADE,
+	CONSTRAINT fk_uspro_addr_id FOREIGN KEY (uspro_addr_id) REFERENCES Master.address (addr_id)
+	ON DELETE CASCADE
+	ON UPDATE CASCADE
 );
 
 CREATE TABLE Users.bonus_points (
@@ -200,9 +200,9 @@ CREATE TABLE Users.bonus_points (
   ubpo_bonus_type nchar (1),
   ubpo_created_on datetime,
 	CONSTRAINT pk_ubpo_id PRIMARY KEY(ubpo_id),
-	CONSTRAINT fk_ubpo_user_id FOREIGN KEY (ubpo_user_id) REFERENCES Users.users (user_id) 
-    ON DELETE CASCADE 
-    ON UPDATE CASCADE
+	CONSTRAINT fk_ubpo_user_id FOREIGN KEY (ubpo_user_id) REFERENCES Users.users (user_id)
+	ON DELETE CASCADE
+	ON UPDATE CASCADE
 );
 
 CREATE TABLE Users.user_password (
@@ -210,7 +210,7 @@ CREATE TABLE Users.user_password (
   uspa_passwordHash varchar(128),
   uspa_passwordSalt varchar(10),
 	CONSTRAINT pk_uspa_user_id PRIMARY KEY(uspa_user_id),
-	CONSTRAINT fk_uspa_user_id FOREIGN KEY (uspa_user_id) REFERENCES users.users (user_id) 
+	CONSTRAINT fk_uspa_user_id FOREIGN KEY (uspa_user_id) REFERENCES users.users (user_id)
 );
 
 --MODULE HOTELS --
@@ -235,9 +235,9 @@ CREATE TABLE Hotel.hotel_reviews (
   hore_user_id int NOT NULL,
   hore_hotel_id int NOT NULL,
   CONSTRAINT pk_hore_user_id FOREIGN KEY (hore_user_id) REFERENCES Users.users(user_id),
-  CONSTRAINT fk_hore_hotel_id FOREIGN KEY (hore_hotel_id) REFERENCES Hotel.hotels(hotel_id) 
-    ON DELETE CASCADE 
-    ON UPDATE CASCADE
+  CONSTRAINT fk_hore_hotel_id FOREIGN KEY (hore_hotel_id) REFERENCES Hotel.hotels(hotel_id)
+	ON DELETE CASCADE
+	ON UPDATE CASCADE
 );
 
 IF OBJECT_ID('Hotel.facilities', 'U') IS NOT NULL DROP TABLE Hotel.facilities
@@ -262,12 +262,12 @@ CREATE TABLE Hotel.facilities (
   faci_hotel_id INT NOT NULL,
   -- UNIQUE ID
   CONSTRAINT uq_faci_room_number UNIQUE (faci_room_number),
-  CONSTRAINT fk_faci_cagro_id FOREIGN KEY (faci_cagro_id) REFERENCES Master.category_group(cagro_id) 
-    ON DELETE CASCADE 
-    ON UPDATE CASCADE,
-  CONSTRAINT fk_faci_hotel_id FOREIGN KEY (faci_cagro_id) REFERENCES Hotel.hotels(hotel_id) 
-    ON DELETE CASCADE 
-    ON UPDATE CASCADE
+  CONSTRAINT fk_faci_cagro_id FOREIGN KEY (faci_cagro_id) REFERENCES Master.category_group(cagro_id)
+	ON DELETE CASCADE
+	ON UPDATE CASCADE,
+  CONSTRAINT fk_faci_hotel_id FOREIGN KEY (faci_cagro_id) REFERENCES Hotel.hotels(hotel_id)
+	ON DELETE CASCADE
+	ON UPDATE CASCADE
 );
 
 IF OBJECT_ID('Hotel.facility_price_history', 'U') IS NOT NULL DROP TABLE Hotel.facility_price_history
@@ -283,12 +283,12 @@ CREATE TABLE Hotel.facility_price_history (
   faph_modified_date datetime,
   faph_faci_id int NOT NULL,
   faph_user_id int NOT NULL,
-  CONSTRAINT fk_faph_faci_id FOREIGN KEY (faph_faci_id) REFERENCES Hotel.facilities(faci_id) 
-    ON DELETE CASCADE
-    ON UPDATE CASCADE,
-  CONSTRAINT fk_faph_user_id FOREIGN KEY (faph_user_id) REFERENCES Users.users(user_id) 
-    ON DELETE CASCADE 
-    ON UPDATE CASCADE
+  CONSTRAINT fk_faph_faci_id FOREIGN KEY (faph_faci_id) REFERENCES Hotel.facilities(faci_id)
+	ON DELETE CASCADE
+	ON UPDATE CASCADE,
+  CONSTRAINT fk_faph_user_id FOREIGN KEY (faph_user_id) REFERENCES Users.users(user_id)
+	ON DELETE CASCADE
+	ON UPDATE CASCADE
 );
 
 IF OBJECT_ID('Hotel.facility_photos', 'U') IS NOT NULL DROP TABLE Hotel.facility_photos
@@ -300,9 +300,9 @@ CREATE TABLE Hotel.facility_photos (
   fapho_url nvarchar(255) NULL,
   fapho_modified_date datetime,
   fapho_faci_id int NOT NULL,
-  CONSTRAINT pk_fapho_faci_id FOREIGN KEY (fapho_faci_id) REFERENCES Hotel.facilities(faci_id) 
-    ON DELETE CASCADE 
-    ON UPDATE CASCADE
+  CONSTRAINT pk_fapho_faci_id FOREIGN KEY (fapho_faci_id) REFERENCES Hotel.facilities(faci_id)
+	ON DELETE CASCADE
+	ON UPDATE CASCADE
 );
 
 -- MODULE HR --
@@ -441,10 +441,10 @@ CREATE TABLE Booking.booking_orders(
 	CONSTRAINT pk_boor_id PRIMARY KEY (boor_id),
 	CONSTRAINT unique_boor_order_number UNIQUE (boor_order_number),
 	CONSTRAINT fk_boor_user_id FOREIGN KEY (boor_user_id) REFERENCES Users.users (user_id) 
-    ON DELETE CASCADE 
+    ON DELETE CASCADE
     ON UPDATE CASCADE,
 	CONSTRAINT fk_boor_hotel_id FOREIGN KEY (boor_hotel_id) REFERENCES Hotel.hotels (hotel_id) 
-    ON DELETE CASCADE 
+    ON DELETE CASCADE
     ON UPDATE CASCADE,
 );
 
@@ -465,7 +465,7 @@ CREATE TABLE Booking.booking_order_detail(
 	CONSTRAINT fk_border_boor_id FOREIGN KEY(borde_boor_id)	REFERENCES Booking.booking_orders(boor_id),
 	CONSTRAINT fk_borde_faci_id FOREIGN KEY(borde_faci_id) REFERENCES Hotel.facilities(faci_id) 
 		ON DELETE CASCADE 
-    ON UPDATE CASCADE 
+	ON UPDATE CASCADE
 );
 
 CREATE TABLE Booking.booking_order_detail_extra(
@@ -510,63 +510,63 @@ CREATE TABLE Booking.user_breakfast(
 
 -- MODULE RESTO --
 CREATE TABLE Resto.resto_menus(
-    reme_faci_id int,
-    reme_id int IDENTITY(1,1),
-    reme_name nvarchar(55) NOT NULL,
-    reme_description nvarchar(255),
-    reme_price money NOT NULL,
-    reme_status nvarchar(15) NOT NULL,
-    reme_modified_date datetime,
-    CONSTRAINT pk_reme_faci_id PRIMARY KEY (reme_id),
-    CONSTRAINT reme_faci_id FOREIGN KEY (reme_faci_id) REFERENCES Hotel.facilities(faci_id) 
-      ON DELETE CASCADE 
-      ON UPDATE CASCADE
+	reme_faci_id int,
+	reme_id int IDENTITY(1,1),
+	reme_name nvarchar(55) NOT NULL,
+	reme_description nvarchar(255),
+	reme_price money NOT NULL,
+	reme_status nvarchar(15) NOT NULL,
+	reme_modified_date datetime,
+	CONSTRAINT pk_reme_faci_id PRIMARY KEY (reme_id),
+	CONSTRAINT reme_faci_id FOREIGN KEY (reme_faci_id) REFERENCES Hotel.facilities(faci_id)
+	  ON DELETE CASCADE
+	  ON UPDATE CASCADE
 );
 
 CREATE TABLE Resto.order_menus(
-    orme_id int IDENTITY,
-    orme_order_number nvarchar (55) UNIQUE NOT NULL,
-    orme_order_date datetime NOT NULL,
-    orme_total_item smallint,
-    orme_total_discount smallmoney,
-    orme_total_amount money,
-    orme_pay_type nchar(2) NOT NULL,
-    orme_cardnumber nvarchar(25),
-    orme_is_paid nchar(2),
-    orme_modified_date datetime,
-    orme_user_id integer,
-    CONSTRAINT pk_orme_id PRIMARY KEY (orme_id),
-    CONSTRAINT fk_orme_user_id FOREIGN KEY (orme_user_id) REFERENCES Users.users(user_id) 
-      ON DELETE CASCADE 
-      ON UPDATE CASCADE
+	orme_id int IDENTITY,
+	orme_order_number nvarchar (55) UNIQUE NOT NULL,
+	orme_order_date datetime NOT NULL,
+	orme_total_item smallint,
+	orme_total_discount smallmoney,
+	orme_total_amount money,
+	orme_pay_type nchar(2) NOT NULL,
+	orme_cardnumber nvarchar(25),
+	orme_is_paid nchar(2),
+	orme_modified_date datetime,
+	orme_user_id integer,
+	CONSTRAINT pk_orme_id PRIMARY KEY (orme_id),
+	CONSTRAINT fk_orme_user_id FOREIGN KEY (orme_user_id) REFERENCES Users.users(user_id)
+	  ON DELETE CASCADE
+	  ON UPDATE CASCADE
 );
 
 CREATE TABLE Resto.order_menu_detail(
-    omde_id int IDENTITY,
-    orme_price money NOT NULL,
-    orme_qty smallint NOT NULL,
-    orme_subtotal money NOT NULL,
-    orme_discount smallmoney,
-    omde_orme_id integer,
-    omde_reme_id integer,
-    CONSTRAINT pk_omme_id PRIMARY KEY (omde_id),
-    CONSTRAINT fk_omde_orme_id FOREIGN KEY (omde_orme_id) REFERENCES Resto.order_menus(orme_id)
-      ON DELETE CASCADE 
-      ON UPDATE CASCADE,
-    CONSTRAINT fk_omde_reme_id FOREIGN KEY (omde_reme_id) REFERENCES Resto.resto_menus(reme_id)
-      ON DELETE CASCADE 
-      ON UPDATE CASCADE
+	omde_id int IDENTITY,
+	orme_price money NOT NULL,
+	orme_qty smallint NOT NULL,
+	orme_subtotal money NOT NULL,
+	orme_discount smallmoney,
+	omde_orme_id integer,
+	omde_reme_id integer,
+	CONSTRAINT pk_omme_id PRIMARY KEY (omde_id),
+	CONSTRAINT fk_omde_orme_id FOREIGN KEY (omde_orme_id) REFERENCES Resto.order_menus(orme_id)
+	  ON DELETE CASCADE
+	  ON UPDATE CASCADE,
+	CONSTRAINT fk_omde_reme_id FOREIGN KEY (omde_reme_id) REFERENCES Resto.resto_menus(reme_id)
+	  ON DELETE CASCADE
+	  ON UPDATE CASCADE
 );
 
 CREATE TABLE Resto.resto_menu_photos(
-    remp_id int IDENTITY,
+	remp_id int IDENTITY,
 	remp_thumbnail_filename nvarchar (50),
-    remp_photo_filename nvarchar (50),
-    remp_primary BIT,
-    remp_url nvarchar (255),
-    remp_reme_id int,
-    CONSTRAINT pk_remp_id PRIMARY KEY (remp_id),
-    CONSTRAINT fk_remp_reme_id FOREIGN KEY (remp_reme_id) REFERENCES Resto.resto_menus(reme_id)
+	remp_photo_filename nvarchar (50),
+	remp_primary BIT,
+	remp_url nvarchar (255),
+	remp_reme_id int,
+	CONSTRAINT pk_remp_id PRIMARY KEY (remp_id),
+	CONSTRAINT fk_remp_reme_id FOREIGN KEY (remp_reme_id) REFERENCES Resto.resto_menus(reme_id)
 );
 
 -- MODULE PAYMENT --
@@ -621,7 +621,7 @@ CREATE TABLE Payment.user_accounts(
 );
 
 CREATE TABLE Payment.payment_transaction(
-	patr_id int IDENTITY(1,1) PRIMARY KEY,
+  patr_id int IDENTITY(1,1) PRIMARY KEY,
 	patr_trx_number nvarchar(55) UNIQUE,
 	patr_debet money,
 	patr_credit money,
@@ -680,7 +680,7 @@ CREATE TABLE purchasing.stocks(
   stock_color NVARCHAR(15),
   stock_modified_date DATETIME NOT NULL DEFAULT GETDATE(),
 
-	CONSTRAINT pk_department_id PRIMARY KEY (stock_id)
+  CONSTRAINT pk_department_id PRIMARY KEY (stock_id)
 );
 
 CREATE TABLE purchasing.vendor_product(
@@ -708,11 +708,11 @@ CREATE TABLE purchasing.stock_photo(
   spho_url NVARCHAR(255) NOT NULL,
   spho_stock_id INT NOT NULL,
 
-	CONSTRAINT pk_spho_id PRIMARY KEY (spho_id),
+  CONSTRAINT pk_spho_id PRIMARY KEY (spho_id),
   CONSTRAINT fk_spho_stock_id FOREIGN KEY (spho_stock_id)
 	REFERENCES purchasing.stocks(stock_id)
-      ON DELETE CASCADE 
-      ON UPDATE CASCADE,
+	ON DELETE CASCADE
+	ON UPDATE CASCADE,
   CONSTRAINT ck_spho_primary CHECK (spho_primary IN (0,1))
 );
 
@@ -754,7 +754,7 @@ CREATE TABLE purchasing.purchase_order_detail (
   pode_modified_date DATETIME NOT NULL DEFAULT GETDATE(),
   pode_stock_id INT,
 
-    CONSTRAINT pk_pode_id PRIMARY KEY (pode_id),
+  CONSTRAINT pk_pode_id PRIMARY KEY (pode_id),
   CONSTRAINT fk_pode_pohe_id FOREIGN KEY (pode_pohe_id)
 	REFERENCES purchasing.purchase_order_header(pohe_id)
 	ON DELETE CASCADE ON UPDATE CASCADE,

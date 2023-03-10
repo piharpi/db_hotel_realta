@@ -87,13 +87,13 @@ BEGIN
   SET NOCOUNT ON;
 
   UPDATE purchasing.purchase_order_header
-    SET pohe_subtotal = 
-      (SELECT SUM(pode_line_total) 
-        FROM purchasing.purchase_order_detail 
-        WHERE pode_pohe_id = pohe_id)
-    WHERE pohe_id IN 
-      (SELECT pode_pohe_id FROM inserted) 
-    OR pohe_id IN (SELECT pode_pohe_id FROM deleted);
+	SET pohe_subtotal =
+	  (SELECT SUM(pode_line_total)
+		FROM purchasing.purchase_order_detail
+		WHERE pode_pohe_id = pohe_id)
+	WHERE pohe_id IN
+	  (SELECT pode_pohe_id FROM inserted)
+	OR pohe_id IN (SELECT pode_pohe_id FROM deleted);
 END;
 GO
 
@@ -118,6 +118,7 @@ BEGIN
   SET cart_modified_date = GETDATE()
   WHERE cart_id IN (SELECT cart_id FROM inserted);
 END;
+
 GO
 
 DROP trigger if exists purchasing.tr_cart_merge_quantity;

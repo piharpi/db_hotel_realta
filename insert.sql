@@ -8,10 +8,10 @@ DELETE Purchasing.stocks;
 DELETE Purchasing.purchase_order_header;
 DELETE Purchasing.vendor;
 
-DBCC CHECKIDENT ('purchasing.stocks', RESEED, 0);
+DBCC CHECKIDENT ('Purchasing.stocks', RESEED, 1);
 GO
 
-DBCC CHECKIDENT ('purchasing.purchase_order_header', RESEED, 0);
+DBCC CHECKIDENT ('Purchasing.purchase_order_header', RESEED, 1);
 GO
 
 -- DELETE MODULE Payment 

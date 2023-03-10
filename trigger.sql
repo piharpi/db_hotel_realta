@@ -158,12 +158,12 @@ GO
 -- =============================================
 -- Author:		Harpi
 -- Create date: 8 January 2023
--- Description:	Create identity in Entity table and insert bank 
+-- Description:	Create identity in Entity table and insert bank
 -- =============================================
 CREATE TRIGGER Payment.InsertBankEntityId
-   ON  Payment.bank 
+   ON  Payment.bank
    INSTEAD OF INSERT
-AS 
+AS
 BEGIN
 	-- SET NOCOUNT ON added to prevent extra result sets from
 	-- interfering with SELECT statements.
@@ -175,26 +175,26 @@ BEGIN
 		SELECT @bank_name = bank_name FROM inserted;
 
 	-- Insert statements for trigger here
-		 INSERT 
-			 INTO Payment.entity 
+		 INSERT
+			 INTO Payment.entity
 		DEFAULT VALUES
 
-		INSERT 
-			INTO Payment.bank (bank_entity_id, bank_code, bank_name, bank_modified_date) 
+		INSERT
+			INTO Payment.bank (bank_entity_id, bank_code, bank_name, bank_modified_date)
     OUTPUT INSERTED.bank_entity_id
 		VALUES (SCOPE_IDENTITY(), @bank_code, @bank_name, GETDATE())
 END
-GO  
+GO
 
 -- =============================================
 -- Author:		Harpi
 -- Create date: 8 January 2023
--- Description:	Create identity in Entity table and insert payment 
+-- Description:	Create identity in Entity table and insert payment
 -- =============================================
 CREATE TRIGGER Payment.InsertPaymentEntityId
-   ON  Payment.payment_gateway 
+   ON  Payment.payment_gateway
    INSTEAD OF INSERT
-AS 
+AS
 BEGIN
 	-- SET NOCOUNT ON added to prevent extra result sets from
 	-- interfering with SELECT statements.
@@ -206,12 +206,12 @@ BEGIN
 		SELECT @paga_name = paga_name FROM inserted;
 
 	-- Insert statements for trigger here
-		 INSERT 
-			 INTO Payment.entity 
+		 INSERT
+			 INTO Payment.entity
 		DEFAULT VALUES
 
-		INSERT 
-			INTO Payment.payment_gateway (paga_entity_id, paga_code, paga_name, paga_modified_date) 
+		INSERT
+			INTO Payment.payment_gateway (paga_entity_id, paga_code, paga_name, paga_modified_date)
     OUTPUT INSERTED.paga_entity_id
 		VALUES (SCOPE_IDENTITY(), @paga_code, @paga_name, GETDATE())
 END

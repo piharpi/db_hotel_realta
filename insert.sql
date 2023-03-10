@@ -253,7 +253,7 @@ VALUES (1, 'SILVER', '2022-01-01', 100, 'Active'),
 -- Insert 5 rows into the users.roles table
 SET IDENTITY_INSERT users.roles ON;
 INSERT INTO users.roles (role_id, role_name)
-VALUES 
+VALUES
 (1, 'Guest'),
 (2, 'Manager'),
 (3, 'OfficeBoy'),
@@ -264,7 +264,7 @@ SET IDENTITY_INSERT users.roles OFF;
 
 -- Insert 15 rows into the users.user_roles table
 INSERT INTO users.user_roles (usro_user_id, usro_role_id)
-VALUES 
+VALUES
 (1, 1),
 (2, 2),
 (3, 3),
@@ -585,7 +585,7 @@ VALUES (1, 10, 2, 20, 'people', 1, 1),
 SET IDENTITY_INSERT Booking.booking_order_detail_extra OFF
 -- SELECT*FROM Booking.booking_order_detail_extra
 
-SET IDENTITY_INSERT Booking.special_offer_coupons ON         
+SET IDENTITY_INSERT Booking.special_offer_coupons ON
 INSERT INTO Booking.special_offer_coupons (soco_id, soco_borde_id, soco_spof_id)
 VALUES (1, 1, 1),
        (2, 2, 2),
@@ -620,7 +620,7 @@ VALUES
     (16, '2022-11-27', 3)
 -- select * from Booking.user_breakfast
 
--- INSERT MODULE RESTO 
+-- INSERT MODULE RESTO
 --resto.resto_menus
 SET IDENTITY_INSERT resto.resto_menus ON
 INSERT INTO resto.resto_menus
@@ -686,7 +686,7 @@ VALUES ('thumbnail1.jpg', 'photo1.jpg', 1, 'http://localhost/resto/menu/photo1.j
 -- INSERT MODULE Payment
 -- insert entity
 SET IDENTITY_INSERT Payment.entity ON
-INSERT 
+INSERT
   INTO Payment.entity(entity_id)
 VALUES (1),(2),(3),(4),(5),(6),(7),(8),(9),(10),(11),(12),(13),(14),(15),(16),(17),(18),(19),(20),(21),(22),(23),(24),(25);
 SET IDENTITY_INSERT Payment.Entity OFF;

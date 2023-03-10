@@ -86,7 +86,7 @@ CREATE TABLE Master.category_group (
   cagro_description nvarchar(255),
   cagro_type nvarchar(25) NOT NULL CHECK (cagro_type IN('category', 'service', 'facility')),
   cagro_icon nvarchar(255),
-	cagro_icon_url nvarchar(255),
+  cagro_icon_url nvarchar(255),
   CONSTRAINT pk_cagro_id PRIMARY KEY(cagro_id)
 );
 
@@ -150,11 +150,11 @@ CREATE TABLE Users.user_members (
   usme_type nvarchar(15) DEFAULT 'Expired',
 	CONSTRAINT pk_usme_user_id PRIMARY KEY(usme_user_id),
 	CONSTRAINT fk_usme_user_id FOREIGN KEY(usme_user_id) REFERENCES Users.users (user_id)
-		ON DELETE CASCADE
-		ON UPDATE CASCADE,
+        ON DELETE CASCADE
+        ON UPDATE CASCADE,
 	CONSTRAINT fk_usme_memb_name FOREIGN KEY (usme_memb_name) REFERENCES Master.members(memb_name)
-	  ON DELETE CASCADE
-		ON UPDATE CASCADE
+        ON DELETE CASCADE
+        ON UPDATE CASCADE
 );
 
 CREATE TABLE Users.roles (
@@ -582,7 +582,7 @@ CREATE TABLE Payment.bank(
 	bank_modified_date datetime
 	CONSTRAINT PK_PaymentBankEntityId PRIMARY KEY(bank_entity_id),
 	CONSTRAINT FK_PaymentBankEntityId FOREIGN KEY(bank_entity_id) 
-		REFERENCES Payment.Entity (entity_id) 
+		REFERENCES Payment.Entity (entity_id)
 		ON UPDATE CASCADE 
 		ON DELETE CASCADE
 );
@@ -610,7 +610,7 @@ CREATE TABLE Payment.user_accounts(
 	usac_modified_date datetime,
 	CONSTRAINT CK_PaymentUserAccountsType CHECK (usac_type IN ('debet', 'credit card', 'payment')),
 	CONSTRAINT PK_PaymentUserAccountsEntityId PRIMARY KEY(usac_entity_id, usac_user_id),
-	CONSTRAINT FK_PaymentUserAccountsEntityPaymentGateway_Bank FOREIGN KEY(usac_entity_id) 
+	CONSTRAINT FK_PaymentUserAccountsEntityPaymentGateway_Bank FOREIGN KEY(usac_entity_id)
 		REFERENCES Payment.Entity(entity_id)
 		ON UPDATE CASCADE
 		ON DELETE CASCADE,

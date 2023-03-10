@@ -241,14 +241,12 @@ GO
 -- Description:	Store Procedure for Insert Purchase Order
 -- ===========================================================
 
-drop procedure purchasing.spInsertPurchaseOrder;
 CREATE PROCEDURE purchasing.spInsertPurchaseOrder
 	@pay_type NCHAR(2),
 	@cart_id INT
 AS
 BEGIN
 	SET NOCOUNT ON;
-	SET XACT_ABORT ON;
 
 	BEGIN TRY
 		BEGIN TRANSACTION

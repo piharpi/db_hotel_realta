@@ -406,64 +406,61 @@ CREATE TABLE HR.work_order_detail (
 
 -- MODULE BOOKING --
 CREATE TABLE Booking.special_offers(
-	spof_id int IDENTITY(1,1) NOT NULL,
-	spof_name nvarchar(55) NOT NULL,
-	spof_description nvarchar(255) NOT NULL,
-	spof_type nchar(5) NOT NULL CHECK (spof_type IN ('T','C','I')),
-	spof_discount decimal(5,2) NOT NULL,
-	spof_start_date datetime NOT NULL,
-	spof_end_date datetime NOT NULL,
-	spof_min_qty int,
-	spof_max_qty int,
-	spof_modified_date datetime
-	CONSTRAINT pk_spof_id PRIMARY KEY(spof_id)
+    spof_id INT IDENTITY(1,1) NOT NULL,
+    spof_name NVARCHAR(55) NOT NULL,
+    spof_description NVARCHAR(255) NOT NULL,
+    spof_type CHAR(5) NOT NULL CHECK (spof_type IN ('T','C','I')),
+    spof_discount SMALLMONEY NOT NULL,
+    spof_start_date DATETIME NOT NULL,
+    spof_end_date DATETIME NOT NULL,
+    spof_min_qty int,
+    spof_max_qty int,
+    spof_modified_date DATETIME DEFAULT GETDATE()
+    CONSTRAINT pk_spof_id PRIMARY KEY(spof_id)
 );
 
 CREATE TABLE Booking.booking_orders(
-	boor_id int	IDENTITY (1,1),
-	boor_order_number nvarchar(55) NOT NULL,
-	boor_order_date datetime NOT NULL,
-	boor_arrival_date datetime,
-	boor_total_room smallint,
-	boor_total_guest smallint,
-	boor_discount decimal(5,2),
-	boor_total_tax decimal(5,2) DEFAULT 0.11,
-	boor_total_ammount money,
-	boor_down_payment money,
-	boor_pay_type nchar(2) NOT NULL,
-	boor_is_paid nchar(2) NOT NULL CHECK (boor_is_paid IN ('DP','P','R ')),
-	boor_type nvarchar(15) NOT NULL CHECK (boor_type IN ('T','C','I')),
-	boor_cardnumber nvarchar(25),
-	boor_member_type nvarchar(15),
-	boor_status nvarchar(15) CHECK (boor_status IN ('BOOKING','CHECKIN','CHECKOUT','CLEANING','CANCELED')),
-	boor_user_id int,
-	boor_hotel_id int
+	boor_id INT	IDENTITY (1,1),
+	boor_order_number NVARCHAR(55) NOT NULL,
+	boor_order_date DATETIME DEFAULT GETDATE(),
+	boor_arrival_date DATETIME,
+	boor_total_room SMALLINT, --on update, count(borde_id)
+	boor_total_guest SMALLINT, --input user
+	boor_discount MONEY, --sum(borde_price*borde_discount)
+	boor_total_tax MONEY, -- sum(borde_price*borde_tax)
+	boor_total_ammount MONEY, -- sum(borde_subtotal)
+	boor_down_payment MONEY, -- on update
+	boor_pay_type NCHAR(2) NOT NULL, CHECK(boor_pay_type IN ('CR', 'C', 'D', 'PG')),
+	boor_is_paid NCHAR(2) NOT NULL CHECK (boor_is_paid IN ('DP','P','R ')),
+	boor_type NVARCHAR(15) NOT NULL CHECK (boor_type IN ('T','C','I')),
+	boor_cardnumber NVARCHAR(25), -- on insert on update
+	boor_member_type NVARCHAR(15), -- ambil dari usme_memb_name(fk user_id)
+	boor_status NVARCHAR(15) CHECK (boor_status IN ('BOOKING','CHECKIN','CHECKOUT','CLEANING','CANCELED')),
+	boor_user_id INT,
+	boor_hotel_id INT
 	CONSTRAINT pk_boor_id PRIMARY KEY (boor_id),
 	CONSTRAINT unique_boor_order_number UNIQUE (boor_order_number),
 	CONSTRAINT fk_boor_user_id FOREIGN KEY (boor_user_id) REFERENCES Users.users (user_id) 
-	ON DELETE CASCADE
-	ON UPDATE CASCADE,
+    ON DELETE CASCADE
+    ON UPDATE CASCADE,
 	CONSTRAINT fk_boor_hotel_id FOREIGN KEY (boor_hotel_id) REFERENCES Hotel.hotels (hotel_id) 
-	ON DELETE CASCADE
-	ON UPDATE CASCADE,
-  CONSTRAINT chk_boor_cardnumber CHECK (
-	(boor_pay_type IN ('CR', 'PG') AND boor_cardnumber IS NOT NULL) OR
-	(boor_pay_type IN ('C', 'D') AND boor_cardnumber IS NULL))
+    ON DELETE CASCADE
+    ON UPDATE CASCADE,
 );
 
 CREATE TABLE Booking.booking_order_detail(
-	borde_boor_id integer,
-	borde_id int IDENTITY (1,1) UNIQUE NOT NULL,
-	borde_checkin datetime NOT NULL,
-	borde_checkout datetime NOT NULL,
-	borde_adults integer,
-	borde_kids integer,
-	borde_price money,
-	borde_extra money,
-	borde_discount decimal(5,2),
-	borde_tax decimal(5,2) DEFAULT 0.11,
-	borde_subtotal money,
-	borde_faci_id integer,
+	borde_boor_id INTEGER,
+	borde_id INT IDENTITY (1,1) UNIQUE NOT NULL,
+	borde_checkin DATETIME NOT NULL, --di input user
+	borde_checkout DATETIME NOT NULL, -- di input user
+	borde_adults INTEGER, -- on update
+	borde_kids INTEGER, -- on update
+	borde_price MONEY, -- ngambil dari faci_rate_price(fk faci_id)
+	borde_extra MONEY, -- sum(boex_subtotal) dari borde_id yg sama
+	borde_discount SMALLMONEY, -- faci_discount+sum(spof_discount) -> lewat soco_id
+	borde_tax SMALLMONEY, -- ngambil default faci_tax_rate
+	borde_subtotal AS borde_price+(borde_price*borde_tax)-(borde_price+borde_discount),
+	borde_faci_id INTEGER,
 	CONSTRAINT pk_borde_id_boor_id PRIMARY KEY (borde_id, borde_boor_id),
 	CONSTRAINT fk_border_boor_id FOREIGN KEY(borde_boor_id)	REFERENCES Booking.booking_orders(boor_id),
 	CONSTRAINT fk_borde_faci_id FOREIGN KEY(borde_faci_id) REFERENCES Hotel.facilities(faci_id) 
@@ -472,41 +469,41 @@ CREATE TABLE Booking.booking_order_detail(
 );
 
 CREATE TABLE Booking.booking_order_detail_extra(
-	boex_id int IDENTITY (1,1),
-	boex_price money,
-	boex_qty smallint,
-	boex_subtotal money,
-	boex_measure_unit nvarchar (50), CHECK(boex_measure_unit IN ('people','unit','kg')),
-	boex_borde_id int,
-	boex_prit_id int
+	boex_id INT IDENTITY (1,1),
+	boex_price MONEY,
+	boex_qty SMALLINT,
+	boex_subtotal AS boex_price*boex_qty,
+	boex_measure_unit NVARCHAR(50), CHECK(boex_measure_unit IN ('people','unit','kg')),
+	boex_borde_id INT,
+	boex_prit_id INT
 	CONSTRAINT pk_boex_id PRIMARY KEY (boex_id),
 	CONSTRAINT fk_boex_borde_id FOREIGN KEY (boex_borde_id) REFERENCES Booking.booking_order_detail (borde_id) 
 		ON DELETE CASCADE 
-	ON UPDATE CASCADE,
-	CONSTRAINT fk_boex_prit_id FOREIGN KEY (boex_prit_id) REFERENCES Master.price_items(prit_id) 
+    ON UPDATE CASCADE,
+	CONSTRAINT fk_boex_prit_id FOREIGN KEY (boex_prit_id) REFERENCES Master.price_items(prit_id)
 		ON DELETE CASCADE 
-	ON UPDATE CASCADE
+    ON UPDATE CASCADE
 )
 
 CREATE TABLE Booking.special_offer_coupons(
-	soco_id int IDENTITY(1,1),
-	soco_borde_id int,
-	soco_spof_id int,
-	CONSTRAINT pk_soco_id PRIMARY KEY(soco_id),
-	CONSTRAINT fk_soco_borde_id FOREIGN KEY(soco_borde_id) REFERENCES Booking.booking_order_detail(borde_id)
-	  ON DELETE CASCADE
-	  ON UPDATE CASCADE,
-	CONSTRAINT fk_soco_spof_id FOREIGN KEY(soco_spof_id) REFERENCES Booking.special_offers(spof_id)
+    soco_id INT IDENTITY(1,1),
+    soco_borde_id INT,
+    soco_spof_id INT,
+    CONSTRAINT pk_soco_id PRIMARY KEY(soco_id),
+    CONSTRAINT fk_soco_borde_id FOREIGN KEY(soco_borde_id) REFERENCES Booking.booking_order_detail(borde_id) 
+      ON DELETE CASCADE 
+      ON UPDATE CASCADE,
+    CONSTRAINT fk_soco_spof_id FOREIGN KEY(soco_spof_id) REFERENCES Booking.special_offers(spof_id) 
 		  ON DELETE CASCADE 
-	  ON UPDATE CASCADE
+      ON UPDATE CASCADE
 );
 
 CREATE TABLE Booking.user_breakfast(
-	usbr_borde_id int,
-	usbr_modified_date datetime,
-	usbr_total_vacant smallint NOT NULL,
-	CONSTRAINT pk_usbr_borde_id_usbr_modified_date PRIMARY KEY(usbr_borde_id,usbr_modified_date),
-	CONSTRAINT fk_usbr_borde_id FOREIGN KEY(usbr_borde_id)
+    usbr_borde_id int,
+    usbr_modified_date date,
+    usbr_total_vacant smallint NOT NULL,
+    CONSTRAINT pk_usbr_borde_id_usbr_modified_date PRIMARY KEY(usbr_borde_id,usbr_modified_date),
+    CONSTRAINT fk_usbr_borde_id FOREIGN KEY(usbr_borde_id) 
 		REFERENCES Booking.booking_order_detail(borde_id) 
 		ON DELETE CASCADE ON UPDATE CASCADE
 );
@@ -712,7 +709,7 @@ CREATE TABLE purchasing.stock_photo(
   spho_stock_id INT NOT NULL,
 
   CONSTRAINT pk_spho_id PRIMARY KEY (spho_id),
-  CONSTRAINT fk_spho_stock_id FOREIGN KEY (spho_stock_id) 
+  CONSTRAINT fk_spho_stock_id FOREIGN KEY (spho_stock_id)
 	REFERENCES purchasing.stocks(stock_id)
 	ON DELETE CASCADE
 	ON UPDATE CASCADE,
@@ -758,10 +755,10 @@ CREATE TABLE purchasing.purchase_order_detail (
   pode_stock_id INT,
 
   CONSTRAINT pk_pode_id PRIMARY KEY (pode_id),
-  CONSTRAINT fk_pode_pohe_id FOREIGN KEY (pode_pohe_id) 
+  CONSTRAINT fk_pode_pohe_id FOREIGN KEY (pode_pohe_id)
 	REFERENCES purchasing.purchase_order_header(pohe_id)
 	ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT fk_pode_stock_id FOREIGN KEY (pode_stock_id) 
+  CONSTRAINT fk_pode_stock_id FOREIGN KEY (pode_stock_id)
 	REFERENCES purchasing.stocks(stock_id)
 	ON DELETE CASCADE ON UPDATE CASCADE
 );
@@ -777,13 +774,13 @@ CREATE TABLE purchasing.stock_detail (
 
   CONSTRAINT pk_stod_id PRIMARY KEY (stod_id),
   CONSTRAINT uq_stod_barcode_number UNIQUE (stod_barcode_number),
-  CONSTRAINT fk_stod_stock_id FOREIGN KEY (stod_stock_id) 
+  CONSTRAINT fk_stod_stock_id FOREIGN KEY (stod_stock_id)
 	REFERENCES purchasing.stocks(stock_id)
 	ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT fk_stod_pohe_id FOREIGN KEY (stod_pohe_id) 
+  CONSTRAINT fk_stod_pohe_id FOREIGN KEY (stod_pohe_id)
 	REFERENCES purchasing.purchase_order_header(pohe_id)
 	ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT fk_stod_faci_id FOREIGN KEY (stod_faci_id) 
+  CONSTRAINT fk_stod_faci_id FOREIGN KEY (stod_faci_id)
 	REFERENCES hotel.facilities(faci_id)
 	ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT ck_stod_status CHECK (stod_status IN(1, 2, 3, 4))

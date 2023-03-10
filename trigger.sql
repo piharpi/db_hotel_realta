@@ -288,3 +288,43 @@ BEGIN
 
 		SELECT patr_id FROM inserted;
 END
+GO
+
+-- =============================================
+-- Author:		Hafiz 
+-- Create date: 11 January 2023
+-- Description:	Trigger to insert identity into payment.Entity table
+			--	and also insert into purchasing.Vendor table
+-- =============================================
+CREATE TRIGGER Purchasing.InsertVendorEntityId
+   ON  Purchasing.Vendor
+   INSTEAD OF INSERT
+AS 
+BEGIN
+	-- SET NOCOUNT ON added to prevent extra result sets from
+	-- interfering with SELECT statements.
+		SET NOCOUNT ON
+
+		DECLARE @vendorName nvarchar (55)
+		DECLARE @vendorActive bit
+		DECLARE @vendorPriority bit
+		DECLARE @vendorWebURL nvarchar(1025)
+
+		SELECT @vendorName = vendor_name FROM inserted;
+		SELECT @vendorActive = vendor_active FROM inserted;
+		SELECT @vendorPriority = vendor_priority FROM inserted;
+		SELECT @vendorWebURL = vendor_weburl FROM inserted;
+
+	-- Insert statements to Payment.Entity
+		 INSERT 
+			 INTO Payment.entity 
+		DEFAULT VALUES
+
+	-- Insert statements to Purchasing.Vendor
+		INSERT 
+			INTO Purchasing.Vendor(vendor_entity_id, vendor_name, vendor_active, vendor_priority, vendor_weburl) 
+    OUTPUT INSERTED.vendor_entity_id
+		VALUES (SCOPE_IDENTITY(), @vendorName, @vendorActive, @vendorPriority, @vendorWebURL)
+
+END
+GO

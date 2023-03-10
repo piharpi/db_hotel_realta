@@ -296,7 +296,7 @@ GO
 -- Description:	Trigger to insert identity into payment.Entity table
 			--	and also insert into purchasing.Vendor table
 -- =============================================
-CREATE TRIGGER Purchasing.InsertPaymentEntityId
+CREATE TRIGGER Purchasing.InsertVendorEntityId
    ON  Purchasing.Vendor
    INSTEAD OF INSERT
 AS 

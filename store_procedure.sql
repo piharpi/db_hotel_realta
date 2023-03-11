@@ -596,7 +596,7 @@ BEGIN
 		,hotel_addr_description AS HotelAddrDescription
 	FROM Hotel.Hotels
 END;
-
+GO
 
 -- =============================================
 -- Author:		Hendri Praminiarto
@@ -752,6 +752,4 @@ BEGIN
         THROW;
     END CATCH
 END
-
-
 GO

@@ -599,8 +599,8 @@ CREATE TABLE Resto.order_menu_detail
       ON DELETE CASCADE
       ON UPDATE CASCADE,
 	CONSTRAINT fk_omde_reme_id FOREIGN KEY (omde_reme_id) REFERENCES Resto.resto_menus(reme_id)
-      ON DELETE CASCADE
-      ON UPDATE CASCADE
+      ON DELETE NO ACTION
+      ON UPDATE NO ACTION
 );
 
 CREATE TABLE Resto.resto_menu_photos

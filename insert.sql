@@ -368,6 +368,8 @@ VALUES
 ('The Westin Hotel Palembang', 'Hotel bintang 4 dengan fasilitas kelas atas di Palembang', 4, '+62 823 4567 8902', '2022-09-01', 5, 0),
 ('Swiss-Belhotel Palembang', 'Hotel bintang 5 dengan fasilitas mewah di Palembang', 5, '+62 823 1234 5680', NULL, 4, 0)
 
+select * from Hotel.hotels
+
 INSERT INTO Hotel.Facilities (faci_name, faci_description, faci_max_number, faci_measure_unit, 
 faci_room_number, faci_startdate, faci_endate, faci_low_price, faci_high_price, faci_rate_price, 
 faci_discount, faci_tax_rate, faci_cagro_id, faci_hotel_id, faci_user_id)
@@ -725,18 +727,18 @@ SET IDENTITY_INSERT resto.order_menus OFF
 
 --resto order menu detail
 SET IDENTITY_INSERT resto.order_menu_detail ON
-INSERT INTO resto.order_menu_detail (omde_id, orme_price, orme_qty, orme_subtotal, orme_discount, omde_orme_id, omde_reme_id)
+INSERT INTO resto.order_menu_detail (omde_id, orme_price, orme_qty, orme_discount, omde_orme_id, omde_reme_id)
 VALUES
-(1, 10000, 2, 20000, 0, 1, 1),
-(2, 12000, 3, 36000, 0, 1, 2),
-(3, 15000, 2, 30000, 0, 2, 3),
-(4, 20000, 4, 80000, 0, 2, 4),
-(5, 10000, 3, 30000, 0, 3, 5),
-(6, 15000, 1, 15000, 0, 3, 6),
-(7, 20000, 3, 60000, 0, 4, 11),
-(8, 12000, 2, 24000, 0, 4, 2),
-(9, 10000, 4, 40000, 0, 5, 3),
-(10, 15000, 2, 30000, 0, 5, 4);
+(1, 10000, 2, 0, 1, 1),
+(2, 12000, 3, 0, 1, 2),
+(3, 15000, 2, 0, 2, 3),
+(4, 20000, 4, 0, 2, 4),
+(5, 10000, 3, 0, 3, 5),
+(6, 15000, 1, 0, 3, 6),
+(7, 20000, 3, 0, 4, 11),
+(8, 12000, 2, 0, 4, 2),
+(9, 10000, 4, 0, 5, 3),
+(10, 15000, 2, 0, 5, 4);
 SET IDENTITY_INSERT resto.order_menu_detail OFF
 -- SELECT*FROM resto.order_menu_detail;
 

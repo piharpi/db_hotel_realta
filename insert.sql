@@ -2,6 +2,11 @@ USE Hotel_Realta;
 GO
 
 -- DELETE MODULE Purchasing
+DBCC CHECKIDENT ('Purchasing.stocks', RESEED, 1);
+GO
+
+DBCC CHECKIDENT ('Purchasing.purchase_order_header', RESEED, 1);
+GO
 DELETE Purchasing.purchase_order_detail;
 DELETE Purchasing.stock_detail;
 DELETE Purchasing.stock_photo;
@@ -9,12 +14,6 @@ DELETE Purchasing.stocks;
 DELETE Purchasing.purchase_order_header;
 DELETE Purchasing.vendor;
 DELETE Purchasing.cart;
-
-DBCC CHECKIDENT ('Purchasing.stocks', RESEED, 1);
-GO
-
-DBCC CHECKIDENT ('Purchasing.purchase_order_header', RESEED, 1);
-GO
 
 -- DELETE MODULE Payment
 DELETE Payment.payment_transaction;
@@ -47,11 +46,16 @@ DELETE HR.employee;
 DELETE HR.job_role;
 
 -- RESET IDENT MODULE Hotel
-DBCC CHECKIDENT ('Hotel.hotels', RESEED, 0);
-DBCC CHECKIDENT ('Hotel.hotel_reviews', RESEED, 0);
-DBCC CHECKIDENT ('Hotel.facilities', RESEED, 0);
-DBCC CHECKIDENT ('Hotel.facility_photos', RESEED, 0);
-DBCC CHECKIDENT ('Hotel.facility_price_history', RESEED, 0);
+DBCC CHECKIDENT ('Hotel.hotels', RESEED, 1);
+GO
+DBCC CHECKIDENT ('Hotel.hotel_reviews', RESEED, 1);
+GO
+DBCC CHECKIDENT ('Hotel.facilities', RESEED, 1);
+GO
+DBCC CHECKIDENT ('Hotel.facility_photos', RESEED, 1);
+GO
+DBCC CHECKIDENT ('Hotel.facility_price_history', RESEED, 1);
+GO
 
 -- DELETE MODULE Hotel
 DELETE Hotel.hotels;
@@ -368,7 +372,7 @@ VALUES
 ('The Westin Hotel Palembang', 'Hotel bintang 4 dengan fasilitas kelas atas di Palembang', 4, '+62 823 4567 8902', '2022-09-01', 5, 0),
 ('Swiss-Belhotel Palembang', 'Hotel bintang 5 dengan fasilitas mewah di Palembang', 5, '+62 823 1234 5680', NULL, 4, 0)
 
-select * from Hotel.hotels
+-- select * from Hotel.hotels
 
 INSERT INTO Hotel.Facilities (faci_name, faci_description, faci_max_number, faci_measure_unit, 
 faci_room_number, faci_startdate, faci_endate, faci_low_price, faci_high_price, faci_rate_price, 

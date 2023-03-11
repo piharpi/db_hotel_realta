@@ -332,7 +332,7 @@ GO
 -- Author:		Hendri Praminiarto
 -- Create date: 11 March 2023
 -- Description:	TRIGGER Resto Menus
--- =============================================
+-- -- =============================================
 
 CREATE TRIGGER [Resto].[trg_update_order_menus_total_item]
 ON [Resto].[order_menu_detail]
@@ -340,7 +340,7 @@ AFTER INSERT, UPDATE, DELETE
 AS
 BEGIN
 	DECLARE @orme_id int;
-	SET @orme_id = (SELECT DISTINCT omde_orme_id
+	SET @orme_id = (SELECT DISTINCT TOP 1 omde_orme_id
 	FROM inserted);
 	IF @orme_id IS NOT NULL
     BEGIN

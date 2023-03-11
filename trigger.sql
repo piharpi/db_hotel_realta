@@ -328,3 +328,35 @@ BEGIN
 
 END
 GO
+
+
+-- =============================================
+-- Author	  :	Alvan Ganteng 
+-- Create date: 9 Mei 2023
+-- Description:	Trigger to update modified_date into Hotel.Hotels
+--				without using field Hotel_rating_star
+-- =============================================
+
+CREATE OR ALTER TRIGGER Hotel.Hotel_Modified_Date_Automation
+ON Hotel.Hotels
+AFTER UPDATE
+AS
+BEGIN
+  IF UPDATE(hotel_name) 
+	OR UPDATE(hotel_description) 
+	OR UPDATE(hotel_status) 
+	OR UPDATE(hotel_reason_status) 
+	OR UPDATE(hotel_phonenumber) 
+	OR UPDATE(hotel_addr_id) 
+	OR UPDATE(hotel_addr_description) 
+	OR 
+		NOT EXISTS (
+			SELECT * FROM inserted JOIN deleted 
+			ON inserted.hotel_id = deleted.hotel_id 
+			WHERE inserted.hotel_rating_star <> deleted.hotel_rating_star)
+  BEGIN
+    UPDATE Hotel.Hotels
+    SET hotel_modified_date = GETDATE()
+    WHERE hotel_id IN (SELECT hotel_id FROM inserted)
+  END
+END;

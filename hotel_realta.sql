@@ -214,27 +214,6 @@ CREATE TABLE Users.user_password (
 );
 
 --MODULE HOTELS --
-CREATE TABLE Master.address (
-  addr_id int IDENTITY(1, 1),
-  addr_line1 nvarchar(255) NOT NULL,
-  addr_line2 nvarchar(255),
-  addr_postal_code nvarchar(5),
-  addr_spatial_location geography,
-  addr_prov_id int,
-  CONSTRAINT pk_addr_id PRIMARY KEY(addr_id),
-);
-
---insert from master data
-CREATE TABLE Master.category_group (
-  cagro_id int IDENTITY(1, 1),
-  cagro_name nvarchar(25) UNIQUE NOT NULL,
-  cagro_description nvarchar(255),
-  cagro_type nvarchar(25) NOT NULL CHECK (cagro_type IN('category', 'service', 'facility')),
-  cagro_icon nvarchar(255),
-  cagro_icon_url nvarchar(255),
-  CONSTRAINT pk_cagro_id PRIMARY KEY(cagro_id)
-);
-
 -- Create a new table called 'Hotels' in schema 'Hotel'
 -- Drop the table if it already exists
 IF OBJECT_ID('Hotel.Hotels', 'U') IS NOT NULL

@@ -590,6 +590,66 @@ CREATE FUNCTION Payment.fnFormatedTransactionId(@transaction_id INT, @transactio
         RETURN @trx_number;
     END
 GO
+
+-- =============================================
+-- Author:		Harpi
+-- Create date: 8 January 2023
+-- Description:	Store Procedure for transfer booking transaction
+-- =============================================
+CREATE PROCEDURE [Payment].[spTransferBookingTransaction]
+    @source_account AS NVARCHAR(50),
+    @target_account AS NVARCHAR(50),
+    @amount AS MONEY
+    AS
+    BEGIN
+        SET NOCOUNT ON;
+        BEGIN TRY
+            BEGIN TRANSACTION
+                DECLARE @source_usac_type varchar(50);
+                DECLARE @target_usac_type varchar(50);
+                DECLARE @usac_current_saldo AS MONEY;
+
+                -- set value @source_usac_type
+                SELECT @source_usac_type = usac_type, @usac_current_saldo = usac_saldo
+                  FROM Payment.user_accounts
+                 WHERE usac_account_number = @source_account
+
+                -- set value @target_usac_type
+                SELECT @target_usac_type = usac_type
+                  FROM Payment.user_accounts
+                 WHERE usac_account_number = @target_account
+
+                -- top up from user bank account
+                IF (@source_usac_type = 'debet' OR @source_usac_type = 'credit_card' OR @source_usac_type = 'payment')
+                BEGIN
+                    IF @source_usac_type = 'debet' OR @source_usac_type = 'payment'
+                    BEGIN
+                        IF @usac_current_saldo-@amount < 0
+                            ROLLBACK  -- seharusnya ditambahkan ke kolom bayar kurang
+                    END
+
+                    UPDATE Payment.user_accounts
+                       SET usac_saldo = usac_saldo - @amount,
+                           usac_modified_date = GETDATE()
+                     WHERE usac_account_number = @source_account;
+                END
+
+                -- to realta hotel account
+                IF (@target_usac_type = 'debet' AND @target_account = '131-3456-78')
+                BEGIN
+                    UPDATE Payment.user_accounts
+                       SET usac_saldo = usac_saldo + @amount,
+                           usac_modified_date = GETDATE()
+                     WHERE usac_account_number = @target_account;
+                END
+            COMMIT TRANSACTION
+        END TRY
+        BEGIN CATCH
+            ROLLBACK
+        END CATCH
+    END
+GO
+
 -- =============================================
 -- Author:		Harpi
 -- Create date: 8 January 2023

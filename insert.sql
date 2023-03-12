@@ -7,6 +7,7 @@ GO
 
 DBCC CHECKIDENT ('Purchasing.purchase_order_header', RESEED, 1);
 GO
+
 DELETE Purchasing.purchase_order_detail;
 DELETE Purchasing.stock_detail;
 DELETE Purchasing.stock_photo;
@@ -16,6 +17,9 @@ DELETE Purchasing.vendor;
 DELETE Purchasing.cart;
 
 -- DELETE MODULE Payment
+DBCC CHECKIDENT ('Payment.payment_transaction', RESEED, 1);
+GO
+
 DELETE Payment.payment_transaction;
 DELETE Payment.payment_gateway;
 DELETE Payment.entity;
@@ -805,16 +809,16 @@ SET IDENTITY_INSERT Payment.user_accounts ON
 INSERT
   INTO Payment.user_accounts(usac_id, usac_entity_id, usac_user_id, usac_account_number, usac_saldo, usac_type, usac_expmonth, usac_expyear, usac_modified_date)
 VALUES (1, 1, 1, '431-2388-93', 1000000, 'debet', 11, 22, CURRENT_TIMESTAMP),
-       (2, 1, 2, '123-2993-32', 1000000, 'credit_card', 12, 27, CURRENT_TIMESTAMP),
+       (2, 1, 2, '123-2993-32', 0, 'credit_card', 12, 27, CURRENT_TIMESTAMP),
        (3, 3, 3, '131-3456-78', 0, 'debet', 05, 25, CURRENT_TIMESTAMP), -- Hotel Realta Account
        (4, 4, 4, '992-1923-39', 1000000, 'debet', 08, 24, CURRENT_TIMESTAMP),
-       (5, 5, 5, '727-1931-34', 1000000, 'debet', 09, 28, CURRENT_TIMESTAMP),
-       (6, 6, 6, '889-3921-22', 1000000, 'credit_card', 02, 25, CURRENT_TIMESTAMP),
+       (5, 5, 5, '727-1931-34', 0, 'debet', 09, 28, CURRENT_TIMESTAMP),
+       (6, 6, 6, '889-3921-22', 0, 'credit_card', 02, 25, CURRENT_TIMESTAMP),
        (7, 7, 7, '571-2939-23', 1000000, 'debet', 01, 26, CURRENT_TIMESTAMP),
        (8, 8, 8, '11-1111-1111', 500000, 'payment', null, null, CURRENT_TIMESTAMP),
        (9, 9, 9, '0873635251525', 500000, 'payment', null, null, CURRENT_TIMESTAMP),
        (10, 10, 10, '081289389126', 500000, 'payment', null, null, CURRENT_TIMESTAMP),
-       (11, 11, 11, '087363155421', 500000, 'payment', null, null, CURRENT_TIMESTAMP),
+       (11, 11, 4, '087363155421', 500000, 'payment', null, null, CURRENT_TIMESTAMP),
        (12, 12, 12, '087365291212', 500000, 'payment', null, null, CURRENT_TIMESTAMP),
        (13, 13, 13, '081928222364', 500000, 'payment', null, null, CURRENT_TIMESTAMP),
        (14, 14, 14, '089012852546', 500000, 'payment', null, null, CURRENT_TIMESTAMP),
@@ -823,13 +827,23 @@ SET IDENTITY_INSERT Payment.user_accounts OFF
 -- SELECT*FROM payment.user_accounts;
 
 -- payment_transactions
-SET IDENTITY_INSERT Payment.payment_transaction ON
+-- SET IDENTITY_INSERT Payment.payment_transaction ON
+-- DISABLE TRIGGER [Payment].[CalculateUserAccountCredit] ON [Payment].[payment_transaction];
 INSERT
-  INTO Payment.payment_transaction(patr_id, patr_trx_number, patr_debet, patr_credit, patr_type, patr_note, patr_modified_date,
+  INTO Payment.payment_transaction(patr_debet, patr_credit, patr_type, patr_note, patr_modified_date,
                                   patr_order_number, patr_source_id, patr_target_id, patr_trx_number_ref, patr_user_id)
-VALUES (1, 'TRB#20221127-0001', 0, 150000, 'TRB', 'Tranfer Booking', CURRENT_TIMESTAMP, 'BO#20221127-0001', '431-2388-93', '131-3456-78', null, 1),
-       (2, 'TRB#20221127-0002', 0, 150000, 'ORM', 'Order Menu', CURRENT_TIMESTAMP, 'MENUS#20221127-0001', '123-2993-32', '131-3456-78', null, 2);
-SET IDENTITY_INSERT Payment.payment_transaction OFF;
+VALUES (0, 150000, 'TRB', 'Tranfer Booking Note', CURRENT_TIMESTAMP, 'BO#20221127-0001', '431-2388-93', '131-3456-78', null, 1);
+INSERT
+  INTO Payment.payment_transaction(patr_debet, patr_credit, patr_type, patr_note, patr_modified_date,
+                                  patr_order_number, patr_source_id, patr_target_id, patr_trx_number_ref, patr_user_id)
+VALUES (0, 150000, 'ORM', 'Order Menu Note', CURRENT_TIMESTAMP, 'MENUS#20221127-0001', '123-2993-32', '131-3456-78', null, 2);
+INSERT
+  INTO Payment.payment_transaction(patr_debet, patr_credit, patr_type, patr_note, patr_modified_date,
+                                  patr_order_number, patr_source_id, patr_target_id, patr_trx_number_ref, patr_user_id)
+VALUES (0, 150000, 'TP', 'Top Up Note', CURRENT_TIMESTAMP,  NULL, '992-1923-39', '131-3456-78', null, 4);
+
+-- SET IDENTITY_INSERT Payment.payment_transaction OFF;
+-- ENABLE TRIGGER [Payment].CalculateUserAccountCredit ON [Payment].payment_transaction;
 -- SELECT*FROM payment.payment_transaction;
 
 -- PURCHASING INSERT

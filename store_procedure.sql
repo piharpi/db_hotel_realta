@@ -99,6 +99,44 @@ GO
 -- =============================================
 -- Author:		Harpi
 -- Create date: 9 Januari 2023
+-- Description:	Stored procedure for create payment_transaction (UNUSED)
+-- =============================================
+CREATE PROCEDURE Payment.spCreatePaymentTransaction
+	-- Add the parameters for the stored procedure here
+    @debet money
+    ,@credit money
+    ,@type nchar(3)
+    ,@note nvarchar(255)
+    ,@order_number nvarchar(55)
+    ,@source_id nvarchar(55)
+    ,@target_id nvarchar(55)
+    ,@trx_number_ref nvarchar(55)
+    ,@user_id int
+AS
+BEGIN
+    -- Generate transaction number
+    DECLARE @trx_number nvarchar(55);
+    SET @trx_number = CONCAT(TRIM(@type),'#',
+                     CONVERT(varchar, GETDATE(), 12),'-',
+                      RIGHT('0000' + CAST(IDENT_CURRENT('Payment.[payment_transaction]') AS NVARCHAR(4)), 4));
+
+    -- SET NOCOUNT ON added to prevent extra result sets from
+	-- interfering with SELECT statements.
+	SET NOCOUNT ON;
+
+    BEGIN TRANSACTION
+        INSERT INTO [Payment].[payment_transaction](
+                    patr_trx_number, patr_debet, patr_credit, patr_type, patr_note,
+                    patr_order_number, patr_source_id, patr_target_id, patr_trx_number_ref, patr_user_id)
+            VALUES (@trx_number, @debet, @credit, @type, @note, @order_number, @source_id, @target_id, @trx_number_ref, @user_id)
+    COMMIT TRANSACTION
+    -- Insert statements for procedure here
+END
+GO
+
+-- =============================================
+-- Author:		Harpi
+-- Create date: 9 Januari 2023
 -- Description:	Stored procedure for updating payment_transaction 
 -- =============================================
 CREATE PROCEDURE Payment.spUpdatePaymentTransaction 
@@ -542,33 +580,78 @@ begin
 end;
 GO
 
+CREATE FUNCTION Payment.fnFormatedTransactionId(@transaction_id INT, @transaction_type NCHAR(5))
+    RETURNS VARCHAR(55)
+    AS BEGIN
+        DECLARE @trx_number VARCHAR(55);
+        SET @trx_number = CONCAT(TRIM(@transaction_type),'#',
+                      CONVERT(varchar, GETDATE(), 12),'-',
+                        RIGHT('0000' + CAST(@transaction_id AS NVARCHAR(4)), 4));
+        RETURN @trx_number;
+    END
+GO
 -- =============================================
 -- Author:		Harpi
 -- Create date: 8 January 2023
--- Description:	Store Procedure for top up
+-- Description:	Store Procedure for top up transaction
 -- =============================================
-CREATE PROCEDURE Payment.spTopUpTransaction
+CREATE PROCEDURE [Payment].[spTopUpTransaction]
 	-- Add the parameters for the stored procedure here
 	 @source_account As nvarchar(50),
 	 @target_account As nvarchar(50),
-	 @expense As money = 0
+	 @amount As money = 0
 AS
 BEGIN
+    DECLARE @source_usac_type varchar(50);
+    DECLARE @target_usac_type varchar(50);
+    DECLARE @usac_current_saldo AS MONEY;
 	-- SET NOCOUNT ON added to prevent extra result sets from
 	-- interfering with SELECT statements.
 	SET NOCOUNT ON;
 
     -- Insert statements for procedure here
 	-- TOP UP
-	UPDATE Payment.user_accounts
-		 SET usac_saldo = usac_saldo - @expense,
-				 usac_modified_date = GETDATE()
-	 WHERE usac_account_number = @source_account;
+    BEGIN TRY
+        BEGIN TRANSACTION
 
-	UPDATE Payment.user_accounts
-		 SET usac_saldo = usac_saldo + @expense,
-				 usac_modified_date = GETDATE()
-	 WHERE usac_account_number = @target_account;
+            -- set value @source_usac_type
+            SELECT @source_usac_type = usac_type, @usac_current_saldo = usac_saldo
+              FROM Payment.user_accounts
+             WHERE usac_account_number = @source_account
+
+            -- set value @target_usac_type
+            SELECT @target_usac_type = usac_type
+              FROM Payment.user_accounts
+             WHERE usac_account_number = @target_account
+
+            -- top up from user bank account
+            IF (@source_usac_type = 'debet' OR @source_usac_type = 'credit_card')
+            BEGIN
+                IF @source_usac_type = 'debet'
+                BEGIN
+                    IF @usac_current_saldo-@amount < 0
+                        ROLLBACK
+                END
+
+                UPDATE Payment.user_accounts
+                   SET usac_saldo = usac_saldo - @amount,
+                       usac_modified_date = GETDATE()
+                 WHERE usac_account_number = @source_account;
+            END
+
+            -- to fintech
+            IF (@target_usac_type = 'payment')
+            BEGIN
+                UPDATE Payment.user_accounts
+                   SET usac_saldo = usac_saldo + @amount,
+                       usac_modified_date = GETDATE()
+                 WHERE usac_account_number = @target_account;
+            END
+        COMMIT TRANSACTION
+    END TRY
+    BEGIN CATCH
+        ROLLBACK TRANSACTION
+    END CATCH
 END
 GO
 

@@ -234,7 +234,7 @@ VALUES (1,'John Smith', 'T', 'Acme Inc.', 'john.smith@acme.com', '123-456-7890',
 	   (7,'William Thompson', 'T', 'Mno Inc.', 'william.thompson@mno.com', '123-456-7896', GETDATE()),
 	   (8,'Ashley Johnson', 'C', 'Pqr Corp.', 'ashley.johnson@pqr.com', '123-456-7897', GETDATE()),
 	   (9,'David Anderson', 'I', 'Stu Inc.', 'david.anderson@stu.com', '123-456-7898', GETDATE()),
-	   (10,'Jessica Smith', 'T', 'Vwx Corp.', 'jessica.smith@vwx.com', '123-456-7899', GETDATE()),
+	   (10,'Account Realta', 'C', 'Hotel Realta.', 'realta@hotel.com', '033-456-7899', GETDATE()),
 	   (11,'David Brown', 'T', 'Example Co', 'david.brown@example.com', '555-555-1222', GETDATE()),
 	   (12,'Jessica Smith', 'C', 'Test Inc', 'jessica.smith@test.com', '555-555-1223', GETDATE()),
 	   (13,'James Johnson', 'I', 'Acme Inc', 'james.johnson@acme.com', '555-555-1224', GETDATE()),
@@ -286,7 +286,7 @@ VALUES
 (7, 2),
 (8, 3),
 (9, 4),
-(10, 5),
+(10, 2),
 (11, 1),
 (12, 2),
 (13, 3),
@@ -788,7 +788,7 @@ ENABLE TRIGGER [Payment].[InsertBankEntityId] ON [Payment].bank;
 DISABLE TRIGGER [Payment].[InsertPaymentEntityId] ON [Payment].payment_gateway;
 INSERT
   INTO Payment.payment_gateway(paga_entity_id, paga_code, paga_name, paga_modified_date)
-VALUES (8, 'GOPAY', 'PT. Dompet Anak Bangsa', CURRENT_TIMESTAMP),
+VALUES (8, 'GOTO', 'PT. Dompet Anak Bangsa', CURRENT_TIMESTAMP),
        (9, 'OVO', 'PT. Visionet Internasional', CURRENT_TIMESTAMP),
        (10, 'DANA', 'PT. Espay Debit Indonesia', CURRENT_TIMESTAMP),
        (11, 'SHOPEEPAY', 'Shopee', CURRENT_TIMESTAMP),
@@ -800,24 +800,26 @@ ENABLE TRIGGER [Payment].[InsertPaymentEntityId] ON [Payment].payment_gateway;
 
 -- SELECT*FROM payment.payment_gateway;
 
+SET IDENTITY_INSERT Payment.user_accounts ON
 -- user_accounts
 INSERT
-  INTO Payment.user_accounts(usac_entity_id, usac_user_id, usac_account_number, usac_saldo, usac_type, usac_expmonth, usac_expyear, usac_modified_date)
-VALUES (1, 1, '6271263188999', 1000000, 'debet', 11, 22, CURRENT_TIMESTAMP),
-       (2, 2, '8012372737662', 1000000, 'credit card', 12, 27, CURRENT_TIMESTAMP),
-       (3, 3, '9712893896126', 1000000, 'debet', 03, 23, CURRENT_TIMESTAMP),
-       (4, 4, '8129387462674', 1000000, 'debet', 08, 24, CURRENT_TIMESTAMP),
-       (5, 5, '7781236462762', 1000000, 'debet', 09, 28, CURRENT_TIMESTAMP),
-       (6, 6, '1278287363663', 1000000, 'credit card', 02, 25, CURRENT_TIMESTAMP),
-       (7, 7, '6326361273712', 1000000, 'debet', 01, 26, CURRENT_TIMESTAMP),
-       (8, 8, '812327176263', 1000000, 'payment', 0, 0, CURRENT_TIMESTAMP),
-       (9, 9, '827363525152', 1000000, 'payment', 0, 0, CURRENT_TIMESTAMP),
-       (10, 10, '829283525152', 1000000, 'payment', 0, 0, CURRENT_TIMESTAMP),
-       (11, 11, '872363155421', 1000000, 'payment', 0, 0, CURRENT_TIMESTAMP),
-       (12, 12, '873652901212', 1000000, 'payment', 0, 0, CURRENT_TIMESTAMP),
-       (13, 13, '809283222364', 1000000, 'payment', 0, 0, CURRENT_TIMESTAMP),
-       (14, 14, '890128352546', 1000000, 'payment', 0, 0, CURRENT_TIMESTAMP),
-       (15, 15, '856272837172', 1000000, 'payment', 0, 0, CURRENT_TIMESTAMP);
+  INTO Payment.user_accounts(usac_id, usac_entity_id, usac_user_id, usac_account_number, usac_saldo, usac_type, usac_expmonth, usac_expyear, usac_modified_date)
+VALUES (1, 1, 1, '431-2388-93', 1000000, 'debet', 11, 22, CURRENT_TIMESTAMP),
+       (2, 1, 2, '123-2993-32', 1000000, 'credit_card', 12, 27, CURRENT_TIMESTAMP),
+       (3, 3, 3, '131-3456-78', 0, 'debet', 05, 25, CURRENT_TIMESTAMP), -- Hotel Realta Account
+       (4, 4, 4, '992-1923-39', 1000000, 'debet', 08, 24, CURRENT_TIMESTAMP),
+       (5, 5, 5, '727-1931-34', 1000000, 'debet', 09, 28, CURRENT_TIMESTAMP),
+       (6, 6, 6, '889-3921-22', 1000000, 'credit_card', 02, 25, CURRENT_TIMESTAMP),
+       (7, 7, 7, '571-2939-23', 1000000, 'debet', 01, 26, CURRENT_TIMESTAMP),
+       (8, 8, 8, '11-1111-1111', 500000, 'payment', null, null, CURRENT_TIMESTAMP),
+       (9, 9, 9, '0873635251525', 500000, 'payment', null, null, CURRENT_TIMESTAMP),
+       (10, 10, 10, '081289389126', 500000, 'payment', null, null, CURRENT_TIMESTAMP),
+       (11, 11, 11, '087363155421', 500000, 'payment', null, null, CURRENT_TIMESTAMP),
+       (12, 12, 12, '087365291212', 500000, 'payment', null, null, CURRENT_TIMESTAMP),
+       (13, 13, 13, '081928222364', 500000, 'payment', null, null, CURRENT_TIMESTAMP),
+       (14, 14, 14, '089012852546', 500000, 'payment', null, null, CURRENT_TIMESTAMP),
+       (15, 15, 15, '085627287172', 500000, 'payment', null, null, CURRENT_TIMESTAMP);
+SET IDENTITY_INSERT Payment.user_accounts OFF
 -- SELECT*FROM payment.user_accounts;
 
 -- payment_transactions
@@ -825,8 +827,8 @@ SET IDENTITY_INSERT Payment.payment_transaction ON
 INSERT
   INTO Payment.payment_transaction(patr_id, patr_trx_number, patr_debet, patr_credit, patr_type, patr_note, patr_modified_date,
                                   patr_order_number, patr_source_id, patr_target_id, patr_trx_number_ref, patr_user_id)
-VALUES (1, 'TRB#20221127-0001', 150000, 150000, 'TRB', 'Tranfer Booking', CURRENT_TIMESTAMP, 'BO#20221127-0001', '6271263188999', '8012372737662', 'TRB#20221127-0001', 1),
-       (2, 'TRB#20221127-0002', 150000, 150000, 'ORM', 'Order Menu', CURRENT_TIMESTAMP, 'MENUS#20221127-0001', '8012372737662', '6271263188999', 'TRB#20221127-0002', 2);
+VALUES (1, 'TRB#20221127-0001', 0, 150000, 'TRB', 'Tranfer Booking', CURRENT_TIMESTAMP, 'BO#20221127-0001', '431-2388-93', '131-3456-78', null, 1),
+       (2, 'TRB#20221127-0002', 0, 150000, 'ORM', 'Order Menu', CURRENT_TIMESTAMP, 'MENUS#20221127-0001', '123-2993-32', '131-3456-78', null, 2);
 SET IDENTITY_INSERT Payment.payment_transaction OFF;
 -- SELECT*FROM payment.payment_transaction;
 

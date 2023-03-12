@@ -677,7 +677,7 @@ CREATE TABLE Payment.payment_transaction(
 	patr_type nchar(3) NOT NULL,
 	patr_note nvarchar(255),
 	patr_modified_date datetime,
-	patr_order_number nvarchar(55),
+	patr_order_number nvarchar(55) NULL,
 	patr_source_id varchar(25),
 	patr_target_id varchar(25),
 	patr_trx_number_ref nvarchar(55) NULL,

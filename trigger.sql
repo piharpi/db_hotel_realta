@@ -224,69 +224,94 @@ GO
 -- =============================================
 CREATE TRIGGER [Payment].[CalculateUserAccountCredit]
    ON  [Payment].[payment_transaction]
-   AFTER INSERT
+    INSTEAD OF INSERT
 AS
 BEGIN
 	-- SET NOCOUNT ON added to prevent extra result sets from
 	-- interfering with SELECT statements.
 	SET NOCOUNT ON
-		DECLARE @tar_account As nvarchar(50)
-		DECLARE @src_account As nvarchar(50)
-		DECLARE @transaction_type As nvarchar(10)
-		DECLARE @xpse As Money
 
-		SELECT @src_account = patr_source_id FROM inserted;
-		SELECT @tar_account = patr_target_id FROM inserted;
-		SELECT @transaction_type = patr_type FROM inserted;
-		SELECT @xpse = (patr_credit + patr_debet) FROM inserted
+    DECLARE @tar_account As NVARCHAR(50)
+    DECLARE @src_account As NVARCHAR(50)
+    DECLARE @transaction_type As NVARCHAR(10)
+    DECLARE @credit AS MONEY
+    DECLARE @debet AS MONEY
+    DECLARE @src_user_id AS INT
+    DECLARE @tar_user_id AS INT
+    DECLARE @transaction_note AS NVARCHAR(MAX)
 
-    -- Insert statements for trigger here
-		-- TOP UP
+    -- filling variable
+    SELECT @src_account = patr_source_id,
+           @tar_account = patr_target_id,
+           @src_user_id = patr_user_id,
+           @transaction_type = patr_type,
+           @transaction_note = patr_note,
+           @credit = patr_credit,
+           @debet = patr_debet
+      FROM inserted;
+
+-- 		TOP UP
 		IF @transaction_type = 'TP'
 		BEGIN
+          INSERT INTO [Payment].[payment_transaction](
+                        patr_trx_number, patr_debet, patr_credit, patr_type, patr_note,
+                        patr_order_number, patr_source_id, patr_target_id, patr_trx_number_ref, patr_user_id)
+                VALUES (Payment.fnFormatedTransactionId(IDENT_CURRENT('Payment.[payment_transaction]'), @transaction_type), 0, @credit,'TP',@transaction_note, null,@src_account, @tar_account, null, @src_user_id);
+
 			EXECUTE [Payment].[spTopUpTransaction]
-				 @source_account = @src_account
-				,@target_account = @tar_account
-				,@expense = @xpse
+				 @src_account
+				,@tar_account
+				,@credit
+
+          SELECT @tar_user_id = usac_user_id
+            FROM Payment.user_accounts
+           WHERE usac_account_number = @tar_account;
+
+           INSERT INTO [Payment].[payment_transaction](
+                        patr_trx_number, patr_debet, patr_credit, patr_type, patr_note,
+                        patr_order_number, patr_source_id, patr_target_id, patr_trx_number_ref, patr_user_id)
+                VALUES (Payment.fnFormatedTransactionId(IDENT_CURRENT('Payment.[payment_transaction]'), @transaction_type), @credit, 0, 'TP', @transaction_note, null, @src_account, @tar_account, null, @tar_user_id);
 		END
+
+
 
 		-- TRANSFER BOOKING
-		IF @transaction_type = 'TRB'
-		BEGIN
-			EXECUTE [Payment].[spTopUpTransaction]
-				 @source_account = @src_account
-				,@target_account = @tar_account
-				,@expense = @xpse
-		END
+-- 		IF @transaction_type = 'TRB'
+-- 		BEGIN
+-- 			EXECUTE [Payment].[spTopUpTransaction]
+-- 				 @source_account = @src_account
+-- 				,@target_account = @tar_account
+-- 				,@expense = @amount
+-- 		END
 
 		-- REPAYMENT
-		IF @transaction_type = 'RPY'
-		BEGIN
-			EXECUTE [Payment].[spTopUpTransaction]
-				 @source_account = @src_account
-				,@target_account = @tar_account
-				,@expense = @xpse
-		END
+-- 		IF @transaction_type = 'RPY'
+-- 		BEGIN
+-- 			EXECUTE [Payment].[spTopUpTransaction]
+-- 				 @source_account = @src_account
+-- 				,@target_account = @tar_account
+-- 				,@expense = @amount
+-- 		END
 
 		-- REFUND
-		IF @transaction_type = 'RF'
-		BEGIN
-			EXECUTE [Payment].[spTopUpTransaction]
-				 @source_account = @tar_account
-				,@target_account = @src_account
-				,@expense =  @xpse
-		END
+-- 		IF @transaction_type = 'RF'
+-- 		BEGIN
+-- 			EXECUTE [Payment].[spTopUpTransaction]
+-- 				 @source_account = @tar_account
+-- 				,@target_account = @src_account
+-- 				,@expense =  @amount
+-- 		END
 
 		-- ORDER MENU
-		IF @transaction_type = 'ORM'
-		BEGIN
-			EXECUTE [Payment].[spTopUpTransaction]
-				 @source_account = @src_account
-				,@target_account = @tar_account
-				,@expense = @xpse
-		END
+-- 		IF @transaction_type = 'ORM'
+-- 		BEGIN
+-- 			EXECUTE [Payment].[spTopUpTransaction]
+-- 				 @source_account = @src_account
+-- 				,@target_account = @tar_account
+-- 				,@expense = @amount
+-- 		END
 
-		SELECT patr_id FROM inserted;
+-- 		SELECT patr_id FROM inserted;
 END
 GO
 

@@ -648,6 +648,7 @@ CREATE TABLE Payment.payment_gateway(
 );
 
 CREATE TABLE Payment.user_accounts(
+    usac_id int identity(1,1),
 	usac_entity_id int NOT NULL,
 	usac_user_id int NOT NULL,
 	usac_account_number varchar(25) UNIQUE NOT NULL,
@@ -656,8 +657,8 @@ CREATE TABLE Payment.user_accounts(
 	usac_expmonth tinyint DEFAULT NULL,
 	usac_expyear smallint DEFAULT NULL,
 	usac_modified_date datetime,
-	CONSTRAINT CK_PaymentUserAccountsType CHECK (usac_type IN ('debet', 'credit card', 'payment')),
-	CONSTRAINT PK_PaymentUserAccountsEntityId PRIMARY KEY(usac_entity_id, usac_user_id),
+	CONSTRAINT CK_PaymentUserAccountsType CHECK (usac_type IN ('debet', 'credit_card', 'payment')),
+	CONSTRAINT PK_PaymentUserAccountsEntityId PRIMARY KEY(usac_user_id, usac_id),
 	CONSTRAINT FK_PaymentUserAccountsEntityPaymentGateway_Bank FOREIGN KEY(usac_entity_id)
 		REFERENCES Payment.Entity(entity_id)
 		ON UPDATE CASCADE
@@ -669,7 +670,7 @@ CREATE TABLE Payment.user_accounts(
 );
 
 CREATE TABLE Payment.payment_transaction(
-  patr_id int IDENTITY(1,1) PRIMARY KEY,
+    patr_id int IDENTITY(1,1) PRIMARY KEY,
 	patr_trx_number nvarchar(55) UNIQUE,
 	patr_debet money,
 	patr_credit money,

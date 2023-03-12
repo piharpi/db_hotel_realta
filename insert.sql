@@ -231,14 +231,14 @@ SET IDENTITY_INSERT Users.users ON;
 INSERT INTO users.users (user_id, user_full_name, user_type, user_company_name, user_email, user_phone_number, user_modified_date)
 VALUES (1,'John Smith', 'T', 'Acme Inc.', 'john.smith@acme.com', '123-456-7890', GETDATE()),
 	   (2,'Jane Doe', 'C', 'XYZ Corp.', 'jane.doe@xyz.com', '123-456-7891', GETDATE()),
-	   (3,'Bob Johnson', 'I', 'ABC Inc.', 'bob.johnson@abc.com', '123-456-7892', GETDATE()),
+	   (3,'Account Realta', 'C', 'Hotel Realta.', 'realta@hotel.com', '033-456-7899', GETDATE()),
 	   (4,'Samantha Williams', 'T', 'Def Corp.', 'samantha.williams@def.com', '123-456-7893', GETDATE()),
 	   (5,'Michael Brown', 'C', 'Ghi Inc.', 'michael.brown@ghi.com', '123-456-7894', GETDATE()),
 	   (6,'Emily Davis', 'I', 'Jkl Ltd.', 'emily.davis@jkl.com', '123-456-7895', GETDATE()),
 	   (7,'William Thompson', 'T', 'Mno Inc.', 'william.thompson@mno.com', '123-456-7896', GETDATE()),
 	   (8,'Ashley Johnson', 'C', 'Pqr Corp.', 'ashley.johnson@pqr.com', '123-456-7897', GETDATE()),
 	   (9,'David Anderson', 'I', 'Stu Inc.', 'david.anderson@stu.com', '123-456-7898', GETDATE()),
-	   (10,'Account Realta', 'C', 'Hotel Realta.', 'realta@hotel.com', '033-456-7899', GETDATE()),
+	   (10,'Bob Johnson', 'I', 'ABC Inc.', 'bob.johnson@abc.com', '123-456-7892', GETDATE()),
 	   (11,'David Brown', 'T', 'Example Co', 'david.brown@example.com', '555-555-1222', GETDATE()),
 	   (12,'Jessica Smith', 'C', 'Test Inc', 'jessica.smith@test.com', '555-555-1223', GETDATE()),
 	   (13,'James Johnson', 'I', 'Acme Inc', 'james.johnson@acme.com', '555-555-1224', GETDATE()),
@@ -832,15 +832,15 @@ SET IDENTITY_INSERT Payment.user_accounts OFF
 INSERT
   INTO Payment.payment_transaction(patr_debet, patr_credit, patr_type, patr_note, patr_modified_date,
                                   patr_order_number, patr_source_id, patr_target_id, patr_trx_number_ref, patr_user_id)
-VALUES (0, 150000, 'TRB', 'Tranfer Booking Note', CURRENT_TIMESTAMP, 'BO#20221127-0001', '431-2388-93', '131-3456-78', null, 1);
+VALUES (0, 769999, 'TRB', 'Tranfer Booking Note', CURRENT_TIMESTAMP, 'BO#20221127-0001', '431-2388-93', '131-3456-78', null, 1);
 INSERT
   INTO Payment.payment_transaction(patr_debet, patr_credit, patr_type, patr_note, patr_modified_date,
                                   patr_order_number, patr_source_id, patr_target_id, patr_trx_number_ref, patr_user_id)
-VALUES (0, 150000, 'ORM', 'Order Menu Note', CURRENT_TIMESTAMP, 'MENUS#20221127-0001', '123-2993-32', '131-3456-78', null, 2);
+VALUES (0, 93000, 'ORM', 'Order Menu Note', CURRENT_TIMESTAMP, 'MENUS#20221127-0001', '123-2993-32', '131-3456-78', null, 2);
 INSERT
   INTO Payment.payment_transaction(patr_debet, patr_credit, patr_type, patr_note, patr_modified_date,
                                   patr_order_number, patr_source_id, patr_target_id, patr_trx_number_ref, patr_user_id)
-VALUES (0, 150000, 'TP', 'Top Up Note', CURRENT_TIMESTAMP,  NULL, '992-1923-39', '131-3456-78', null, 4);
+VALUES (0, 235000, 'TP', 'Top Up Note', CURRENT_TIMESTAMP,  null, '992-1923-39', '087363155421', null, 4);
 
 -- SET IDENTITY_INSERT Payment.payment_transaction OFF;
 -- ENABLE TRIGGER [Payment].CalculateUserAccountCredit ON [Payment].payment_transaction;

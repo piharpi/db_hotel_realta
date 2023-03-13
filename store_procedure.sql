@@ -979,3 +979,124 @@ BEGIN
     END CATCH
 END
 GO
+
+-- =============================================
+-- Author:		Eri
+-- Create date: 13 March 2023
+-- Description:	Store Procedure Update Profile
+-- =============================================
+
+CREATE PROCEDURE [users].[SpUpdateProfile]
+(
+    @user_id int,
+    @user_full_name nvarchar(55),
+    @user_type nvarchar(15),
+    @user_phone_number nvarchar(25),
+    @user_email nvarchar(256),
+    @user_company_name nvarchar(255),
+    @uspro_national_id nvarchar(20),
+    @uspro_birth_date date,
+    @uspro_job_title nvarchar(50),
+    @uspro_marital_status nchar(1),
+    @uspro_gender nchar(1)
+)
+AS
+BEGIN
+    SET NOCOUNT ON;
+    BEGIN TRANSACTION;
+
+    UPDATE Users.users
+    SET 
+        user_full_name = @user_full_name,
+        user_type = @user_type,
+        user_phone_number = @user_phone_number,
+        user_email = @user_email,
+        user_company_name = @user_company_name,
+        user_modified_date = GETDATE()
+    WHERE user_id = @user_id;
+
+    UPDATE Users.user_profiles
+    SET
+        uspro_national_id = @uspro_national_id,
+        uspro_birth_date = @uspro_birth_date,
+        uspro_job_title = @uspro_job_title,
+        uspro_marital_status = @uspro_marital_status,
+        uspro_gender = @uspro_gender
+    WHERE uspro_user_id = @user_id;
+
+    COMMIT;
+END
+
+-- =============================================
+-- Author:		Eri
+-- Create date: 13 March 2023
+-- Description:	Store Procedure SignIn
+-- =============================================
+
+CREATE PROCEDURE [users].[SignIn]
+    @userEmail NVARCHAR(256),
+    @userPassword NVARCHAR(50),
+    @responseMessage NVARCHAR(250)='' OUTPUT
+AS
+BEGIN
+
+    SET NOCOUNT ON
+
+    DECLARE @userID INT
+
+	SET @userID = (select a.user_id FROM users.users a
+	JOIN users.user_password b
+	ON a.user_id=b.uspa_user_id
+	WHERE a.user_email=@userEmail
+	AND b.uspa_passwordHash=HASHBYTES('SHA2_512', @userPassword+b.uspa_passwordSalt))
+
+	IF(@userID IS NOT NULL)
+    BEGIN
+		SET @responseMessage='Login Success'
+    END
+    ELSE
+        SET @responseMessage='Authentication Invalid'
+
+END
+
+-- =============================================
+-- Author:		Eri
+-- Create date: 13 March 2023
+-- Description:	Store Procedure SignUp
+-- =============================================
+
+CREATE PROCEDURE [users].[SignUp]
+    @userName NVARCHAR(50), 
+	@userEmail NVARCHAR(256),
+    @userPassword NVARCHAR(50),
+	@userPhoneNumber NVARCHAR(25),
+    @responseMessage NVARCHAR(250) OUTPUT
+AS
+BEGIN
+    SET NOCOUNT ON
+
+    DECLARE @salt UNIQUEIDENTIFIER=NEWID()
+    BEGIN TRY
+        INSERT INTO users.[Users] (user_full_name, user_email, user_phone_number)
+		VALUES(@userName, @userEmail, @userPhoneNumber)
+
+		DECLARE @userID INT
+
+    SET @userID =(SELECT TOP 1 user_id FROM [users].[Users] WHERE user_email=@userEmail)
+	IF(@userID IS NOT NULL)
+    BEGIN
+		SET IDENTITY_INSERT users.user_password ON;
+        INSERT INTO users.[user_password] (uspa_user_id, uspa_passwordHash, uspa_passwordSalt)
+        VALUES(@userID, HASHBYTES('SHA2_512', @userPassword+'1234567890'), '1234567890')
+		SET IDENTITY_INSERT users.user_password OFF;
+		SET @responseMessage='Success'
+    END
+    ELSE
+        SET @responseMessage='Failed'
+
+    END TRY
+    BEGIN CATCH
+        SET @responseMessage=ERROR_MESSAGE() 
+    END CATCH
+
+END

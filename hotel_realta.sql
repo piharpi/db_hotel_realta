@@ -134,7 +134,7 @@ CREATE TABLE Master.members (
 CREATE TABLE Users.users (
   user_id int IDENTITY(1,1) NOT NULL,
   user_full_name nvarchar (55) DEFAULT 'guest' NOT NULL,
-  user_type nvarchar (15) CHECK(user_type IN('T','C','I')),
+  user_type nvarchar (15) CHECK(user_type IN('T','C','I','E')),
   user_company_name nvarchar (255),
   user_email nvarchar(256),
   user_phone_number nvarchar (25) UNIQUE NOT NULL,
@@ -144,7 +144,7 @@ CREATE TABLE Users.users (
 
 CREATE TABLE Users.user_members (
   usme_user_id int,
-  usme_memb_name nvarchar(15) CHECK(usme_memb_name IN('Silver','Gold','VIP','Wizard')),
+  usme_memb_name nvarchar(15) CHECK(usme_memb_name IN('SILVER','GOLD','VIP','WIZARD')),
   usme_promote_date datetime,
   usme_points smallint,
   usme_type nvarchar(15) DEFAULT 'Expired',

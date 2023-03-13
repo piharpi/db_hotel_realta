@@ -466,7 +466,7 @@ CREATE TABLE Booking.booking_orders(
 	boor_total_ammount MONEY, -- sum(borde_subtotal)
 	boor_down_payment MONEY, -- on update
 	boor_pay_type NCHAR(2) NOT NULL, CHECK(boor_pay_type IN ('CR', 'C', 'D', 'PG')),
-	boor_is_paid NCHAR(2) NOT NULL CHECK (boor_is_paid IN ('DP','P','R', 'U')),
+	boor_is_paid NCHAR(2) NOT NULL CHECK (boor_is_paid IN ('DP','P','R')),
 	boor_type NVARCHAR(15) NOT NULL CHECK (boor_type IN ('T','C','I')),
 	boor_cardnumber NVARCHAR(25), -- on insert on update
 	boor_member_type NVARCHAR(15), -- ambil dari usme_memb_name(fk user_id)
@@ -672,8 +672,8 @@ CREATE TABLE Payment.user_accounts(
 CREATE TABLE Payment.payment_transaction(
     patr_id int IDENTITY(1,1) PRIMARY KEY,
 	patr_trx_number nvarchar(55) UNIQUE,
-	patr_debet money default(0) not null,
-	patr_credit money default(0) not null,
+	patr_debet money default(0),
+	patr_credit money default(0),
 	patr_type nchar(3) NOT NULL,
 	patr_note nvarchar(255),
 	patr_modified_date datetime DEFAULT(GETDATE()),

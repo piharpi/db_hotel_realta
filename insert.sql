@@ -647,15 +647,13 @@ VALUES (1, 1, 1),
        (5, 5, 5),
        (6, 6, 6),
        (7, 7, 7),
-       (8, 8, 8),
-       (9, 9, 9),
-       (10, 10, 1)
+       (8, 8, 8)
 SET IDENTITY_INSERT Booking.special_offer_coupons OFF
 -- SELECT*FROM Booking.special_offer_coupons
 
 INSERT INTO Booking.user_breakfast (usbr_borde_id, usbr_modified_date, usbr_total_vacant)
 VALUES
-    (1, '2022-11-27',1),
+    (1,'2022-11-27',1),
     (2,'2022-11-27',  2),
     (3,'2022-11-27',  3),
     (4,'2022-11-27',  2),

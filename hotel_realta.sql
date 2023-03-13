@@ -678,8 +678,8 @@ CREATE TABLE Payment.payment_transaction(
 	patr_note nvarchar(255),
 	patr_modified_date datetime DEFAULT(GETDATE()),
 	patr_order_number nvarchar(55) NULL,
-	patr_source_id varchar(25),
-	patr_target_id varchar(25),
+	patr_source_id varchar(25) NULL,
+	patr_target_id varchar(25) NULL,
 	patr_trx_number_ref nvarchar(55) NULL,
 	patr_user_id int,
 	CONSTRAINT CK_PaymentPaymentTransactionType CHECK (patr_type IN ('TP', 'TRB', 'RPY', 'RF', 'ORM')),
@@ -693,9 +693,9 @@ CREATE TABLE Payment.payment_transaction(
 		REFERENCES Payment.User_Accounts(usac_account_number)
 );
 
-CREATE UNIQUE INDEX UQ_PaymentTransaction_patr_trx_number_ref
-  ON Payment.payment_transaction(patr_trx_number_ref)
-  WHERE patr_trx_number_ref IS NOT NULL
+-- CREATE UNIQUE INDEX UQ_PaymentTransaction_patr_trx_number_ref
+--   ON Payment.payment_transaction(patr_trx_number_ref)
+--   WHERE patr_trx_number_ref IS NOT NULL
 
 -- MODULE PURCHASING --
 CREATE TABLE purchasing.vendor(

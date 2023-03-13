@@ -466,7 +466,7 @@ CREATE TABLE Booking.booking_orders(
 	boor_total_ammount MONEY, -- sum(borde_subtotal)
 	boor_down_payment MONEY, -- on update
 	boor_pay_type NCHAR(2) NOT NULL, CHECK(boor_pay_type IN ('CR', 'C', 'D', 'PG')),
-	boor_is_paid NCHAR(2) NOT NULL CHECK (boor_is_paid IN ('DP','P','R ')),
+	boor_is_paid NCHAR(2) NOT NULL CHECK (boor_is_paid IN ('DP','P','R', 'U')),
 	boor_type NVARCHAR(15) NOT NULL CHECK (boor_type IN ('T','C','I')),
 	boor_cardnumber NVARCHAR(25), -- on insert on update
 	boor_member_type NVARCHAR(15), -- ambil dari usme_memb_name(fk user_id)

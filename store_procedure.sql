@@ -589,7 +589,7 @@ CREATE FUNCTION Payment.fnGetUserBalance(@user_id INT)
     RETURNS TABLE
     AS
         RETURN
-            SELECT usac_type, usac_account_number, usac_saldo
+            SELECT usac_user_id, usac_type, usac_account_number, usac_saldo
               FROM Payment.user_accounts
              WHERE usac_user_id = @user_id
 ;

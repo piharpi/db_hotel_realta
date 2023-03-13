@@ -359,13 +359,14 @@ CREATE TABLE HR.department (
 CREATE TABLE HR.employee (
 	emp_id int IDENTITY(1,1) NOT NULL,
 	emp_national_id nvarchar(25) NOT NULL,
+	emp_full_name nvarchar(50) NOT NULL,
 	emp_birth_date datetime NOT NULL,
 	emp_marital_status nchar(1) NOT NULL,
 	emp_gender nchar(1) NOT NULL,
 	emp_hire_date datetime NOT NULL,
 	emp_salaried_flag nchar(1) NOT NULL,
 	emp_vacation_hours int,
-	emp_sickleave_hourse int,
+	emp_sickleave_hours int,
 	emp_current_flag int,
 	emp_emp_id int,
 	emp_photo nvarchar(255),
@@ -373,8 +374,8 @@ CREATE TABLE HR.employee (
 	emp_joro_id int NOT NULL,
 	CONSTRAINT pk_emp_id PRIMARY KEY (emp_id),
 	CONSTRAINT uq_emp_national_id UNIQUE (emp_national_id),
-	CONSTRAINT fk_emp_joro_id FOREIGN KEY (emp_joro_id) REFERENCES HR.job_role(joro_id) ON DELETE CASCADE ON UPDATE CASCADE,
-	CONSTRAINT fk_emp_id FOREIGN KEY (emp_emp_id) REFERENCES hr.employee(emp_id)
+	CONSTRAINT fk_emp_joro_id FOREIGN KEY (emp_joro_id) REFERENCES HR.job_role(joro_id) ON UPDATE CASCADE ON DELETE CASCADE,
+	CONSTRAINT fk_emp_emp_id FOREIGN KEY (emp_emp_id) REFERENCES HR.employee(emp_id)
 );
 
 CREATE TABLE HR.employee_pay_history (
@@ -384,18 +385,7 @@ CREATE TABLE HR.employee_pay_history (
 	ephi_pay_frequence int,
 	ephi_modified_date datetime,
 	CONSTRAINT pk_ephi_emp_id_ephi_rate_change_date PRIMARY KEY(ephi_emp_id, ephi_rate_change_date),
-	CONSTRAINT fk_ephi_emp_id FOREIGN KEY(ephi_emp_id) REFERENCES HR.employee(emp_id) ON DELETE CASCADE ON UPDATE CASCADE
-);
-
-CREATE TABLE HR.shift(
-	shift_id int IDENTITY(1,1),
-	shift_name nvarchar(25) NOT NULL,
-	shift_start_time datetime NOT NULL,
-	shift_end_time datetime NOT NULL,
-	CONSTRAINT pk_shift_id PRIMARY KEY(shift_id),
-	CONSTRAINT uq_shift_name UNIQUE (shift_name),
-	CONSTRAINT uq_shift_start_time UNIQUE (shift_start_time),
-	CONSTRAINT uq_shift_end_time UNIQUE (shift_end_time)
+	CONSTRAINT fk_ephi_emp_id FOREIGN KEY(ephi_emp_id) REFERENCES HR.employee(emp_id) ON UPDATE CASCADE ON DELETE CASCADE
 );
 
 CREATE TABLE HR.employee_department_history (
@@ -405,11 +395,19 @@ CREATE TABLE HR.employee_department_history (
 	edhi_end_date datetime,
 	edhi_modified_date datetime,
 	edhi_dept_id int NOT NULL,
-	edhi_shift_id int NOT NULL,
-	CONSTRAINT pk_edhi_id_edhi_emp_id PRIMARY KEY (edhi_id, edhi_emp_id),
+	CONSTRAINT pk_edhi_id PRIMARY KEY (edhi_id),
 	CONSTRAINT fk_edhi_emp_id FOREIGN KEY(edhi_emp_id) REFERENCES HR.employee(emp_id) ON DELETE CASCADE ON UPDATE CASCADE,
-	CONSTRAINT fk_shift_id FOREIGN KEY (edhi_shift_id) REFERENCES HR.shift(shift_id) ON DELETE CASCADE ON UPDATE CASCADE,
 	CONSTRAINT fk_edhi_dept_id FOREIGN KEY (edhi_dept_id) REFERENCES HR.department(dept_id) ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+CREATE TABLE HR.shift(
+	shift_id int IDENTITY(1,1),
+	shift_name nvarchar(25) NOT NULL,
+	shift_start_time datetime NOT NULL,
+	shift_end_time datetime NOT NULL,
+	shift_edhi_id int NOT NULL,
+	CONSTRAINT pk_shift_id PRIMARY KEY(shift_id),
+	CONSTRAINT fk_edhi_id FOREIGN KEY (shift_edhi_id) REFERENCES HR.employee_department_history(edhi_id) ON DELETE CASCADE ON UPDATE CASCADE,
 );
 
 CREATE TABLE HR.work_orders (
@@ -419,7 +417,7 @@ CREATE TABLE HR.work_orders (
 	woro_user_id int,
 	CONSTRAINT pk_woro_id PRIMARY KEY(woro_id),
 	CONSTRAINT fk_woro_user_id FOREIGN KEY(woro_user_id) REFERENCES Users.users(user_id)
-)
+);
 
 CREATE TABLE HR.work_order_detail (
 	wode_id int IDENTITY(1,1),
@@ -433,8 +431,8 @@ CREATE TABLE HR.work_order_detail (
 	wode_faci_id int,
 	wode_woro_id int,
 	CONSTRAINT pk_wode_id PRIMARY KEY(wode_id),
-	CONSTRAINT fk_woro_wode_id FOREIGN KEY(wode_woro_id) REFERENCES HR.work_orders(woro_id),
-	CONSTRAINT fk_wode_emp_id FOREIGN KEY(wode_emp_id) REFERENCES HR.employee(emp_id), 
+	CONSTRAINT fk_woro_wode_id FOREIGN KEY(wode_woro_id) REFERENCES HR.work_orders(woro_id) ON DELETE CASCADE ON UPDATE CASCADE,
+	CONSTRAINT fk_wode_emp_id FOREIGN KEY(wode_emp_id) REFERENCES HR.employee(emp_id) ON DELETE SET NULL ON UPDATE CASCADE, 
 	CONSTRAINT fk_wode_seta_id FOREIGN KEY(wode_seta_id) REFERENCES Master.service_task(seta_id), 
 	CONSTRAINT fk_faci_id FOREIGN KEY(wode_faci_id) REFERENCES Hotel.facilities(faci_id)
 );

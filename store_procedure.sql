@@ -580,6 +580,11 @@ begin
 end;
 GO
 
+-- =============================================
+-- Author:		Harpi
+-- Create date: 13 Februari 2023
+-- Description:	User Defined Function, getUserBalance
+-- =============================================
 CREATE FUNCTION Payment.fnGetUserBalance(@user_id INT)
     RETURNS TABLE
     AS
@@ -590,6 +595,11 @@ CREATE FUNCTION Payment.fnGetUserBalance(@user_id INT)
 ;
 GO
 
+-- =============================================
+-- Author:		Harpi
+-- Create date: 13 Februari 2023
+-- Description:	User defined function, formattedIdTransaction
+-- =============================================
 CREATE FUNCTION Payment.fnFormatedTransactionId(@transaction_id INT, @transaction_type NCHAR(5))
     RETURNS VARCHAR(55)
     AS BEGIN
@@ -598,6 +608,69 @@ CREATE FUNCTION Payment.fnFormatedTransactionId(@transaction_id INT, @transactio
                       CONVERT(varchar, GETDATE(), 12),'-',
                         RIGHT('0000' + CAST(@transaction_id AS NVARCHAR(4)), 4));
         RETURN @trx_number;
+    END
+GO
+
+-- =============================================
+-- Author:		Harpi
+-- Create date: 13 Februari 2023
+-- Description:	User defined function, fnRefundAmount
+-- =============================================
+CREATE FUNCTION Payment.fnRefundAmount(@amount MONEY, @percentage FLOAT = 50.0)
+    RETURNS MONEY
+    BEGIN
+        DECLARE @refund_amount MONEY
+        DECLARE @refund_percentage FLOAT
+
+        SET @refund_percentage = @percentage / 100.0;
+        SET @refund_amount = @amount * @refund_percentage;
+
+        RETURN @refund_amount
+    END
+GO
+
+-- =============================================
+-- Author:		Harpi
+-- Create date: 13 Februari 2023
+-- Description:	Store Procedure for refund transfer
+-- =============================================
+CREATE PROCEDURE [Payment].[spRefundTransaction]
+    @trx_number_ref AS VARCHAR(50)
+    AS
+    BEGIN
+        BEGIN TRY
+            BEGIN TRANSACTION
+                DECLARE @source_account VARCHAR(55);
+                DECLARE @target_account VARCHAR(55);
+                DECLARE @refund_amount MONEY;
+                DECLARE @refund_age INT;
+
+                SET @source_account = '131-3456-78';
+
+                SELECT @refund_amount = Payment.fnRefundAmount((patr_credit + patr_debet), default),
+                       @refund_age = DATEDIFF(day, patr_modified_date, GETDATE()),
+                       @target_account = patr_source_id
+                FROM Payment.payment_transaction
+                WHERE patr_trx_number = @trx_number_ref
+
+--                 IF (@refund_amount > 0.0 AND @refund_age < 7)
+--                 BEGIN
+                    -- refund from realta bank account
+                    UPDATE Payment.user_accounts
+                       SET usac_saldo = usac_saldo - @refund_amount,
+                           usac_modified_date = GETDATE()
+                     WHERE usac_account_number = @source_account;
+
+                    -- to customer user account
+                    UPDATE Payment.user_accounts
+                       SET usac_saldo = usac_saldo + @refund_amount,
+                           usac_modified_date = GETDATE()
+                     WHERE usac_account_number = @target_account;
+--                 END
+            COMMIT TRANSACTION
+        END TRY
+        BEGIN CATCH
+        END CATCH
     END
 GO
 

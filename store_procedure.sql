@@ -979,3 +979,143 @@ BEGIN
     END CATCH
 END
 GO
+
+
+-- =============================================
+-- Author:		Ericson
+-- Create date: 11 March 2023
+-- Description:	Store Procedure update employee group
+-- =============================================
+create procedure hr.spUpdateEmployeeGroup
+(
+	@listShift [HR].[ShiftList] READONLY,
+	--employee
+	@EmpId int,
+	@EmpNationalId nvarchar(50),
+	@EmpFullName nvarchar(100),
+	@EmpBirthDate datetime,
+	@EmpMaritalStatus char(1),
+	@EmpGender nchar(1),
+	@EmpHireDate datetime,
+	@EmpSalariedFlag nchar(1),
+	@EmpVacationHours int,
+	@EmpSickleaveHours int,
+	@EmpCurrentFlag int,
+	@EmpPhoto nvarchar(255),
+	@EmpModifiedDate datetime,
+	@EmpEmpId int,
+	--employee pay history
+	@EphiRateChangeDate datetime,
+	@EphiRateSalary money,
+	@EphiPayFrequence int,
+	@EphiModifiedDate datetime,
+	--employee department history
+	@EdhiStartDate datetime,
+	@EdhiEndDate datetime,
+	@EdhiModifiedDate datetime,
+	--misc
+	@DeptName nvarchar(50),
+	@JoroName nvarchar(55)
+)
+as
+begin
+	begin try
+		begin transaction
+			DECLARE  
+			@ShiftName nvarchar(25),
+			@ShiftStartTime datetime,
+			@ShiftEndTime datetime,
+			@EdhiDeptId int,
+			@EmpJoroId int,
+			@EphiEmpId int,
+			@EdhiId int;
+
+			SELECT @EmpJoroId = joro_id FROM HR.job_role WHERE joro_name = @JoroName;
+			
+			UPDATE HR.employee 
+			SET 
+				emp_national_id = @EmpNationalId, 
+				emp_full_name = @EmpFullName,
+				emp_birth_date = @EmpBirthDate, 
+				emp_marital_status = @EmpMaritalStatus, 
+				emp_gender = @EmpGender, 
+				emp_hire_date = @EmpHireDate, 
+				emp_salaried_flag = @EmpSalariedFlag, 
+				emp_vacation_hours = @EmpVacationHours, 
+				emp_sickleave_hours = @EmpSickleaveHours, 
+				emp_current_flag = @EmpCurrentFlag, 
+				emp_photo = @EmpPhoto, 
+				emp_modified_date = @EmpModifiedDate, 
+				emp_emp_id = @EmpEmpId, 
+				emp_joro_id = @EmpJoroId 
+			WHERE 
+				emp_id = @EmpId;
+	
+			UPDATE hr.employee_pay_history
+			SET 
+				ephi_rate_change_date = @EphiRateChangeDate,
+				ephi_rate_salary = @EphiRateSalary,
+				ephi_pay_frequence = @EphiPayFrequence,
+				ephi_modified_date = @EphiModifiedDate
+			WHERE 
+				ephi_emp_id = @EmpId;
+				
+			SELECT @EdhiDeptId = dept_id FROM HR.department WHERE dept_name = @DeptName;
+
+			SELECT @EdhiId = edhi_id FROM HR.employee_department_history 
+			WHERE edhi_emp_id = @EmpId;
+				
+			UPDATE HR.employee_department_history 
+			SET 
+				edhi_start_date = @EdhiStartDate,
+				edhi_end_date = @EdhiEndDate,
+				edhi_modified_date = @EdhiModifiedDate,
+				edhi_dept_id = @EdhiDeptId
+			WHERE 
+				edhi_id = @EdhiId
+
+			IF OBJECT_ID('tempdb..#temp_shift', 'U') IS NOT NULL
+				DROP TABLE #temp_shift;
+
+			CREATE TABLE #temp_shift (
+				shift_id int,
+				shift_name nvarchar(50),
+				shift_start_time datetime,
+				shift_end_time datetime
+			);
+			
+			TRUNCATE TABLE #temp_shift;
+			INSERT INTO #temp_shift (shift_id, shift_name, shift_start_time, shift_end_time)
+			SELECT s.shift_id, s.shift_name, s.shift_start_time, s.shift_end_time
+			FROM HR.shift s
+			WHERE shift_edhi_id = @EdhiId
+
+			MERGE INTO #temp_shift AS T
+			USING @listShift AS S
+			ON (T.shift_name = S.ShiftName)
+			WHEN MATCHED THEN
+				UPDATE SET T.shift_start_time = S.ShiftStartTime, T.shift_end_time = S.ShiftEndTime
+			WHEN NOT MATCHED BY SOURCE THEN
+				DELETE
+			WHEN NOT MATCHED BY TARGET THEN
+				INSERT (shift_name, shift_start_time, shift_end_time)
+				VALUES (S.ShiftName, S.ShiftStartTime, S.ShiftEndTime);
+
+			MERGE INTO HR.Shift AS T
+			USING #temp_shift AS S
+			ON (T.shift_id = S.shift_id)
+			WHEN MATCHED THEN
+				UPDATE SET T.shift_name = S.shift_name, T.shift_start_time = S.shift_start_time, T.shift_end_time = S.shift_end_time
+			WHEN NOT MATCHED BY SOURCE AND T.shift_edhi_id = @EdhiId THEN
+				DELETE
+			WHEN NOT MATCHED BY TARGET THEN
+				INSERT (shift_name, shift_start_time, shift_end_time, shift_edhi_id)
+				VALUES (S.shift_name, S.shift_start_time, S.shift_end_time, @EdhiId);
+		commit transaction
+	end try
+	begin catch 
+		rollback;
+		throw;
+	end catch;
+end
+GO

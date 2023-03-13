@@ -979,3 +979,62 @@ BEGIN
     END CATCH
 END
 GO
+
+-- =============================================
+-- Author:		Hafiz 
+-- Create date: 14 March 2023
+-- Description:	Creata Store Procedure Find Vendor by Id
+-- =============================================
+Create Procedure [Purchasing].[spFindById]
+	@id int
+	AS
+	BEGIN
+	SET NOCOUNT ON;
+
+	BEGIN TRANSACTION;
+	-- memulai transaction
+	BEGIN TRY	
+		SELECT
+			vendor_entity_id AS VendorEntityId, 
+			vendor_name AS VendorName, 
+			vendor_active AS VendorActive, 
+			vendor_priority AS VendorPriority, 
+			vendor_register_date AS VendorRegisterDate,
+			vendor_weburl AS VendorWeburl,
+			vendor_modified_date AS VendorModifiedDate 
+		From [Purchasing].[vendor]
+		WHERE vendor_entity_id = @id;
+    COMMIT TRANSACTION; -- commit transaction jika tidak ada error
+    END TRY
+    BEGIN CATCH
+        ROLLBACK TRANSACTION; -- rollback transaction jika terjadi error
+        THROW;
+    END CATCH
+END
+GO
+
+-- =============================================
+-- Author:		Hafiz 
+-- Create date: 14 March 2023
+-- Description:	Creata Store Procedure Delete Vendor by Id
+-- =============================================
+Create Procedure [Purchasing].[spDeleteVendor]
+	@id int
+	AS
+	BEGIN
+	SET NOCOUNT ON;
+	
+	BEGIN TRANSACTION;
+		BEGIN TRY
+			Delete From [Purchasing].[vendor]
+			WHERE vendor_entity_id = @id;
+		COMMIT TRANSACTION; -- commit transaction jika tidak ada error
+    END TRY
+
+    BEGIN CATCH
+        ROLLBACK TRANSACTION; -- rollback transaction jika terjadi error
+        THROW;
+    END CATCH
+
+END
+GO

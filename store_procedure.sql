@@ -1119,3 +1119,163 @@ begin
 	end catch;
 end
 GO
+
+-- =============================================
+-- Author:		Ericson
+-- Create date: 11 March 2023
+-- Description:	Store Procedure create employee group
+-- =============================================
+create procedure hr.spCreateEmployeeGroup
+(
+	@listShift [HR].[ShiftList] READONLY,
+	--employee
+	@EmpId int OUTPUT,
+	@EmpNationalId nvarchar(50),
+	@EmpFullName nvarchar(50),
+	@EmpBirthDate datetime,
+	@EmpMaritalStatus char(1),
+	@EmpGender nchar(1),
+	@EmpHireDate datetime,
+	@EmpSalariedFlag nchar(1),
+	@EmpVacationHours int,
+	@EmpSickleaveHours int,
+	@EmpCurrentFlag int,
+	@EmpPhoto nvarchar(255),
+	@EmpModifiedDate datetime,
+	@EmpEmpId int,
+	--employee pay history
+	@EphiRateChangeDate datetime,
+	@EphiRateSalary money,
+	@EphiPayFrequence int,
+	@EphiModifiedDate datetime,
+	--employee department history
+	@EdhiStartDate datetime,
+	@EdhiEndDate datetime,
+	@EdhiModifiedDate datetime,
+	--misc
+	@DeptName nvarchar(50),
+	@JoroName nvarchar(55)
+)
+as
+begin
+	begin try
+		begin transaction
+			DECLARE  
+			@ShiftName nvarchar(25),
+			@ShiftStartTime datetime,
+			@ShiftEndTime datetime,
+			@EdhiDeptId int,
+			@ShiftEdhiId int,
+			@EmpJoroId int;
+
+			SELECT @EmpJoroId = joro_id FROM HR.job_role WHERE joro_name = @JoroName;
+			DECLARE @insertedId TABLE (id int)	
+			INSERT INTO HR.employee 
+			(
+				emp_national_id, 
+				emp_full_name, 
+				emp_birth_date, 
+				emp_marital_status, 
+				emp_gender, 
+				emp_hire_date, 
+				emp_salaried_flag, 
+				emp_vacation_hours, 
+				emp_sickleave_hours, 
+				emp_current_flag, 
+				emp_photo, 
+				emp_modified_date, 
+				emp_emp_id, 
+				emp_joro_id
+			)
+			OUTPUT inserted.emp_id INTO @insertedId
+			VALUES
+			(
+				@EmpNationalId, 
+				@EmpFullName,
+				@EmpBirthDate, 
+				@EmpMaritalStatus, 
+				@EmpGender, 
+				@EmpHireDate, 
+				@EmpSalariedFlag, 
+				@EmpVacationHours, 
+				@EmpSickleaveHours, 
+				@EmpCurrentFlag, 
+				@EmpPhoto, 
+				@EmpModifiedDate, 
+				@EmpEmpId, 
+				@EmpJoroId
+			);
+
+			SELECT @EmpId = id FROM @insertedId;
+
+			INSERT INTO hr.employee_pay_history(
+				ephi_emp_id,
+				ephi_rate_change_date,
+				ephi_rate_salary,
+				ephi_pay_frequence,
+				ephi_modified_date
+			) 
+			VALUES (
+				@EmpId,
+				@EphiRateChangeDate,
+				@EphiRateSalary,
+				@EphiPayFrequence,
+				@EphiModifiedDate
+			);
+			
+			SELECT @EdhiDeptId = dept_id FROM HR.department WHERE dept_name = @DeptName;
+
+			INSERT INTO HR.employee_department_history (
+				edhi_emp_id,
+				edhi_start_date,
+				edhi_end_date,
+				edhi_modified_date,
+				edhi_dept_id
+			)
+			OUTPUT inserted.edhi_id INTO @insertedId
+			VALUES (
+				@EmpId,
+				@EdhiStartDate,
+				@EdhiEndDate,
+				@EdhiModifiedDate,
+				@EdhiDeptId
+			);
+			
+			SELECT @ShiftEdhiId = id FROM @insertedId;
+
+			DECLARE ShiftList CURSOR FOR
+			SELECT ShiftName, ShiftStartTime, ShiftEndTime
+			FROM @listShift;
+
+			OPEN ShiftList
+			
+			WHILE @@FETCH_STATUS = 0
+			BEGIN
+				FETCH NEXT FROM ShiftList INTO @ShiftName, @ShiftStartTime, @ShiftEndTime;
+				IF @@FETCH_STATUS = 0
+				BEGIN
+					INSERT INTO HR.shift (
+						shift_name,
+						shift_start_time,
+						shift_end_time,
+						shift_edhi_id
+					)
+					VALUES (
+						@ShiftName,
+						@ShiftStartTime,
+						@ShiftEndTime,
+						@ShiftEdhiId
+					);
+				END
+			END
+
+			CLOSE ShiftList;
+			DEALLOCATE ShiftList;
+		commit transaction
+	end try
+	begin catch 
+		rollback;
+		throw;
+	end catch;
+end
+GO

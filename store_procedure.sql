@@ -634,8 +634,9 @@ GO
 -- Create date: 13 Februari 2023
 -- Description:	Store Procedure for refund transfer
 -- =============================================
-CREATE PROCEDURE [Payment].[spRefundTransaction]
-    @trx_number_ref AS VARCHAR(50)
+CREATE OR ALTER PROCEDURE [Payment].[spRefundTransaction]
+    @trx_number_ref AS VARCHAR(50),
+    @refund_rate AS FLOAT
     AS
     BEGIN
         BEGIN TRY
@@ -647,7 +648,7 @@ CREATE PROCEDURE [Payment].[spRefundTransaction]
 
                 SET @source_account = '131-3456-78';
 
-                SELECT @refund_amount = Payment.fnRefundAmount((patr_credit + patr_debet), default),
+                SELECT @refund_amount = Payment.fnRefundAmount((patr_credit + patr_debet), @refund_rate),
                        @refund_age = DATEDIFF(day, patr_modified_date, GETDATE()),
                        @target_account = patr_source_id
                 FROM Payment.payment_transaction
@@ -676,55 +677,90 @@ GO
 
 -- =============================================
 -- Author:		Harpi
+-- Create date: 13 March 2023
+-- Description:	Store Procedure for create transfer booking
+-- =============================================
+CREATE OR ALTER PROCEDURE [Payment].[spCreateTransferBooking]
+       @boor_order_number VARCHAR(50)
+       ,@boor_card_number VARCHAR(50)
+       ,@boor_user_id INT
+AS
+BEGIN
+    INSERT
+      INTO Payment.payment_transaction(patr_type, patr_note, patr_order_number, patr_source_id, patr_target_id, patr_user_id)
+    VALUES ('TRB', 'Transfer Booking Note', @boor_order_number, @boor_card_number, '131-3456-78', @boor_user_id);
+END
+GO
+
+-- =============================================
+-- Author:		Harpi
 -- Create date: 8 January 2023
 -- Description:	Store Procedure for transfer booking transaction
 -- =============================================
-CREATE PROCEDURE [Payment].[spTransferBookingTransaction]
-    @source_account AS NVARCHAR(50),
-    @target_account AS NVARCHAR(50),
-    @amount AS MONEY
+CREATE OR ALTER PROCEDURE [Payment].[spCalculationTranferBooking]
+    @order_number AS NVARCHAR(50),
+    @target_account AS NVARCHAR(50)
     AS
     BEGIN
         SET NOCOUNT ON;
         BEGIN TRY
             BEGIN TRANSACTION
-                DECLARE @source_usac_type varchar(50);
-                DECLARE @target_usac_type varchar(50);
-                DECLARE @usac_current_saldo AS MONEY;
+                DECLARE @user_payment_method varchar(10);
+                DECLARE @user_current_saldo AS MONEY;
+                DECLARE @total_ammount AS MONEY;
+                DECLARE @total_down_payment AS MONEY;
+                DECLARE @payment_option AS NCHAR(2);
+                DECLARE @source_account AS NVARCHAR(50)
 
-                -- set value @source_usac_type
-                SELECT @source_usac_type = usac_type, @usac_current_saldo = usac_saldo
+                SELECT @total_ammount = boor_total_ammount,
+                       @total_down_payment = boor_down_payment,
+                       @payment_option = TRIM(boor_is_paid),
+                       @source_account = boor_cardnumber
+                FROM Booking.booking_orders
+                WHERE boor_order_number = @order_number
+
+                -- set value @user_payment_method & @user_current_saldo
+                SELECT @user_payment_method = usac_type,
+                       @user_current_saldo = usac_saldo
                   FROM Payment.user_accounts
                  WHERE usac_account_number = @source_account
 
-                -- set value @target_usac_type
-                SELECT @target_usac_type = usac_type
-                  FROM Payment.user_accounts
-                 WHERE usac_account_number = @target_account
-
-                -- top up from user bank account
-                IF (@source_usac_type = 'debet' OR @source_usac_type = 'credit_card' OR @source_usac_type = 'payment')
+                -- check if the payment method is 'cash' just ignore it
+                IF (@user_payment_method = 'debet' OR @user_payment_method = 'credit_card' OR @user_payment_method = 'payment')
                 BEGIN
-                    IF @source_usac_type = 'debet' OR @source_usac_type = 'payment'
+                    IF @user_payment_method = 'debet' OR @user_payment_method = 'payment'
                     BEGIN
-                        IF @usac_current_saldo-@amount < 0
-                            ROLLBACK  -- seharusnya ditambahkan ke kolom bayar kurang
+                        -- check if payment option is 'Down Payment'
+                        IF (@payment_option = 'DP' AND (@user_current_saldo - @total_down_payment) < 0)
+                            ROLLBACK -- TODO : Tambahkan feature untuk pemberitahuan bahwa saldo kurang utk dp!
+
+                        -- check if payment options is 'Paid'
+                        IF (@payment_option = 'P' AND (@user_current_saldo - @total_ammount) < 0)
+                            ROLLBACK -- TODO : Tambahkan feature untuk pemberitahuan bahwa saldo kurang!
                     END
 
+                    -- TODO : check apakah lunas atau tidak , jika lunas status paid jika tidak maka lainya!
+                    -- paying booking order from user account
                     UPDATE Payment.user_accounts
-                       SET usac_saldo = usac_saldo - @amount,
+                       SET usac_saldo = usac_saldo - @total_ammount,
                            usac_modified_date = GETDATE()
                      WHERE usac_account_number = @source_account;
                 END
 
                 -- to realta hotel account
-                IF (@target_usac_type = 'debet' AND @target_account = '131-3456-78')
-                BEGIN
-                    UPDATE Payment.user_accounts
-                       SET usac_saldo = usac_saldo + @amount,
-                           usac_modified_date = GETDATE()
-                     WHERE usac_account_number = @target_account;
-                END
+                UPDATE Payment.user_accounts
+                   SET usac_saldo = usac_saldo + @total_ammount,
+                       usac_modified_date = GETDATE()
+                 WHERE usac_account_number = @target_account;
+
+                        -- IF (@@ROWCOUNT > 0)
+--                     BEGIN
+--                            UPDATE [Booking].[booking_orders]
+--                             SET boor_is_paid = 'P'
+--                             WHERE boor_order_number = @order_number;
+--
+--                            SELECT 'SUCCESS' AS STATUS
+--                     END
             COMMIT TRANSACTION
         END TRY
         BEGIN CATCH

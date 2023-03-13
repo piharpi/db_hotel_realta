@@ -598,24 +598,25 @@ SET IDENTITY_INSERT Booking.special_offers OFF
 
 
 SET IDENTITY_INSERT Booking.booking_orders ON
-INSERT INTO Booking.booking_orders (boor_id, boor_order_number,boor_order_date, boor_total_room ,boor_pay_type, boor_is_paid, boor_type, boor_user_id, boor_hotel_id)
-VALUES (1, 'BO#20221127-0001', '2023-01-27', 4,'C', 'DP', 'T', 1, 1),
-       (2, 'BO#20221127-0002', '2023-01-27', 4,'C', 'P', 'C', 2, 2),
-       (3, 'BO#20221127-0003', '2023-01-27', 4,'D', 'R', 'I', 3, 3),
-       (4, 'BO#20221127-0004', '2023-01-27', 4,'C', 'DP', 'T', 4, 4),
-       (5, 'BO#20221127-0005', '2023-01-27', 4,'D', 'P', 'C', 5, 5),
-       (6, 'BO#20221127-0006', '2023-01-27', 4,'C', 'R', 'I', 6, 6),
-       (7, 'BO#20221127-0007', '2023-01-27', 4,'D', 'DP', 'T', 7, 7),
-       (8, 'BO#20221127-0008', '2023-01-27', 4,'C', 'P', 'C', 8, 8),
-       (9, 'BO#20221127-0009', '2023-01-27', 4,'C', 'R', 'I', 9, 9),
-       (10, 'BO#20221127-0010', '2023-01-27', 3,'C', 'DP', 'T', 10, 10),
-       (11, 'BO#20221127-0011', '2023-01-27', 3,'D', 'P', 'C', 9, 9),
-       (12, 'BO#20221127-0012', '2023-01-27', 3,'D', 'R', 'I', 10, 10),
-       (13, 'BO#20221127-0013', '2023-01-27', 3,'D', 'DP', 'T', 7, 7),
-       (14, 'BO#20221127-0014', '2023-01-27', 3,'C', 'P', 'C', 2, 1),
-       (15, 'BO#20221127-0015', '2023-01-27', 3,'D', 'R', 'I', 8, 5),
-       (16, 'BO#20221127-0016', '2023-01-27', 3,'D', 'DP', 'T', 7, 6),
-       (17, 'BO#20221127-0017', '2023-01-27', 3,'C', 'P', 'C', 1, 7)
+INSERT INTO Booking.booking_orders 
+(
+	boor_id,
+ 	boor_order_number,
+ 	boor_order_date,
+ 	boor_total_room,
+	boor_total_ammount,
+ 	boor_down_payment,
+ 	boor_pay_type,
+ 	boor_is_paid,
+ 	boor_type,
+ 	boor_user_id,
+ 	boor_hotel_id
+ )
+VALUES (1, 'BO#20221127-0001', '2023-01-27', 3,500000,200000,'D', 'DP', 'T', 1, 1),
+       (2, 'BO#20221127-0002', '2023-01-27', 4,300000,0,'C', 'P', 'C', 2, 2),
+       (3, 'BO#20221127-0003', '2023-01-27', 4,300000,200000,'D', 'DP', 'T', 4, 3),
+       (4, 'BO#20221127-0004', '2023-01-27', 4,150000,50000,'PG', 'DP', 'C', 8, 4),
+       (5, 'BO#20221127-0005', '2023-01-27', 4,500000,2000,'C', 'P', 'C', 5, 5)
 SET IDENTITY_INSERT Booking.booking_orders OFF
 -- SELECT*FROM Booking.booking_orders
 

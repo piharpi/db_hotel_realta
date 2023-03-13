@@ -2,8 +2,9 @@
 
 1. Clone `git@github.com:piharpi/db_hotel_realta.git`
 2. Checkout `[namabranch]`  sesuai dengan module masing-masing
-    - terdapat 4 files (`hotel_realta.sql`, `store_procedure.sql`, `trigger.sql`, `insert.sql`) :
+    - terdapat 4 files (`hotel_realta.sql`, `utility.sql`, `store_procedure.sql`, `trigger.sql`, `insert.sql`) :
     - File `hotel_realta.sql` digunakan untuk mendefinisikan DDL.
+    - File `utility.sql` digunakan untuk mendefinisikan user defined table type.
     - File `store_procedure.sql` digunakan untuk mendefinisikan kumpulan procedures(_routines_).
     - File `trigger.sql` digunakan untuk mendefinisikan kumpulan trigger. 
     - File `insert.sql` digunakan untuk inisiasi data awal.
@@ -14,6 +15,7 @@ _***)**_ Sebelum Pull Request pastikan tidak mengganggu fitur module lain.
 ## Eksekusi
 Untuk mengeksekusi harus berurutan dari :
 1. `hotel_realta.sql` 
-2. `store_procedure.sql`
-3. `trigger.sql`
-4. `insert.sql`
+2. `utility.sql`
+3. `store_procedure.sql`
+4. `trigger.sql`
+5. `insert.sql`

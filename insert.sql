@@ -482,30 +482,21 @@ SET IDENTITY_INSERT hr.job_role OFF
 -- select * from hr.job_role;
 
 SET IDENTITY_INSERT hr.employee ON
-insert into hr.employee (emp_id, emp_national_id, emp_birth_date, emp_marital_status, emp_gender, emp_hire_date,
+insert into hr.employee (emp_id, emp_national_id, emp_full_name, emp_birth_date, emp_marital_status, emp_gender, emp_hire_date,
 	emp_salaried_flag, emp_joro_id) values
-	(1, 'a123123123456456456789789', '2001-01-01', 'S', 'M', GETDATE(), '1', 1),
-	(2, 'b456456456123123123789789', '2002-02-01', 'M', 'F', GETDATE(), '0', 2),
-	(3, 'c231231231339339339013013', '2003-03-01', 'M', 'M', GETDATE(), '1', 3),
-	(4, 'd524524524621621621832832', '1999-04-01', 'S', 'F', GETDATE(), '0', 4),
-	(5, 'e122122122322322322494944', '1997-05-01', 'S', 'M', GETDATE(), '1', 5),
-	(6, 'f090285082940243284423853', '1999-06-01', 'M', 'F', GETDATE(), '0', 6),
-	(7, 'g122932483892095343534255', '1998-07-01', 'M', 'M', GETDATE(), '1', 7),
-	(8, 'h214392573294812743928523', '2002-08-01', 'S', 'F', GETDATE(), '0', 8),
-	(9, 'i217473298498378988932754', '1999-09-01', 'S', 'M', GETDATE(), '1', 9),
-	(10, 'j219483945782893873249573', '2001-10-01', 'M', 'F', GETDATE(), '0', 10)
+	(1, 'a123123123456456456789789', 'Edi' ,'2001-01-01', 'S', 'M', GETDATE(), '1', 1),
+	(2, 'b456456456123123123789789', 'Putri' , '2002-02-01', 'M', 'F', GETDATE(), '0', 2),
+	(3, 'c231231231339339339013013', 'Ridwan' , '2003-03-01', 'M', 'M', GETDATE(), '1', 3),
+	(4, 'd524524524621621621832832', 'Dewi' , '1999-04-01', 'S', 'F', GETDATE(), '0', 4),
+	(5, 'e122122122322322322494944', 'Budi' , '1997-05-01', 'S', 'M', GETDATE(), '1', 5),
+	(6, 'f090285082940243284423853', 'Siska' , '1999-06-01', 'M', 'F', GETDATE(), '0', 6),
+	(7, 'g122932483892095343534255', 'Budi' , '1998-07-01', 'M', 'M', GETDATE(), '1', 7),
+	(8, 'h214392573294812743928523', 'Astri' , '2002-08-01', 'S', 'F', GETDATE(), '0', 8),
+	(9, 'i217473298498378988932754', 'Irwan' , '1999-09-01', 'S', 'M', GETDATE(), '1', 9),
+	(10, 'j219483945782893873249573', 'Maria' , '2001-10-01', 'M', 'F', GETDATE(), '0', 10)
 ;
 SET IDENTITY_INSERT hr.employee OFF
 -- select * from hr.employee;
-
-SET IDENTITY_INSERT hr.shift ON
-insert into hr.shift(shift_id, shift_name, shift_start_time, shift_end_time) values
-	(1,'Shift 1', '08:00:00', '16:00:00'),
-	(2,'Shift 2', '16:00:00', '00:00:00'),
-	(3,'Shift 3', '00:00:00', '08:00:00')
-;
-SET IDENTITY_INSERT hr.shift OFF
--- select * from hr.shift;
 
 SET IDENTITY_INSERT hr.department ON
 insert into hr.department(dept_id, dept_name, dept_modified_date)values
@@ -523,20 +514,38 @@ SET IDENTITY_INSERT hr.department OFF
 -- select * from hr.department;
 
 SET IDENTITY_INSERT hr.employee_department_history ON
-insert into hr.employee_department_history(edhi_id, edhi_emp_id, edhi_dept_id, edhi_shift_id) values
-	(1,1, 1, 1),
-	(2,2, 2, 2),
-	(3,3, 3, 3),
-	(4,4, 4, 1),
-	(5,5, 5, 2),
-	(6,6, 6, 3),
-	(7,7, 7, 1),
-	(8,8, 8, 2),
-	(9,9, 9, 3),
-	(10,10, 2, 1)
+insert into hr.employee_department_history(edhi_id, edhi_emp_id, edhi_dept_id) values
+	(1,1, 1),
+	(2,2, 2),
+	(3,3, 3),
+	(4,4, 4),
+	(5,5, 5),
+	(6,6, 6),
+	(7,7, 7),
+	(8,8, 8),
+	(9,9, 9),
+	(10,10, 2)
 ;
 SET IDENTITY_INSERT hr.employee_department_history OFF
 -- select * from hr.employee_department_history;
+
+SET IDENTITY_INSERT hr.shift ON
+insert into hr.shift(shift_id, shift_name, shift_start_time, shift_end_time, shift_edhi_id) values
+	(1,'Day', '08:00:00', '16:00:00', 1),
+	(2,'Noon', '16:00:00', '00:00:00', 1),
+	(3,'Night', '00:00:00', '08:00:00', 2),
+	(4,'Day', '08:00:00', '16:00:00', 3),
+	(5,'Noon', '16:00:00', '00:00:00', 4),
+	(6,'Night', '00:00:00', '08:00:00', 5),
+	(7,'Day', '08:00:00', '16:00:00', 6),
+	(8,'Noon', '16:00:00', '00:00:00', 7),
+	(9,'Night', '00:00:00', '08:00:00', 7),
+	(10,'Day', '08:00:00', '16:00:00', 8),
+	(11,'Noon', '16:00:00', '00:00:00', 9),
+	(12,'Night', '00:00:00', '08:00:00', 10)
+;
+SET IDENTITY_INSERT hr.shift OFF
+-- select * from hr.shift;
 
 insert into hr.employee_pay_history (ephi_emp_id, ephi_rate_change_date) values
 	(1, GETDATE()),

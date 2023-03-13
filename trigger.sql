@@ -239,71 +239,86 @@ BEGIN
     DECLARE @src_user_id AS INT
     DECLARE @tar_user_id AS INT
     DECLARE @transaction_note AS NVARCHAR(MAX)
+	DECLARE @order_number AS VARCHAR(55)
+	DECLARE @trx_number_ref AS VARCHAR(55)
+
+	SET @order_number = null;
+	SET @trx_number_ref = null;
 
     -- filling variable
     SELECT @src_account = patr_source_id,
            @tar_account = patr_target_id,
            @src_user_id = patr_user_id,
-           @transaction_type = patr_type,
+           @order_number = patr_order_number,
+           @trx_number_ref = patr_trx_number_ref,
+           @transaction_type = TRIM(patr_type),
            @transaction_note = patr_note,
            @credit = patr_credit,
            @debet = patr_debet
       FROM inserted;
 
--- 		TOP UP
-		IF @transaction_type = 'TP'
-		BEGIN
-          INSERT INTO [Payment].[payment_transaction](
-                        patr_trx_number, patr_debet, patr_credit, patr_type, patr_note,
-                        patr_order_number, patr_source_id, patr_target_id, patr_trx_number_ref, patr_user_id)
-                VALUES (Payment.fnFormatedTransactionId(IDENT_CURRENT('Payment.[payment_transaction]'), @transaction_type), 0, @credit,'TP',@transaction_note, null,@src_account, @tar_account, null, @src_user_id);
+	IF (@transaction_type = 'RF' OR @transaction_type = 'RPY')
+    BEGIN
+        SELECT @src_account = patr_target_id,
+               @tar_account = patr_source_id,
+               @credit = Payment.fnRefundAmount((patr_credit + patr_debet), default)
+        FROM Payment.payment_transaction
+        WHERE patr_trx_number = @trx_number_ref
+    END
 
-			EXECUTE [Payment].[spTopUpTransaction]
-				 @src_account
-				,@tar_account
-				,@credit
-
-          SELECT @tar_user_id = usac_user_id
-            FROM Payment.user_accounts
-           WHERE usac_account_number = @tar_account;
-
-           INSERT INTO [Payment].[payment_transaction](
-                        patr_trx_number, patr_debet, patr_credit, patr_type, patr_note,
-                        patr_order_number, patr_source_id, patr_target_id, patr_trx_number_ref, patr_user_id)
-                VALUES (Payment.fnFormatedTransactionId(IDENT_CURRENT('Payment.[payment_transaction]'), @transaction_type), @credit, 0, 'TP', @transaction_note, null, @src_account, @tar_account, null, @tar_user_id);
-		END
-
+      INSERT INTO [Payment].[payment_transaction](
+                    patr_trx_number, patr_debet, patr_credit, patr_type, patr_note,
+                    patr_order_number, patr_source_id, patr_target_id, patr_trx_number_ref, patr_user_id)
+            VALUES (Payment.fnFormatedTransactionId(IDENT_CURRENT('Payment.[payment_transaction]'), @transaction_type), 0,
+                    @credit, @transaction_type,@transaction_note, @order_number,@src_account, @tar_account, @trx_number_ref, @src_user_id);
+-- 	TOP UP
+    IF @transaction_type = 'TP'
+    BEGIN
+        EXECUTE [Payment].[spTopUpTransaction]
+             @src_account
+            ,@tar_account
+            ,@credit
+    END
 
 
-		-- TRANSFER BOOKING
--- 		IF @transaction_type = 'TRB'
--- 		BEGIN
--- 			EXECUTE [Payment].[spTopUpTransaction]
--- 				 @source_account = @src_account
--- 				,@target_account = @tar_account
--- 				,@expense = @amount
--- 		END
+    -- TRANSFER BOOKING
+    IF @transaction_type = 'TRB'
+    BEGIN
+        EXECUTE [Payment].[spTransferBookingTransaction]
+             @src_account
+            ,@tar_account
+            ,@credit
+    END
+
+    -- ORDER MENU
+    IF @transaction_type = 'ORM'
+    BEGIN
+        EXECUTE [Payment].[spTransferBookingTransaction]
+             @src_account
+            ,@tar_account
+            ,@credit
+    END
+
+    -- REFUND
+    IF @transaction_type = 'RF'
+    BEGIN
+        EXECUTE [Payment].[spRefundTransaction]
+             @trx_number_ref
+    END
+
+    SELECT @tar_user_id = usac_user_id
+      FROM Payment.user_accounts
+     WHERE usac_account_number = @tar_account;
+
+    INSERT INTO [Payment].[payment_transaction](
+                patr_trx_number, patr_debet, patr_credit, patr_type, patr_note,
+                patr_order_number, patr_source_id, patr_target_id, patr_trx_number_ref, patr_user_id)
+        VALUES (Payment.fnFormatedTransactionId(IDENT_CURRENT('Payment.[payment_transaction]'), @transaction_type),
+                @credit, 0, @transaction_type, @transaction_note, @order_number, @src_account, @tar_account, @trx_number_ref, @tar_user_id);
+
 
 		-- REPAYMENT
 -- 		IF @transaction_type = 'RPY'
--- 		BEGIN
--- 			EXECUTE [Payment].[spTopUpTransaction]
--- 				 @source_account = @src_account
--- 				,@target_account = @tar_account
--- 				,@expense = @amount
--- 		END
-
-		-- REFUND
--- 		IF @transaction_type = 'RF'
--- 		BEGIN
--- 			EXECUTE [Payment].[spTopUpTransaction]
--- 				 @source_account = @tar_account
--- 				,@target_account = @src_account
--- 				,@expense =  @amount
--- 		END
-
-		-- ORDER MENU
--- 		IF @transaction_type = 'ORM'
 -- 		BEGIN
 -- 			EXECUTE [Payment].[spTopUpTransaction]
 -- 				 @source_account = @src_account

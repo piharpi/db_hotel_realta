@@ -1017,7 +1017,201 @@ END
 GO
 
 -- =============================================
--- Author:		Hafiz 
+-- Author:		Gabriel
+-- Create date: 14 March 2023
+-- Description:	Procedure for insert booking_orders
+-- =============================================
+
+CREATE OR ALTER procedure booking.sp_insert_booking_orders
+	@boor_hotel_id as int,
+	@boor_user_id as int,
+	@boor_pay_type as nchar(2),
+	@boor_is_paid as nchar(2),
+	@boor_down_payment as money =0
+AS
+BEGIN
+	-- declare abort on action
+	SET XACT_ABORT ON;
+
+	-- declare and retriving latest id,order_date and generate order_number
+	DECLARE @boor_order_id INT = IDENT_CURRENT('Booking.booking_orders');
+	DECLARE @boor_order_date DATE = GETDATE();
+	DECLARE @boor_order_number VARCHAR(50);
+	-- generate order number
+	SET @boor_order_number =
+		CONCAT
+		(
+			'BO#',
+			CONVERT(VARCHAR(10), @boor_order_date, 112),
+			'-',
+			RIGHT('0000' + CAST(@boor_order_id+1 AS VARCHAR(4)), 4)
+		);
+
+	--retrive member type from users
+	declare @member_type nvarchar(15) = COALESCE((select usme_memb_name from Users.user_members where usme_user_id=@boor_user_id),'');
+	--retrive
+	declare @boor_type nvarchar(15) = COALESCE((select user_type from Users.users where user_id=@boor_user_id),'I');
+
+	INSERT INTO
+		Booking.booking_orders
+		(
+			boor_hotel_id,
+			boor_user_id,
+			boor_order_number,
+			boor_order_date,
+			boor_pay_type,
+			boor_is_paid,
+			boor_type,
+			boor_member_type
+		)
+		VALUES
+		(
+			@boor_hotel_id,
+			@boor_user_id,
+			@boor_order_number,
+			@boor_order_date,
+			@boor_pay_type,
+			@boor_is_paid,
+			@boor_type,
+			@member_type
+		);
+	--insert to booking_orders
+	select SCOPE_IDENTITY();
+
+END
+GO
+
+-- =====================================================
+-- Author:		Gabriel
+-- Create date: 14 March 2023
+-- Description:	Procedure for insert booking_order_detail
+-- ======================================================
+
+CREATE OR ALTER procedure booking.sp_insert_booking_order_detail
+	@borde_boor_id int,
+	@borde_faci_id int,
+	@borde_checkin datetime,
+	@borde_checkout datetime,
+	@borde_discount smallmoney=NULL
+AS
+BEGIN
+	SET XACT_ABORT ON
+	DECLARE @faci_price money = (select faci_low_price from Hotel.facilities where faci_id=@borde_faci_id)
+	DECLARE @faci_tax smallmoney = (select faci_tax_rate from Hotel.facilities where faci_id=@borde_faci_id)
+
+	-- insert borde
+	INSERT INTO Booking.booking_order_detail
+	(
+		borde_boor_id,
+		borde_faci_id,
+		borde_checkin,
+		borde_checkout,
+		borde_price,
+		borde_adults,
+		borde_kids,
+		borde_extra,
+		borde_discount,
+		borde_tax
+	)
+    VALUES
+	(
+		@borde_boor_id,
+		@borde_faci_id,
+		@borde_checkin,
+		@borde_checkout,
+		@faci_price,
+		0,--bordeAdults
+		0,--bordeKids
+		0,--bordeExtra
+		0,--bordeDiscount,
+		@faci_tax
+	);
+	-- get borde_id for insertion into booking_order_detail_extra
+    select SCOPE_IDENTITY();
+END
+GO
+
+CREATE OR ALTER procedure booking.sp_insert_booking_order_detail
+	@borde_boor_id int,
+	@borde_faci_id int,
+	@borde_checkin datetime,
+	@borde_checkout datetime,
+	@borde_discount smallmoney=NULL
+AS
+BEGIN
+	SET XACT_ABORT ON
+	DECLARE @faci_price money = (select faci_low_price from Hotel.facilities where faci_id=@borde_faci_id)
+	DECLARE @faci_tax smallmoney = (select faci_tax_rate from Hotel.facilities where faci_id=@borde_faci_id)
+
+	-- insert borde
+	INSERT INTO Booking.booking_order_detail
+	(
+		borde_boor_id,
+		borde_faci_id,
+		borde_checkin,
+		borde_checkout,
+		borde_price,
+		borde_adults,
+		borde_kids,
+		borde_extra,
+		borde_discount,
+		borde_tax
+	)
+    VALUES
+	(
+		@borde_boor_id,
+		@borde_faci_id,
+		@borde_checkin,
+		@borde_checkout,
+		@faci_price,
+		0,--bordeAdults
+		0,--bordeKids
+		0,--bordeExtra
+		0,--bordeDiscount,
+		@faci_tax
+	);
+	-- get borde_id for insertion into booking_order_detail_extra
+    select SCOPE_IDENTITY();
+END
+GO
+
+-- ============================================================
+-- Author:		Gabriel
+-- Create date: 14 March 2023
+-- Description:	Procedure for insert booking_order_detail_extra
+-- =============================================================
+
+CREATE OR ALTER PROCEDURE Booking.sp_insert_booking_extra
+	@boex_borde_id int,
+	@boex_prit_id int,
+	@boex_qty smallint,
+	@boex_measure_unit nvarchar(50)
+AS
+BEGIN
+	SET XACT_ABORT ON
+	DECLARE @prit_price smallmoney=(select prit_price from Master.price_items where prit_id=@boex_prit_id);
+	INSERT INTO Booking.booking_order_detail_extra
+	(
+		boex_borde_id,
+		boex_prit_id,
+		boex_price,
+		boex_qty,
+		boex_measure_unit
+	)
+	VALUES
+	(
+		@boex_borde_id,
+		@boex_prit_id,
+		@prit_price,
+		@boex_qty,
+		@boex_measure_unit
+	)
+    select SCOPE_IDENTITY();
+END
+GO
+
+-- =============================================
+-- Author:		Hafiz
 -- Create date: 14 March 2023
 -- Description:	Creata Store Procedure Find Vendor by Id
 -- =============================================
@@ -1029,15 +1223,15 @@ Create Procedure [Purchasing].[spFindById]
 
 	BEGIN TRANSACTION;
 	-- memulai transaction
-	BEGIN TRY	
+	BEGIN TRY
 		SELECT
-			vendor_entity_id AS VendorEntityId, 
-			vendor_name AS VendorName, 
-			vendor_active AS VendorActive, 
-			vendor_priority AS VendorPriority, 
+			vendor_entity_id AS VendorEntityId,
+			vendor_name AS VendorName,
+			vendor_active AS VendorActive,
+			vendor_priority AS VendorPriority,
 			vendor_register_date AS VendorRegisterDate,
 			vendor_weburl AS VendorWeburl,
-			vendor_modified_date AS VendorModifiedDate 
+			vendor_modified_date AS VendorModifiedDate
 		From [Purchasing].[vendor]
 		WHERE vendor_entity_id = @id;
     COMMIT TRANSACTION; -- commit transaction jika tidak ada error
@@ -1050,7 +1244,7 @@ END
 GO
 
 -- =============================================
--- Author:		Hafiz 
+-- Author:		Hafiz
 -- Create date: 14 March 2023
 -- Description:	Creata Store Procedure Delete Vendor by Id
 -- =============================================
@@ -1059,7 +1253,7 @@ Create Procedure [Purchasing].[spDeleteVendor]
 	AS
 	BEGIN
 	SET NOCOUNT ON;
-	
+
 	BEGIN TRANSACTION;
 		BEGIN TRY
 			Delete From [Purchasing].[vendor]

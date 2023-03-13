@@ -836,15 +836,19 @@ VALUES (0, 769999, 'TRB', 'Tranfer Booking Note', CURRENT_TIMESTAMP, 'BO#2022112
 INSERT
   INTO Payment.payment_transaction(patr_debet, patr_credit, patr_type, patr_note, patr_modified_date,
                                   patr_order_number, patr_source_id, patr_target_id, patr_trx_number_ref, patr_user_id)
-VALUES (0, 93000, 'ORM', 'Order Menu Note', CURRENT_TIMESTAMP, 'MENUS#20221127-0001', '123-2993-32', '131-3456-78', null, 2);
+VALUES (0, 100000, 'ORM', 'Order Menu', CURRENT_TIMESTAMP, 'MENUS#20221127-0001', '123-2993-32', '131-3456-78', null, 2);
 INSERT
   INTO Payment.payment_transaction(patr_debet, patr_credit, patr_type, patr_note, patr_modified_date,
                                   patr_order_number, patr_source_id, patr_target_id, patr_trx_number_ref, patr_user_id)
 VALUES (0, 235000, 'TP', 'Top Up Note', CURRENT_TIMESTAMP,  null, '992-1923-39', '087363155421', null, 4);
+INSERT
+  INTO Payment.payment_transaction(patr_debet, patr_credit, patr_type, patr_note, patr_modified_date,
+                                  patr_order_number, patr_source_id, patr_target_id, patr_trx_number_ref, patr_user_id)
+VALUES (0, 0, 'RF', '*Refund Order Menu', CURRENT_TIMESTAMP,  null, null, null, Payment.fnFormatedTransactionId(3, 'ORM'), 2);
 
 -- SET IDENTITY_INSERT Payment.payment_transaction OFF;
 -- ENABLE TRIGGER [Payment].CalculateUserAccountCredit ON [Payment].payment_transaction;
--- SELECT*FROM payment.payment_transaction;
+-- SELECT*FROM payment.payment_transaction; debet 869999.0000
 
 -- PURCHASING INSERT
 DISABLE TRIGGER [Purchasing].[InsertVendorEntityId] ON [Purchasing].vendor;

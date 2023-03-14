@@ -234,8 +234,7 @@ BEGIN
     DECLARE @tar_account As NVARCHAR(50)
     DECLARE @src_account As NVARCHAR(50)
     DECLARE @transaction_type As NVARCHAR(10)
-    DECLARE @credit AS MONEY
-    DECLARE @debet AS MONEY
+    DECLARE @total_amount AS MONEY
     DECLARE @src_user_id AS INT
     DECLARE @tar_user_id AS INT
     DECLARE @transaction_note AS NVARCHAR(MAX)
@@ -252,16 +251,18 @@ BEGIN
            @order_number = patr_order_number,
            @trx_number_ref = patr_trx_number_ref,
            @transaction_type = TRIM(patr_type),
-           @transaction_note = patr_note,
-           @credit = patr_credit,
-           @debet = patr_debet
+           @transaction_note = patr_note
       FROM inserted;
+
+    SELECT @total_amount = boor_total_ammount
+    FROM Booking.booking_orders
+    WHERE boor_order_number = @order_number
 
 	IF (@transaction_type = 'RF' OR @transaction_type = 'RPY')
     BEGIN
         SELECT @src_account = patr_target_id,
                @tar_account = patr_source_id,
-               @credit = Payment.fnRefundAmount((patr_credit + patr_debet), default)
+               @total_amount = Payment.fnRefundAmount((patr_credit + patr_debet), default)
         FROM Payment.payment_transaction
         WHERE patr_trx_number = @trx_number_ref
     END
@@ -270,40 +271,38 @@ BEGIN
                     patr_trx_number, patr_debet, patr_credit, patr_type, patr_note,
                     patr_order_number, patr_source_id, patr_target_id, patr_trx_number_ref, patr_user_id)
             VALUES (Payment.fnFormatedTransactionId(IDENT_CURRENT('Payment.[payment_transaction]'), @transaction_type), 0,
-                    @credit, @transaction_type,@transaction_note, @order_number,@src_account, @tar_account, @trx_number_ref, @src_user_id);
+                    @total_amount, @transaction_type,@transaction_note, @order_number, @src_account, @tar_account, @trx_number_ref, @src_user_id);
 -- 	TOP UP
     IF @transaction_type = 'TP'
     BEGIN
         EXECUTE [Payment].[spTopUpTransaction]
              @src_account
-            ,@tar_account
-            ,@credit
+            ,@total_amount
     END
-
 
     -- TRANSFER BOOKING
     IF @transaction_type = 'TRB'
     BEGIN
-        EXECUTE [Payment].[spTransferBookingTransaction]
-             @src_account
-            ,@tar_account
-            ,@credit
+        EXECUTE [Payment].[spCalculationTranferBooking]
+             @order_number,
+             @tar_account
     END
 
     -- ORDER MENU
-    IF @transaction_type = 'ORM'
-    BEGIN
-        EXECUTE [Payment].[spTransferBookingTransaction]
-             @src_account
-            ,@tar_account
-            ,@credit
-    END
+--     IF @transaction_type = 'ORM'
+--     BEGIN
+--         EXECUTE [Payment].[spTransferBookingTransaction]
+--              @src_account
+--             ,@tar_account
+--             ,@total_amount
+--     END
 
     -- REFUND
     IF @transaction_type = 'RF'
     BEGIN
         EXECUTE [Payment].[spRefundTransaction]
-             @trx_number_ref
+            @trx_number_ref,
+            default
     END
 
     SELECT @tar_user_id = usac_user_id
@@ -314,7 +313,7 @@ BEGIN
                 patr_trx_number, patr_debet, patr_credit, patr_type, patr_note,
                 patr_order_number, patr_source_id, patr_target_id, patr_trx_number_ref, patr_user_id)
         VALUES (Payment.fnFormatedTransactionId(IDENT_CURRENT('Payment.[payment_transaction]'), @transaction_type),
-                @credit, 0, @transaction_type, @transaction_note, @order_number, @src_account, @tar_account, @trx_number_ref, @tar_user_id);
+                @total_amount, 0, @transaction_type, @transaction_note, @order_number, @src_account, @tar_account, @trx_number_ref, @tar_user_id);
 
 
 		-- REPAYMENT
@@ -323,7 +322,7 @@ BEGIN
 -- 			EXECUTE [Payment].[spTopUpTransaction]
 -- 				 @source_account = @src_account
 -- 				,@target_account = @tar_account
--- 				,@expense = @amount
+-- 				,@expense = @total_amount
 -- 		END
 
 -- 		SELECT patr_id FROM inserted;

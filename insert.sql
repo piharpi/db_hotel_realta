@@ -758,7 +758,7 @@ VALUES (1, 'Winter Sale', 'Get 20% off your stay when you book a room during the
        (7, 'AAA/CAA Discount', 'Show your AAA or CAA membership card and get 10% off your stay', 'T', 0.2 , '2022-12-01', '2023-03-31', 1, 3, GETDATE()),
        (8, 'Senior Discount', 'Guests 65 and over receive 10% off their stay', 'C', 0.1, '2022-12-01', '2022-03-31', 1, 3, GETDATE()),
        (9, 'Military Discount', 'Active duty military personnel receive 15% off their stay', 'I', 0.15, '2022-12-01', '2023-03-31', 1, 3, GETDATE())
-SET IDENTITY_INSERT Booking.special_offers OFF
+SET IDENTITY_INSERT Booking.special_offers OFF;
 -- SELECT*FROM Booking.special_offers
 -- select * from Booking.special_offers;
 

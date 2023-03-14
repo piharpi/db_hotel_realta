@@ -762,6 +762,7 @@ SET IDENTITY_INSERT Booking.special_offers OFF
 -- SELECT*FROM Booking.special_offers
 -- select * from Booking.special_offers;
 
+DISABLE TRIGGER Booking.TgPaymentBookingTransaction ON Booking.booking_orders;
 SET IDENTITY_INSERT Booking.booking_orders ON
 INSERT INTO Booking.booking_orders (boor_id,boor_order_number, 	boor_order_date, boor_total_room, boor_total_ammount, boor_down_payment,boor_pay_type,boor_is_paid,boor_type, boor_cardnumber, boor_user_id,boor_hotel_id)
 VALUES (1,'BO#20221127-0001', '2023-01-27', 3,500000,200000,'D', 'DP', 'T', '431-2388-93', 1, 1);

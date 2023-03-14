@@ -489,3 +489,40 @@ BEGIN
     WHERE hotel_id IN (SELECT hotel_id FROM inserted)
   END
 END;
+
+-- =============================================
+-- Author:		Gabi 
+-- Create date: GetDate()
+-- Description:	Trigger to update totalRoom,totalAmount in Booking_orders
+-- =============================================
+
+CREATE OR ALTER TRIGGER Booking.TrToRoomAndTotalAmountUpdate
+ON booking.booking_order_detail
+AFTER INSERT, DELETE, UPDATE 
+AS
+BEGIN
+	SET XACT_ABORT ON;
+  	UPDATE Booking.booking_orders
+  	SET 
+	-- Update the boor_total_room column for each affected boorId
+		boor_total_room = 
+		(
+			SELECT COUNT(d.borde_id)
+			FROM Booking.booking_order_detail d
+			WHERE borde_boor_id = boor_id
+  		),
+	-- Update the boor_total_amount column for each affected boorId
+		boor_total_ammount=
+		(
+			SELECT SUM(d.borde_subtotal)
+			FROM Booking.booking_order_detail d
+			WHERE borde_boor_id=boor_id
+		)
+  WHERE boor_id IN (
+    SELECT borde_boor_id
+    FROM inserted
+    UNION
+    SELECT borde_boor_id
+    FROM deleted
+  )
+END;

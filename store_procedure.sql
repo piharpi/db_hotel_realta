@@ -1104,10 +1104,10 @@ CREATE OR ALTER procedure booking.sp_insert_booking_order_detail
 AS
 BEGIN
 	SET XACT_ABORT ON
-	DECLARE @faci_price money = (select faci_low_price from Hotel.facilities where faci_id=@borde_faci_id)
-	DECLARE @faci_tax smallmoney = (select faci_tax_rate from Hotel.facilities where faci_id=@borde_faci_id)
+	DECLARE @faci_price money = (select faci_rate_price from Hotel.facilities where faci_id=@borde_faci_id)
+	DECLARE @faci_tax smallmoney = (select faci_tax_rate/faci_rate_price from Hotel.facilities where faci_id=@borde_faci_id)
 
-	-- insert borde
+	-- Insert borde
 	INSERT INTO Booking.booking_order_detail
 	(
 		borde_boor_id,

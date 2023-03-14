@@ -7,6 +7,7 @@ GO
 
 DBCC CHECKIDENT ('Purchasing.purchase_order_header', RESEED, 1);
 GO
+
 DELETE Purchasing.purchase_order_detail;
 DELETE Purchasing.stock_detail;
 DELETE Purchasing.stock_photo;
@@ -16,6 +17,9 @@ DELETE Purchasing.vendor;
 DELETE Purchasing.cart;
 
 -- DELETE MODULE Payment
+DBCC CHECKIDENT ('Payment.payment_transaction', RESEED, 1);
+GO
+
 DELETE Payment.payment_transaction;
 DELETE Payment.payment_gateway;
 DELETE Payment.entity;
@@ -227,14 +231,14 @@ SET IDENTITY_INSERT Users.users ON;
 INSERT INTO users.users (user_id, user_full_name, user_type, user_company_name, user_email, user_phone_number, user_modified_date)
 VALUES (1,'John Smith', 'T', 'Acme Inc.', 'john.smith@acme.com', '123-456-7890', GETDATE()),
 	   (2,'Jane Doe', 'C', 'XYZ Corp.', 'jane.doe@xyz.com', '123-456-7891', GETDATE()),
-	   (3,'Bob Johnson', 'I', 'ABC Inc.', 'bob.johnson@abc.com', '123-456-7892', GETDATE()),
+	   (3,'Account Realta', 'C', 'Hotel Realta.', 'realta@hotel.com', '033-456-7899', GETDATE()),
 	   (4,'Samantha Williams', 'T', 'Def Corp.', 'samantha.williams@def.com', '123-456-7893', GETDATE()),
 	   (5,'Michael Brown', 'C', 'Ghi Inc.', 'michael.brown@ghi.com', '123-456-7894', GETDATE()),
 	   (6,'Emily Davis', 'I', 'Jkl Ltd.', 'emily.davis@jkl.com', '123-456-7895', GETDATE()),
 	   (7,'William Thompson', 'T', 'Mno Inc.', 'william.thompson@mno.com', '123-456-7896', GETDATE()),
 	   (8,'Ashley Johnson', 'C', 'Pqr Corp.', 'ashley.johnson@pqr.com', '123-456-7897', GETDATE()),
 	   (9,'David Anderson', 'I', 'Stu Inc.', 'david.anderson@stu.com', '123-456-7898', GETDATE()),
-	   (10,'Jessica Smith', 'T', 'Vwx Corp.', 'jessica.smith@vwx.com', '123-456-7899', GETDATE()),
+	   (10,'Bob Johnson', 'I', 'ABC Inc.', 'bob.johnson@abc.com', '123-456-7892', GETDATE()),
 	   (11,'David Brown', 'T', 'Example Co', 'david.brown@example.com', '555-555-1222', GETDATE()),
 	   (12,'Jessica Smith', 'C', 'Test Inc', 'jessica.smith@test.com', '555-555-1223', GETDATE()),
 	   (13,'James Johnson', 'I', 'Acme Inc', 'james.johnson@acme.com', '555-555-1224', GETDATE()),
@@ -286,7 +290,7 @@ VALUES
 (7, 2),
 (8, 3),
 (9, 4),
-(10, 5),
+(10, 2),
 (11, 1),
 (12, 2),
 (13, 3),
@@ -758,45 +762,27 @@ SET IDENTITY_INSERT Booking.special_offers OFF
 
 
 SET IDENTITY_INSERT Booking.booking_orders ON
-INSERT INTO Booking.booking_orders (boor_id, boor_order_number,boor_order_date, boor_total_room ,boor_pay_type, boor_is_paid, boor_type, boor_user_id, boor_hotel_id)
-VALUES (1, 'BO#20221127-0001', '2023-01-27', 4,'C', 'DP', 'T', 1, 1),
-       (2, 'BO#20221127-0002', '2023-01-27', 4,'C', 'P', 'C', 2, 2),
-       (3, 'BO#20221127-0003', '2023-01-27', 4,'D', 'R', 'I', 3, 3),
-       (4, 'BO#20221127-0004', '2023-01-27', 4,'C', 'DP', 'T', 4, 4),
-       (5, 'BO#20221127-0005', '2023-01-27', 4,'D', 'P', 'C', 5, 5),
-       (6, 'BO#20221127-0006', '2023-01-27', 4,'C', 'R', 'I', 6, 6),
-       (7, 'BO#20221127-0007', '2023-01-27', 4,'D', 'DP', 'T', 7, 7),
-       (8, 'BO#20221127-0008', '2023-01-27', 4,'C', 'P', 'C', 8, 8),
-       (9, 'BO#20221127-0009', '2023-01-27', 4,'C', 'R', 'I', 9, 9),
-       (10, 'BO#20221127-0010', '2023-01-27', 3,'C', 'DP', 'T', 10, 10),
-       (11, 'BO#20221127-0011', '2023-01-27', 3,'D', 'P', 'C', 9, 9),
-       (12, 'BO#20221127-0012', '2023-01-27', 3,'D', 'R', 'I', 10, 10),
-       (13, 'BO#20221127-0013', '2023-01-27', 3,'D', 'DP', 'T', 7, 7),
-       (14, 'BO#20221127-0014', '2023-01-27', 3,'C', 'P', 'C', 2, 1),
-       (15, 'BO#20221127-0015', '2023-01-27', 3,'D', 'R', 'I', 8, 5),
-       (16, 'BO#20221127-0016', '2023-01-27', 3,'D', 'DP', 'T', 7, 6),
-       (17, 'BO#20221127-0017', '2023-01-27', 3,'C', 'P', 'C', 1, 7)
+INSERT INTO Booking.booking_orders (boor_id,boor_order_number, 	boor_order_date, boor_total_room,boor_total_ammount,boor_down_payment,boor_pay_type,boor_is_paid,boor_type,boor_carnumber,boor_user_id,boor_hotel_id)
+VALUES (1, 'BO#20221127-0001', '2023-01-27', 3,500000,200000,'D', 'DP', 'T', '431-2388-93', 1, 1),
+       (2, 'BO#20221127-0002', '2023-01-27', 4,300000,0,'C', 'P', 'C','123-2993-32', 2, 2),
+       (3, 'BO#20221127-0003', '2023-01-27', 4,300000,200000,'D', 'DP', 'T','992-1923-39', 4, 3),
+       (4, 'BO#20221127-0004', '2023-01-27', 4,150000,50000,'PG', 'DP', 'C','571-2939-23', 8, 4),
+       (5, 'BO#20221127-0005', '2023-01-27', 4,500000,0,'D', 'P', 'C','571-2939-23', 7, 5)
 SET IDENTITY_INSERT Booking.booking_orders OFF
 -- SELECT*FROM Booking.booking_orders
 
 SET IDENTITY_INSERT Booking.booking_order_detail ON
 INSERT INTO Booking.booking_order_detail (borde_boor_id, borde_id, borde_checkin, borde_checkout, borde_adults, borde_kids, borde_price, borde_extra, borde_discount, borde_tax, borde_faci_id)
-VALUES (1, 1, '2022-11-27', '2022-11-28', 2, 0, 100, 0, 0, 10, 1),
-       (2, 2, '2022-11-27', '2022-11-28', 2, 1, 120, 20, 10, 12, 2),
-       (3, 3, '2022-11-27', '2022-11-28', 3, 0, 150, 30, 20, 15, 3),
-       (4, 4, '2022-11-27', '2022-11-28', 2, 2, 200, 40, 30, 20, 4),
-       (5, 5, '2022-11-27', '2022-11-28', 1, 1, 250, 50, 40, 25, 5),
-       (6, 6, '2022-11-27', '2022-11-28', 4, 0, 300, 60, 50, 30, 6),
-       (7, 7, '2022-11-27', '2022-11-28', 2, 3, 350, 70, 60, 35, 7),
-       (8, 8, '2022-11-27', '2022-11-28', 3, 2, 400, 80, 70, 40, 8),
-       (9, 9, '2022-11-27', '2022-11-28', 1, 4, 450, 90, 80, 45, 9),
-       (10, 10, '2022-11-27', '2022-11-28', 4, 1, 500, 100, 90, 50, 1),
-       (11, 11, '2022-11-27', '2022-11-28', 2, 0, 550, 110, 100, 55, 1),
-       (12, 12, '2022-11-27', '2022-11-28', 3, 1, 600, 120, 110, 60, 2),
-       (13, 13, '2022-11-27', '2022-11-28', 1, 2, 650, 130, 120, 65, 3),
-       (14, 14, '2022-11-27', '2022-11-28', 4, 0, 700, 140, 130, 70, 4),
-       (15, 15, '2022-11-27', '2022-11-28', 2, 3, 750, 150, 140, 75, 5),
-       (16, 16, '2022-11-27', '2022-11-28', 3, 2, 800, 160, 150, 80, 6)
+VALUES (1, 1, '2022-11-27', '2022-11-28', 2, 0, 100, 0, 0, 10, 5),
+       (1, 2, '2022-11-27', '2022-11-28', 2, 1, 120, 20, 10, 12, 6),
+       (2, 3, '2022-11-27', '2022-11-28', 3, 0, 150, 30, 20, 15, 7),
+       (2, 4, '2022-11-27', '2022-11-28', 2, 2, 200, 40, 30, 20, 5),
+       (3, 5, '2022-11-27', '2022-11-28', 1, 1, 250, 50, 40, 25, 5),
+       (3, 6, '2022-11-27', '2022-11-28', 4, 0, 300, 60, 50, 30, 5),
+       (4, 7, '2022-11-27', '2022-11-28', 2, 3, 350, 70, 60, 35, 6),
+       (4, 8, '2022-11-27', '2022-11-28', 3, 2, 400, 80, 70, 40, 8),
+       (5, 9, '2022-11-27', '2022-11-28', 1, 4, 450, 90, 80, 45, 6),
+       (5, 10, '2022-11-27', '2022-11-28', 4, 1, 500, 100, 90, 50, 6)
 SET IDENTITY_INSERT Booking.booking_order_detail OFF
 -- SELECT*FROM Booking.booking_order_detail
 
@@ -812,17 +798,7 @@ VALUES (1, 10, 2, 'people', 1, 1),
        (7, 40, 8, 'people', 7, 3),
        (8, 45, 9, 'unit', 8, 4),
        (9, 50, 10, 'kg', 9, 3),
-       (10, 55, 11, 'people', 10, 2),
-       (11, 60, 12, 'unit', 11, 1),
-       (12, 65, 13, 'kg', 12, 2),
-       (13, 70, 14, 'people', 13, 3),
-       (14, 75, 15, 'unit', 14, 4),
-       (15, 80, 16, 'kg', 15, 5),
-       (16, 85, 17, 'people', 16, 2),
-       (17, 90, 18, 'unit', 1, 1),
-       (18, 95, 19, 'kg', 2, 2),
-       (19, 100, 20, 'people', 3, 2),
-       (20, 105, 21, 'unit', 4, 3)
+       (10, 55, 11, 'people', 10, 2)
 SET IDENTITY_INSERT Booking.booking_order_detail_extra OFF
 -- SELECT*FROM Booking.booking_order_detail_extra
 
@@ -835,15 +811,13 @@ VALUES (1, 1, 1),
        (5, 5, 5),
        (6, 6, 6),
        (7, 7, 7),
-       (8, 8, 8),
-       (9, 9, 9),
-       (10, 10, 1)
+       (8, 8, 8)
 SET IDENTITY_INSERT Booking.special_offer_coupons OFF
 -- SELECT*FROM Booking.special_offer_coupons
 
 INSERT INTO Booking.user_breakfast (usbr_borde_id, usbr_modified_date, usbr_total_vacant)
 VALUES
-    (1, '2022-11-27',1),
+    (1,'2022-11-27',1),
     (2,'2022-11-27',  2),
     (3,'2022-11-27',  3),
     (4,'2022-11-27',  2),
@@ -852,13 +826,7 @@ VALUES
     (7,'2022-11-27',  2),
     (8,'2022-11-27',  3),
     (9,'2022-11-27',  1),
-    (10, '2022-11-27', 4),
-    (11, '2022-11-27', 2),
-    (12, '2022-11-27', 3),
-    (13, '2022-11-27', 1),
-    (14, '2022-11-27', 4),
-    (15, '2022-11-27', 2),
-    (16, '2022-11-27', 3)
+    (10, '2022-11-27', 4)
 -- select * from Booking.user_breakfast
 
 -- INSERT MODULE RESTO
@@ -952,7 +920,7 @@ ENABLE TRIGGER [Payment].[InsertBankEntityId] ON [Payment].bank;
 DISABLE TRIGGER [Payment].[InsertPaymentEntityId] ON [Payment].payment_gateway;
 INSERT
   INTO Payment.payment_gateway(paga_entity_id, paga_code, paga_name, paga_modified_date)
-VALUES (8, 'GOPAY', 'PT. Dompet Anak Bangsa', CURRENT_TIMESTAMP),
+VALUES (8, 'GOTO', 'PT. Dompet Anak Bangsa', CURRENT_TIMESTAMP),
        (9, 'OVO', 'PT. Visionet Internasional', CURRENT_TIMESTAMP),
        (10, 'DANA', 'PT. Espay Debit Indonesia', CURRENT_TIMESTAMP),
        (11, 'SHOPEEPAY', 'Shopee', CURRENT_TIMESTAMP),
@@ -964,35 +932,65 @@ ENABLE TRIGGER [Payment].[InsertPaymentEntityId] ON [Payment].payment_gateway;
 
 -- SELECT*FROM payment.payment_gateway;
 
+SET IDENTITY_INSERT Payment.user_accounts ON
 -- user_accounts
 INSERT
-  INTO Payment.user_accounts(usac_entity_id, usac_user_id, usac_account_number, usac_saldo, usac_type, usac_expmonth, usac_expyear, usac_modified_date)
-VALUES (1, 1, '6271263188999', 1000000, 'debet', 11, 22, CURRENT_TIMESTAMP),
-       (2, 2, '8012372737662', 1000000, 'credit card', 12, 27, CURRENT_TIMESTAMP),
-       (3, 3, '9712893896126', 1000000, 'debet', 03, 23, CURRENT_TIMESTAMP),
-       (4, 4, '8129387462674', 1000000, 'debet', 08, 24, CURRENT_TIMESTAMP),
-       (5, 5, '7781236462762', 1000000, 'debet', 09, 28, CURRENT_TIMESTAMP),
-       (6, 6, '1278287363663', 1000000, 'credit card', 02, 25, CURRENT_TIMESTAMP),
-       (7, 7, '6326361273712', 1000000, 'debet', 01, 26, CURRENT_TIMESTAMP),
-       (8, 8, '812327176263', 1000000, 'payment', 0, 0, CURRENT_TIMESTAMP),
-       (9, 9, '827363525152', 1000000, 'payment', 0, 0, CURRENT_TIMESTAMP),
-       (10, 10, '829283525152', 1000000, 'payment', 0, 0, CURRENT_TIMESTAMP),
-       (11, 11, '872363155421', 1000000, 'payment', 0, 0, CURRENT_TIMESTAMP),
-       (12, 12, '873652901212', 1000000, 'payment', 0, 0, CURRENT_TIMESTAMP),
-       (13, 13, '809283222364', 1000000, 'payment', 0, 0, CURRENT_TIMESTAMP),
-       (14, 14, '890128352546', 1000000, 'payment', 0, 0, CURRENT_TIMESTAMP),
-       (15, 15, '856272837172', 1000000, 'payment', 0, 0, CURRENT_TIMESTAMP);
+  INTO Payment.user_accounts(usac_id, usac_entity_id, usac_user_id, usac_account_number, usac_saldo, usac_type, usac_expmonth, usac_expyear, usac_modified_date)
+VALUES (1, 1, 1, '431-2388-93', 1000000, 'debet', 11, 22, CURRENT_TIMESTAMP),
+       (2, 1, 2, '123-2993-32', 0, 'credit_card', 12, 27, CURRENT_TIMESTAMP),
+       (3, 3, 3, '131-3456-78', 0, 'debet', 05, 25, CURRENT_TIMESTAMP), -- Hotel Realta Account
+       (4, 4, 4, '992-1923-39', 1000000, 'debet', 08, 24, CURRENT_TIMESTAMP),
+       (5, 5, 5, '727-1931-34', 0, 'debet', 09, 28, CURRENT_TIMESTAMP),
+       (6, 6, 6, '889-3921-22', 0, 'credit_card', 02, 25, CURRENT_TIMESTAMP),
+       (7, 7, 7, '571-2939-23', 1000000, 'debet', 01, 26, CURRENT_TIMESTAMP),
+       (8, 8, 8, '11-1111-1111', 500000, 'payment', null, null, CURRENT_TIMESTAMP),
+       (9, 9, 9, '0873635251525', 500000, 'payment', null, null, CURRENT_TIMESTAMP),
+       (10, 10, 10, '081289389126', 500000, 'payment', null, null, CURRENT_TIMESTAMP),
+       (11, 11, 4, '087363155421', 500000, 'payment', null, null, CURRENT_TIMESTAMP),
+       (12, 12, 12, '087365291212', 500000, 'payment', null, null, CURRENT_TIMESTAMP),
+       (13, 13, 13, '081928222364', 500000, 'payment', null, null, CURRENT_TIMESTAMP),
+       (14, 14, 14, '089012852546', 500000, 'payment', null, null, CURRENT_TIMESTAMP),
+       (15, 15, 15, '085627287172', 500000, 'payment', null, null, CURRENT_TIMESTAMP);
+SET IDENTITY_INSERT Payment.user_accounts OFF
 -- SELECT*FROM payment.user_accounts;
 
 -- payment_transactions
-SET IDENTITY_INSERT Payment.payment_transaction ON
-INSERT
-  INTO Payment.payment_transaction(patr_id, patr_trx_number, patr_debet, patr_credit, patr_type, patr_note, patr_modified_date,
-                                  patr_order_number, patr_source_id, patr_target_id, patr_trx_number_ref, patr_user_id)
-VALUES (1, 'TRB#20221127-0001', 150000, 150000, 'TRB', 'Tranfer Booking', CURRENT_TIMESTAMP, 'BO#20221127-0001', '6271263188999', '8012372737662', 'TRB#20221127-0001', 1),
-       (2, 'TRB#20221127-0002', 150000, 150000, 'ORM', 'Order Menu', CURRENT_TIMESTAMP, 'MENUS#20221127-0001', '8012372737662', '6271263188999', 'TRB#20221127-0002', 2);
-SET IDENTITY_INSERT Payment.payment_transaction OFF;
--- SELECT*FROM payment.payment_transaction;
+-- SET IDENTITY_INSERT Payment.payment_transaction ON
+-- DISABLE TRIGGER [Payment].[CalculateUserAccountCredit] ON [Payment].[payment_transaction];
+
+-- pay_type 'debet'
+EXECUTE [Payment].[spCreateTransferBooking]
+       'BO#20221127-0001'
+       ,'431-2388-93'
+       ,1
+GO
+
+-- pay_type 'cash',  ignored
+EXECUTE [Payment].[spCreateTransferBooking]
+       'BO#20221127-0002'
+       ,'123-2993-32'
+       ,2
+GO
+-- INSERT
+--   INTO Payment.payment_transaction(patr_debet, patr_credit, patr_type, patr_note, patr_modified_date,
+--                                   patr_order_number, patr_source_id, patr_target_id, patr_trx_number_ref, patr_user_id)
+-- VALUES (0, 769999, 'TRB', 'Tranfer Booking Note', CURRENT_TIMESTAMP, 'BO#20221127-0001', '431-2388-93', '131-3456-78', null, 1);
+-- INSERT
+--   INTO Payment.payment_transaction(patr_debet, patr_credit, patr_type, patr_note, patr_modified_date,
+--                                   patr_order_number, patr_source_id, patr_target_id, patr_trx_number_ref, patr_user_id)
+-- VALUES (0, 100000, 'ORM', 'Order Menu', CURRENT_TIMESTAMP, 'MENUS#20221127-0001', '123-2993-32', '131-3456-78', null, 2);
+-- INSERT
+--   INTO Payment.payment_transaction(patr_debet, patr_credit, patr_type, patr_note, patr_modified_date,
+--                                   patr_order_number, patr_source_id, patr_target_id, patr_trx_number_ref, patr_user_id)
+-- VALUES (0, 235000, 'TP', 'Top Up Note', CURRENT_TIMESTAMP,  null, '992-1923-39', '087363155421', null, 4);
+-- INSERT
+--   INTO Payment.payment_transaction(patr_debet, patr_credit, patr_type, patr_note, patr_modified_date,
+--                                   patr_order_number, patr_source_id, patr_target_id, patr_trx_number_ref, patr_user_id)
+-- VALUES (0, 0, 'RF', '*Refund Order Menu', CURRENT_TIMESTAMP,  null, null, null, Payment.fnFormatedTransactionId(3, 'ORM'), 2);
+
+-- SET IDENTITY_INSERT Payment.payment_transaction OFF;
+-- ENABLE TRIGGER [Payment].CalculateUserAccountCredit ON [Payment].payment_transaction;
+-- SELECT*FROM payment.payment_transaction; debet 869999.0000
 
 -- PURCHASING INSERT
 DISABLE TRIGGER [Purchasing].[InsertVendorEntityId] ON [Purchasing].vendor;

@@ -470,7 +470,7 @@ CREATE TABLE Booking.booking_orders(
 	boor_total_ammount MONEY, -- sum(borde_subtotal)
 	boor_down_payment MONEY, -- on update
 	boor_pay_type NCHAR(2) NOT NULL, CHECK(boor_pay_type IN ('CR', 'C', 'D', 'PG')),
-	boor_is_paid NCHAR(2) NOT NULL CHECK (boor_is_paid IN ('DP','P','R ')),
+	boor_is_paid NCHAR(2) NOT NULL CHECK (boor_is_paid IN ('DP','P','R')),
 	boor_type NVARCHAR(15) NOT NULL CHECK (boor_type IN ('T','C','I')),
 	boor_cardnumber NVARCHAR(25), -- on insert on update
 	boor_member_type NVARCHAR(15), -- ambil dari usme_memb_name(fk user_id)
@@ -498,7 +498,7 @@ CREATE TABLE Booking.booking_order_detail(
 	borde_extra MONEY, -- sum(boex_subtotal) dari borde_id yg sama
 	borde_discount SMALLMONEY, -- faci_discount+sum(spof_discount) -> lewat soco_id
 	borde_tax SMALLMONEY, -- ngambil default faci_tax_rate
-	borde_subtotal AS borde_price+(borde_price*borde_tax)-(borde_price+borde_discount),
+	borde_subtotal AS (borde_price+(borde_price*borde_tax))-(borde_price*borde_discount),
 	borde_faci_id INTEGER,
 	CONSTRAINT pk_borde_id_boor_id PRIMARY KEY (borde_id, borde_boor_id),
 	CONSTRAINT fk_border_boor_id FOREIGN KEY(borde_boor_id)	REFERENCES Booking.booking_orders(boor_id),
@@ -652,6 +652,7 @@ CREATE TABLE Payment.payment_gateway(
 );
 
 CREATE TABLE Payment.user_accounts(
+    usac_id int identity(1,1),
 	usac_entity_id int NOT NULL,
 	usac_user_id int NOT NULL,
 	usac_account_number varchar(25) UNIQUE NOT NULL,
@@ -660,8 +661,8 @@ CREATE TABLE Payment.user_accounts(
 	usac_expmonth tinyint DEFAULT NULL,
 	usac_expyear smallint DEFAULT NULL,
 	usac_modified_date datetime,
-	CONSTRAINT CK_PaymentUserAccountsType CHECK (usac_type IN ('debet', 'credit card', 'payment')),
-	CONSTRAINT PK_PaymentUserAccountsEntityId PRIMARY KEY(usac_entity_id, usac_user_id),
+	CONSTRAINT CK_PaymentUserAccountsType CHECK (usac_type IN ('debet', 'credit_card', 'payment')),
+	CONSTRAINT PK_PaymentUserAccountsEntityId PRIMARY KEY(usac_user_id, usac_id),
 	CONSTRAINT FK_PaymentUserAccountsEntityPaymentGateway_Bank FOREIGN KEY(usac_entity_id)
 		REFERENCES Payment.Entity(entity_id)
 		ON UPDATE CASCADE
@@ -673,16 +674,16 @@ CREATE TABLE Payment.user_accounts(
 );
 
 CREATE TABLE Payment.payment_transaction(
-  patr_id int IDENTITY(1,1) PRIMARY KEY,
+    patr_id int IDENTITY(1,1) PRIMARY KEY,
 	patr_trx_number nvarchar(55) UNIQUE,
-	patr_debet money,
-	patr_credit money,
+	patr_debet money default(0),
+	patr_credit money default(0),
 	patr_type nchar(3) NOT NULL,
 	patr_note nvarchar(255),
-	patr_modified_date datetime,
-	patr_order_number nvarchar(55),
-	patr_source_id varchar(25),
-	patr_target_id varchar(25),
+	patr_modified_date datetime DEFAULT(GETDATE()),
+	patr_order_number nvarchar(55) NULL,
+	patr_source_id varchar(25) NULL,
+	patr_target_id varchar(25) NULL,
 	patr_trx_number_ref nvarchar(55) NULL,
 	patr_user_id int,
 	CONSTRAINT CK_PaymentPaymentTransactionType CHECK (patr_type IN ('TP', 'TRB', 'RPY', 'RF', 'ORM')),
@@ -696,9 +697,9 @@ CREATE TABLE Payment.payment_transaction(
 		REFERENCES Payment.User_Accounts(usac_account_number)
 );
 
-CREATE UNIQUE INDEX UQ_PaymentTransaction_patr_trx_number_ref
-  ON Payment.payment_transaction(patr_trx_number_ref)
-  WHERE patr_trx_number_ref IS NOT NULL
+-- CREATE UNIQUE INDEX UQ_PaymentTransaction_patr_trx_number_ref
+--   ON Payment.payment_transaction(patr_trx_number_ref)
+--   WHERE patr_trx_number_ref IS NOT NULL
 
 -- MODULE PURCHASING --
 CREATE TABLE purchasing.vendor(

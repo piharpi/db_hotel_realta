@@ -61,7 +61,7 @@ CREATE TABLE Master.provinces (
   prov_id int IDENTITY (1, 1),
   prov_name nvarchar(85) NOT NULL,
   prov_country_id int CONSTRAINT pk_prov_id PRIMARY KEY(prov_id),
-  CONSTRAINT fk_prov_country_name FOREIGN KEY(prov_country_id) REFERENCES Master.country(country_id)
+  CONSTRAINT fk_prov_country_id FOREIGN KEY(prov_country_id) REFERENCES Master.country(country_id)
 	ON DELETE CASCADE
 	ON UPDATE CASCADE
 );
@@ -70,8 +70,9 @@ CREATE TABLE Master.address (
   addr_id int IDENTITY(1, 1),
   addr_line1 nvarchar(255) NOT NULL,
   addr_line2 nvarchar(255),
+  addr_city NVARCHAR(25) NOT NULL,
   addr_postal_code nvarchar(5),
-  addr_spatial_location geography,
+  addr_spatial_location NVARCHAR(100),
   addr_prov_id int,
   CONSTRAINT pk_addr_id PRIMARY KEY(addr_id),
   CONSTRAINT fk_addr_prov_id FOREIGN KEY(addr_prov_id) REFERENCES Master.provinces(prov_id)
@@ -114,6 +115,7 @@ CREATE TABLE Master.price_items (
   prit_price money NOT NULL,
   prit_description nvarchar(255),
   prit_type nvarchar(15) NOT NULL CHECK (prit_type IN ('SNACK', 'FACILITY', 'SOFTDRINK', 'FOOD', 'SERVICE')),
+  prit_icon_url NVARCHAR(255),
   prit_modified_date datetime,
   CONSTRAINT pk_prit_id PRIMARY KEY(prit_id)
 );

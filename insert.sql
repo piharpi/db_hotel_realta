@@ -7,7 +7,6 @@ GO
 
 DBCC CHECKIDENT ('Purchasing.purchase_order_header', RESEED, 1);
 GO
-
 DELETE Purchasing.purchase_order_detail;
 DELETE Purchasing.stock_detail;
 DELETE Purchasing.stock_photo;
@@ -17,9 +16,6 @@ DELETE Purchasing.vendor;
 DELETE Purchasing.cart;
 
 -- DELETE MODULE Payment
-DBCC CHECKIDENT ('Payment.payment_transaction', RESEED, 1);
-GO
-
 DELETE Payment.payment_transaction;
 DELETE Payment.payment_gateway;
 DELETE Payment.entity;
@@ -78,6 +74,28 @@ DELETE Users.users;
 DELETE Users.user_profiles;
 DELETE Users.user_members;
 
+-- RESET IDENT MODULE Master
+DBCC CHECKIDENT ('Master.regions', RESEED, 1);
+GO
+DBCC CHECKIDENT ('Master.country', RESEED, 1);
+GO
+DBCC CHECKIDENT ('Master.provinces', RESEED, 1);
+GO
+DBCC CHECKIDENT ('Master.address', RESEED, 1);
+GO
+DBCC CHECKIDENT ('Master.price_items', RESEED, 1);
+GO
+DBCC CHECKIDENT ('Master.members', RESEED, 1);
+GO
+DBCC CHECKIDENT ('Master.service_task', RESEED, 1);
+GO
+DBCC CHECKIDENT ('Master.category_group', RESEED, 1);
+GO
+DBCC CHECKIDENT ('Master.policy', RESEED, 1);
+GO
+DBCC CHECKIDENT ('Master.policy_category_group', RESEED, 1);
+GO
+
 -- DELETE MODULE Master
 DELETE Master.regions;
 DELETE Master.country;
@@ -97,67 +115,60 @@ DELETE Master.policy_category_group;
 --REGION
 SET IDENTITY_INSERT Master.Regions ON;
 INSERT INTO Master.Regions (region_code, region_name)
-VALUES ('1', 'Region 1'), ('2', 'Region 2'), ('3', 'Region 3'),
-	   ('4', 'Region 4'), ('5', 'Region 5'), ('6', 'Region 6'),
-	   ('7', 'Region 7'), ('8', 'Region 8'), ('9', 'Region 9'),
-	   ('10', 'Region 10'), ('11', 'Region 11'), ('12', 'Region 12'),
-	   ('13', 'Region 13'), ('14', 'Region 14'), ('15', 'Region 15'),
-	   ('16', 'Region 16'), ('17', 'Region 17'), ('18', 'Region 18'),
-	   ('19', 'Region 19'), ('20', 'Region 20');
+VALUES ('1','Asia'), ('2','Europe'), ('3','North America'), ('4','South America'), ('5','Africa')
 SET IDENTITY_INSERT Master.Regions OFF;
 -- SELECT*FROM Master.Regions
 -- ORDER by region_code ASC
 
 SET IDENTITY_INSERT Master.Country ON;
-INSERT INTO Master.Country (country_id, country_name, country_region_id)
-VALUES (1, 'France', 1), (2, 'Germany', 2), (3, 'Spain', 3),
-	   (4, 'Italy', 4), (5, 'United Kingdom', 5), (6, 'Netherlands', 6),
-	   (7, 'Belgium', 7), (8, 'Denmark', 8), (9, 'Sweden', 9),
-	   (10, 'Norway', 10), (11, 'China', 11), (12, 'Japan', 12),
-	   (13, 'South Korea', 13), (14, 'North Korea', 14), (15, 'India', 15),
-	   (16, 'Pakistan', 16), (17, 'Bangladesh', 17), (18, 'Nepal', 18),
-	   (19, 'Bhutan', 19), (20, 'Sri Lanka', 20);
+INSERT INTO Master.country (country_id, country_name, country_region_id) VALUES 
+(1, 'Indonesia', 1), (2, 'Thailand', 1), (3, 'Japan', 1), (4, 'Germany', 2), (5, 'France', 2),
+(6, 'United States', 3), (7, 'Canada', 3), (8, 'Brazil', 4), (9, 'Argentina', 4), (10, 'South Africa', 5);
 SET IDENTITY_INSERT Master.Country OFF;
 -- SELECT*FROM Master.Country
 -- ORDER by country_id ASC
 
 SET IDENTITY_INSERT Master.Provinces ON;
-INSERT INTO Master.Provinces (prov_id, prov_name, prov_country_id)
-VALUES (1, 'Ontario', 1), (2, 'Quebec', 1), (3, 'British Columbia', 1),
-	   (4, 'Alberta', 1), (5, 'Manitoba', 1), (6, 'Saskatchewan', 1),
-	   (7, 'New Brunswick', 1), (8, 'Nova Scotia', 1), (9, 'Prince Edward Island', 1),
-	   (10, 'Newfoundland and Labrador', 1), (11, 'Hesse', 2), (12, 'Bavaria', 2),
-	   (13, 'Baden-Württemberg', 2), (14, 'North Rhine-Westphalia', 2), (15, 'Lower Saxony', 2),
-	   (16, 'Andalusia', 3), (17, 'Catalonia', 3), (18, 'Valencia', 3),
-	   (19, 'Galicia', 3), (20, 'Castilla y León', 3);
+INSERT INTO Master.provinces (prov_id, prov_name, prov_country_id) VALUES 
+(1, 'Jakarta', 1), 
+(2, 'Bali', 1), 
+(3, 'Chiang Mai', 2), 
+(4, 'Tokyo', 3), 
+(5, 'Berlin', 4),
+(6, 'Paris', 5), 
+(7, 'California', 6), 
+(8, 'New York', 6), 
+(9, 'Ontario', 7), 
+(10, 'Sao Paulo', 8),
+(11, 'Buenos Aires', 9), 
+(12, 'Cape Town', 10), 
+(13, 'Durban', 10), 
+(14, 'Gauteng', 10), 
+(15, 'Nairobi', 3);
 SET IDENTITY_INSERT Master.Provinces OFF;
+SET IDENTITY_INSERT Payment.payment_transaction OFF;
 
 -- SELECT*FROM Master.provinces
 -- ORDER BY prov_id
 
 
 SET IDENTITY_INSERT Master.Address ON;
-INSERT INTO Master.Address (addr_id, addr_line1, addr_line2, addr_postal_code, addr_spatial_location, addr_prov_id)
-VALUES (1, '123 Main Street', '', 'A1AA1', geography::Point(43.65, -79.38, 4326), 1),
-	(2, '456 Maple Avenue', '', 'B2BB2', geography::Point(43.65, -79.38, 4326), 1),
-	(3, '789 Oak Boulevard', '', 'C3CC3', geography::Point(43.65, -79.38, 4326), 1),
-	(4, '321 Pine Street', '', 'D4DD4', geography::Point(43.65, -79.38, 4326), 1),
-	(5, '654 Cedar Road', '', 'E5EE5', geography::Point(43.65, -79.38, 4326), 1),
-	(6, '987 Spruce Lane', '', 'F6FF6', geography::Point(43.65, -79.38, 4326), 1),
-	(7, '246 Fir Avenue', '', 'G77G7', geography::Point(43.65, -79.38, 4326), 1),
-	(8, '369 Hemlock Drive', '', 'H8HH8', geography::Point(43.65, -79.38, 4326), 1),
-	(9, '159 Willow Way', '', 'I9II9', geography::Point(43.65, -79.38, 4326), 1),
-	(10, '753 Maple Street', '', 'J0JJ0', geography::Point(43.65, -79.38, 4326), 1),
-	(11, '1 Parliament Hill', '', 'K1KA6', geography::Point(45.42, -75.70, 4326), 2),
-	(12, '2 Sussex Drive', '', 'K1NK1', geography::Point(45.42, -75.70, 4326), 2),
-	(13, '3 Rideau Street', '', 'K1NJ9', geography::Point(45.42, -75.70, 4326), 2),
-	(14, '4 Wellington Street', '', 'K1PJ9', geography::Point(45.42, -75.70, 4326), 2),
-	(15, '5 Elgin Street', '', 'K1PK7', geography::Point(45.42, -75.70, 4326), 2),
-	(16, 'Avenida de la Constitución, 3', '', '41001', geography::Point(37.38, -6.00, 4326), 16),
-	(17, 'Plaza de Santo Domingo, 3', '', '41001', geography::Point(37.38, -6.00, 4326), 16),
-	(18, 'Calle de la Ribera, 15', '', '41001', geography::Point(37.38, -6.00, 4326), 16),
-	(19, 'Calle del Arenal, 12', '', '41001', geography::Point(37.38, -6.00, 4326), 16),
-	(20, 'Calle de la Ribera, 25', '', '41001', geography::Point(37.38, -6.00, 4326), 16);
+INSERT INTO Master.address (addr_id, addr_line1, addr_line2, addr_city, addr_postal_code, addr_spatial_location, addr_prov_id) VALUES
+(1, 'Jl. Sudirman No.1', NULL, 'Jakarta', '12345', 'POINT(-6.2146 106.8451)', 1),
+(2, 'Jl. Raya Kuta No.25', NULL, 'Bali', '54321', 'POINT(-8.7158 115.1702)', 2),
+(3, '123 Moo 4, Tambon San Sai Noi', NULL, 'Chiang Mai', '67890', 'POINT(18.8408 98.9611)', 3),
+(4, '1-1-1 Shibuya', NULL, 'Tokyo', '01234', 'POINT(35.6581 139.7414)', 4),
+(5, '10 Unter den Linden', NULL, 'Berlin', '23456', 'POINT(52.5166 13.3833)', 5),
+(6, '55 Rue du Faubourg Saint-Honoré', NULL, 'Paris', '34567', 'POINT(48.8714 2.3074)', 6),
+(7, '123 Main St', NULL, 'Los Angeles', '45678', 'POINT(34.0522 -118.2437)', 7),
+(8, '456 Park Ave', NULL, 'New York', '56789', 'POINT(40.7711 -73.9742)', 8),
+(9, '789 King St W', NULL, 'Toronto', '67890', 'POINT(43.6468 -79.3933)', 9),
+(10, '123 Avenida Paulista', NULL, 'Sao Paulo', '78901', 'POINT(-23.5674 -46.6476)', 10),
+(11, '456 Calle Florida', NULL, 'Buenos Aires', '89012', 'POINT(-34.6037 -58.3816)', 11),
+(12, '123 Long St', NULL, 'Cape Town', '90123', 'POINT(-33.9189 18.4232)', 12),
+(13, '456 Durban Rd', NULL, 'Durban', '01234', 'POINT(-29.8587 31.0218)', 13),
+(14, '789 Oxford Rd', NULL, 'Johannesburg', '12345', 'POINT(-26.2041 28.0473)', 14),
+(15, '123 Uhuru Hwy', NULL, 'Nairobi', '23456', 'POINT(-1.2921 36.8219)', 15);
 SET IDENTITY_INSERT Master.Address OFF;
 -- SELECT*FROM Master.Address
 -- ORDER BY addr_id ASC
@@ -181,28 +192,62 @@ SET IDENTITY_INSERT Master.category_group OFF;
 
 --POLICY
 SET IDENTITY_INSERT Master.policy ON;
-insert into master.policy (poli_id, poli_name, poli_description)
-values
-(1,'Pembatalan Gratis', 'Kebijakan pembatalan gratis yang memberikan kemudahan bagi tamu untuk membatalkan reservasi mereka hingga 24 jam sebelum tanggal check-in tanpa dikenakan biaya apapun'),
-(2,'Check-in Awal', 'Kebijakan check-in awal yang memberikan kemudahan bagi tamu untuk melakukan check-in lebih awal dari waktu yang ditentukan, dengan biaya tambahan yang telah ditentukan'),
-(3,'Check-out Terlambat', 'Kebijakan check-out terlambat yang memberikan kemudahan bagi tamu untuk melakukan check-out lebih lambat dari waktu yang ditentukan, dengan biaya tambahan yang telah ditentukan'),
-(4,'Fasilitas Anak-anak', 'Kebijakan fasilitas anak-anak yang memberikan kemudahan bagi tamu yang membawa anak-anak dengan fasilitas yang disesuaikan dengan kebutuhan anak-anak, seperti kamar yang lebih luas dan fasilitas bermain');
+INSERT INTO Master.policy (poli_id,poli_name, poli_description)
+VALUES
+('1','Early Check-In Policy', 'Policy related to early check-in requests'),
+('2','Late Check-Out Policy', 'Policy related to late check-out requests'),
+('3','Extra Person Policy', 'Policy related to additional guests in the room'),
+('4','Parking Policy', 'Policy related to parking facilities'),
+('5','Room Service Policy', 'Policy related to room service requests');
 SET IDENTITY_INSERT Master.policy OFF;
 -- SELECT*FROM Master.policy
 -- ORDER BY poli_id ASC
 
 --PRICE_ITEM
 SET IDENTITY_INSERT Master.price_items ON;
-insert into master.price_items (prit_id, prit_name, prit_price, prit_description, prit_type, prit_modified_date)
-values
-(1, 'Kue Kering', 12000, 'Kue kering dengan beragam rasa yang enak dan lezat', 'SNACK', '2022-01-01'),
-(2, 'Kamar Standar', 500000, 'Kamar standar dengan fasilitas yang cukup lengkap', 'FACILITY', '2022-01-01'),
-(3, 'Aqua', 10000, 'Minuman bersoda dengan rasa jeruk yang segar', 'SOFTDRINK', '2022-01-01'),
-(4, 'Nasi Goreng', 35000, 'Nasi goreng dengan bahan-bahan yang berkualitas dan rasa yang nikmat', 'FOOD', '2022-01-01'),
-(5, 'Massage', 80000, 'Layanan massage yang dapat membantu mengurangi stres dan merelaksasi tubuh', 'SERVICE', '2022-01-01');
+
+INSERT INTO Master.price_items (prit_id, prit_name, prit_price, prit_description, prit_type, prit_icon_url)
+VALUES 
+  (1, 'Minuman Soda', 15000, 'Minuman soda dingin dalam kaleng', 'SOFTDRINK', 'https://example.com/soda.png'),
+  (2, 'Coklat Panas', 25000, 'Coklat panas dengan marshmallow di atasnya', 'SNACK', 'https://example.com/chocolate.png'),
+  (3, 'Layanan Pijat Kepala', 120000, 'Layanan pijat kepala selama 30 menit', 'SERVICE', 'https://example.com/head-massage.png'),
+  (4, 'Makanan Ringan', 20000, 'Kemasan makanan ringan berisi keripik, kacang, dan kacang tanah', 'SNACK', 'https://example.com/snacks.png'),
+  (5, 'Kamar Mandi Bersih', 50000, 'Layanan kebersihan kamar mandi', 'SERVICE', 'https://example.com/clean-bathroom.png'),
+  (6, 'Sepatu Boot Bercahaya', 100000, 'Sepatu boot bercahaya untuk di malam hari', 'FACILITY', 'https://example.com/light-up-boots.png'),
+  (7, 'Paket Sarapan', 75000, 'Paket sarapan berisi roti panggang, telur, dan jus jeruk', 'FOOD', 'https://example.com/breakfast.png'),
+  (8, 'Layanan Laundry', 80000, 'Layanan laundry untuk satu set pakaian', 'SERVICE', 'https://example.com/laundry.png'),
+  (9, 'Sarapan Ala Inggris', 120000, 'Sarapan ala Inggris dengan telur dadar, sosis, dan kentang goreng', 'FOOD', 'https://example.com/english-breakfast.png'),
+  (10, 'Minuman Es', 20000, 'Minuman es yang menyegarkan dengan potongan buah-buahan', 'SOFTDRINK', 'https://example.com/iced-drink.png'),
+  (11, 'Pijat Badan', 200000, 'Layanan pijat badan selama 60 menit', 'SERVICE', 'https://example.com/full-body-massage.png'),
+  (12, 'Makanan Penutup', 35000, 'Pilihan berbagai makanan penutup lezat', 'FOOD', 'https://example.com/dessert.png'),
+  (13, 'Sepatu Pantai', 50000, 'Sepatu pantai yang nyaman dan anti selip', 'FACILITY', 'https://example.com/beach-shoes.png'),
+  (14, 'Layanan Kebersihan Kamar', 100000, 'Layanan kebersihan kamar untuk satu kali kunjungan', 'SERVICE', 'https://example.com/clean-room.png'),
+  (15, 'Minuman Kemasan', 10000, 'Berbagai pilihan minuman dalam kemasan praktis', 'SOFTDRINK', 'https://example.com/packaged-drink.png');
 SET IDENTITY_INSERT Master.price_items OFF;
 -- SELECT*FROM Master.price_items
 -- ORDER BY prit_id ASC
+
+--Policy_Category_Group
+INSERT INTO Master.policy_category_group (poca_poli_id, poca_cagro_id)
+VALUES
+(4, 1),
+(2, 2),
+(5, 2),
+(3, 3),
+(1, 4),
+(2, 4),
+(4, 4),
+(5, 4),
+(1, 5),
+(3, 5),
+(4, 5),
+(5, 5),
+(2, 6),
+(4, 6),
+(5, 6),
+(1, 7),
+(3, 7),
+(5, 7);
 
 --MEMBER
 insert into master.members (memb_name, memb_description)
@@ -231,14 +276,14 @@ SET IDENTITY_INSERT Users.users ON;
 INSERT INTO users.users (user_id, user_full_name, user_type, user_company_name, user_email, user_phone_number, user_modified_date)
 VALUES (1,'John Smith', 'T', 'Acme Inc.', 'john.smith@acme.com', '123-456-7890', GETDATE()),
 	   (2,'Jane Doe', 'C', 'XYZ Corp.', 'jane.doe@xyz.com', '123-456-7891', GETDATE()),
-	   (3,'Account Realta', 'C', 'Hotel Realta.', 'realta@hotel.com', '033-456-7899', GETDATE()),
+	   (3,'Bob Johnson', 'I', 'ABC Inc.', 'bob.johnson@abc.com', '123-456-7892', GETDATE()),
 	   (4,'Samantha Williams', 'T', 'Def Corp.', 'samantha.williams@def.com', '123-456-7893', GETDATE()),
 	   (5,'Michael Brown', 'C', 'Ghi Inc.', 'michael.brown@ghi.com', '123-456-7894', GETDATE()),
 	   (6,'Emily Davis', 'I', 'Jkl Ltd.', 'emily.davis@jkl.com', '123-456-7895', GETDATE()),
 	   (7,'William Thompson', 'T', 'Mno Inc.', 'william.thompson@mno.com', '123-456-7896', GETDATE()),
 	   (8,'Ashley Johnson', 'C', 'Pqr Corp.', 'ashley.johnson@pqr.com', '123-456-7897', GETDATE()),
 	   (9,'David Anderson', 'I', 'Stu Inc.', 'david.anderson@stu.com', '123-456-7898', GETDATE()),
-	   (10,'Bob Johnson', 'I', 'ABC Inc.', 'bob.johnson@abc.com', '123-456-7892', GETDATE()),
+	   (10,'Jessica Smith', 'T', 'Vwx Corp.', 'jessica.smith@vwx.com', '123-456-7899', GETDATE()),
 	   (11,'David Brown', 'T', 'Example Co', 'david.brown@example.com', '555-555-1222', GETDATE()),
 	   (12,'Jessica Smith', 'C', 'Test Inc', 'jessica.smith@test.com', '555-555-1223', GETDATE()),
 	   (13,'James Johnson', 'I', 'Acme Inc', 'james.johnson@acme.com', '555-555-1224', GETDATE()),
@@ -290,7 +335,7 @@ VALUES
 (7, 2),
 (8, 3),
 (9, 4),
-(10, 2),
+(10, 5),
 (11, 1),
 (12, 2),
 (13, 3),
@@ -792,7 +837,7 @@ ENABLE TRIGGER [Payment].[InsertBankEntityId] ON [Payment].bank;
 DISABLE TRIGGER [Payment].[InsertPaymentEntityId] ON [Payment].payment_gateway;
 INSERT
   INTO Payment.payment_gateway(paga_entity_id, paga_code, paga_name, paga_modified_date)
-VALUES (8, 'GOTO', 'PT. Dompet Anak Bangsa', CURRENT_TIMESTAMP),
+VALUES (8, 'GOPAY', 'PT. Dompet Anak Bangsa', CURRENT_TIMESTAMP),
        (9, 'OVO', 'PT. Visionet Internasional', CURRENT_TIMESTAMP),
        (10, 'DANA', 'PT. Espay Debit Indonesia', CURRENT_TIMESTAMP),
        (11, 'SHOPEEPAY', 'Shopee', CURRENT_TIMESTAMP),
@@ -804,51 +849,35 @@ ENABLE TRIGGER [Payment].[InsertPaymentEntityId] ON [Payment].payment_gateway;
 
 -- SELECT*FROM payment.payment_gateway;
 
-SET IDENTITY_INSERT Payment.user_accounts ON
 -- user_accounts
 INSERT
-  INTO Payment.user_accounts(usac_id, usac_entity_id, usac_user_id, usac_account_number, usac_saldo, usac_type, usac_expmonth, usac_expyear, usac_modified_date)
-VALUES (1, 1, 1, '431-2388-93', 1000000, 'debet', 11, 22, CURRENT_TIMESTAMP),
-       (2, 1, 2, '123-2993-32', 0, 'credit_card', 12, 27, CURRENT_TIMESTAMP),
-       (3, 3, 3, '131-3456-78', 0, 'debet', 05, 25, CURRENT_TIMESTAMP), -- Hotel Realta Account
-       (4, 4, 4, '992-1923-39', 1000000, 'debet', 08, 24, CURRENT_TIMESTAMP),
-       (5, 5, 5, '727-1931-34', 0, 'debet', 09, 28, CURRENT_TIMESTAMP),
-       (6, 6, 6, '889-3921-22', 0, 'credit_card', 02, 25, CURRENT_TIMESTAMP),
-       (7, 7, 7, '571-2939-23', 1000000, 'debet', 01, 26, CURRENT_TIMESTAMP),
-       (8, 8, 8, '11-1111-1111', 500000, 'payment', null, null, CURRENT_TIMESTAMP),
-       (9, 9, 9, '0873635251525', 500000, 'payment', null, null, CURRENT_TIMESTAMP),
-       (10, 10, 10, '081289389126', 500000, 'payment', null, null, CURRENT_TIMESTAMP),
-       (11, 11, 4, '087363155421', 500000, 'payment', null, null, CURRENT_TIMESTAMP),
-       (12, 12, 12, '087365291212', 500000, 'payment', null, null, CURRENT_TIMESTAMP),
-       (13, 13, 13, '081928222364', 500000, 'payment', null, null, CURRENT_TIMESTAMP),
-       (14, 14, 14, '089012852546', 500000, 'payment', null, null, CURRENT_TIMESTAMP),
-       (15, 15, 15, '085627287172', 500000, 'payment', null, null, CURRENT_TIMESTAMP);
-SET IDENTITY_INSERT Payment.user_accounts OFF
+  INTO Payment.user_accounts(usac_entity_id, usac_user_id, usac_account_number, usac_saldo, usac_type, usac_expmonth, usac_expyear, usac_modified_date)
+VALUES (1, 1, '6271263188999', 1000000, 'debet', 11, 22, CURRENT_TIMESTAMP),
+       (2, 2, '8012372737662', 1000000, 'credit card', 12, 27, CURRENT_TIMESTAMP),
+       (3, 3, '9712893896126', 1000000, 'debet', 03, 23, CURRENT_TIMESTAMP),
+       (4, 4, '8129387462674', 1000000, 'debet', 08, 24, CURRENT_TIMESTAMP),
+       (5, 5, '7781236462762', 1000000, 'debet', 09, 28, CURRENT_TIMESTAMP),
+       (6, 6, '1278287363663', 1000000, 'credit card', 02, 25, CURRENT_TIMESTAMP),
+       (7, 7, '6326361273712', 1000000, 'debet', 01, 26, CURRENT_TIMESTAMP),
+       (8, 8, '812327176263', 1000000, 'payment', 0, 0, CURRENT_TIMESTAMP),
+       (9, 9, '827363525152', 1000000, 'payment', 0, 0, CURRENT_TIMESTAMP),
+       (10, 10, '829283525152', 1000000, 'payment', 0, 0, CURRENT_TIMESTAMP),
+       (11, 11, '872363155421', 1000000, 'payment', 0, 0, CURRENT_TIMESTAMP),
+       (12, 12, '873652901212', 1000000, 'payment', 0, 0, CURRENT_TIMESTAMP),
+       (13, 13, '809283222364', 1000000, 'payment', 0, 0, CURRENT_TIMESTAMP),
+       (14, 14, '890128352546', 1000000, 'payment', 0, 0, CURRENT_TIMESTAMP),
+       (15, 15, '856272837172', 1000000, 'payment', 0, 0, CURRENT_TIMESTAMP);
 -- SELECT*FROM payment.user_accounts;
 
 -- payment_transactions
--- SET IDENTITY_INSERT Payment.payment_transaction ON
--- DISABLE TRIGGER [Payment].[CalculateUserAccountCredit] ON [Payment].[payment_transaction];
+SET IDENTITY_INSERT Payment.payment_transaction ON
 INSERT
-  INTO Payment.payment_transaction(patr_debet, patr_credit, patr_type, patr_note, patr_modified_date,
+  INTO Payment.payment_transaction(patr_id, patr_trx_number, patr_debet, patr_credit, patr_type, patr_note, patr_modified_date,
                                   patr_order_number, patr_source_id, patr_target_id, patr_trx_number_ref, patr_user_id)
-VALUES (0, 769999, 'TRB', 'Tranfer Booking Note', CURRENT_TIMESTAMP, 'BO#20221127-0001', '431-2388-93', '131-3456-78', null, 1);
-INSERT
-  INTO Payment.payment_transaction(patr_debet, patr_credit, patr_type, patr_note, patr_modified_date,
-                                  patr_order_number, patr_source_id, patr_target_id, patr_trx_number_ref, patr_user_id)
-VALUES (0, 100000, 'ORM', 'Order Menu', CURRENT_TIMESTAMP, 'MENUS#20221127-0001', '123-2993-32', '131-3456-78', null, 2);
-INSERT
-  INTO Payment.payment_transaction(patr_debet, patr_credit, patr_type, patr_note, patr_modified_date,
-                                  patr_order_number, patr_source_id, patr_target_id, patr_trx_number_ref, patr_user_id)
-VALUES (0, 235000, 'TP', 'Top Up Note', CURRENT_TIMESTAMP,  null, '992-1923-39', '087363155421', null, 4);
-INSERT
-  INTO Payment.payment_transaction(patr_debet, patr_credit, patr_type, patr_note, patr_modified_date,
-                                  patr_order_number, patr_source_id, patr_target_id, patr_trx_number_ref, patr_user_id)
-VALUES (0, 0, 'RF', '*Refund Order Menu', CURRENT_TIMESTAMP,  null, null, null, Payment.fnFormatedTransactionId(3, 'ORM'), 2);
-
--- SET IDENTITY_INSERT Payment.payment_transaction OFF;
--- ENABLE TRIGGER [Payment].CalculateUserAccountCredit ON [Payment].payment_transaction;
--- SELECT*FROM payment.payment_transaction; debet 869999.0000
+VALUES (1, 'TRB#20221127-0001', 150000, 150000, 'TRB', 'Tranfer Booking', CURRENT_TIMESTAMP, 'BO#20221127-0001', '6271263188999', '8012372737662', 'TRB#20221127-0001', 1),
+       (2, 'TRB#20221127-0002', 150000, 150000, 'ORM', 'Order Menu', CURRENT_TIMESTAMP, 'MENUS#20221127-0001', '8012372737662', '6271263188999', 'TRB#20221127-0002', 2);
+SET IDENTITY_INSERT Payment.payment_transaction OFF;
+-- SELECT*FROM payment.payment_transaction;
 
 -- PURCHASING INSERT
 DISABLE TRIGGER [Purchasing].[InsertVendorEntityId] ON [Purchasing].vendor;

@@ -979,3 +979,50 @@ BEGIN
     END CATCH
 END
 GO
+
+
+-- =============================================
+-- Author:		Alip
+-- Create date: 14 March 2023
+-- Description:	Store Procedure Price_items
+-- =============================================
+
+CREATE PROCEDURE [Master].[AddOrUpdatePriceItem]
+    @pritid int = NULL,
+    @pritname nvarchar(55),
+    @prittype nvarchar(15),
+    @pritprice money,
+    @pritdescription nvarchar(255),
+    @priticonurl nvarchar(255)
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    BEGIN TRY
+        BEGIN TRAN
+
+        IF @pritid IS NOT NULL -- Update existing price item
+        BEGIN
+            UPDATE [Master].[price_items]
+            SET prit_name = @pritname,
+                prit_type = @prittype,
+                prit_price = @pritprice,
+                prit_description = @pritdescription,
+                prit_icon_url = @priticonurl,
+                prit_modified_date = GETDATE()
+            WHERE prit_id = @pritid
+        END
+        ELSE -- Insert new price item
+        BEGIN
+            INSERT INTO Master.price_items(prit_name, prit_type, prit_price, prit_description, prit_icon_url, prit_modified_date)
+            VALUES (@pritname, @prittype, @pritprice, @pritdescription, @priticonurl, GETDATE())
+        END
+
+        COMMIT TRAN
+    END TRY
+    BEGIN CATCH
+        ROLLBACK TRAN;
+        THROW;
+    END CATCH
+END
+

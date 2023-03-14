@@ -489,3 +489,19 @@ BEGIN
     WHERE hotel_id IN (SELECT hotel_id FROM inserted)
   END
 END;
+GO
+-- =============================================
+-- Author	  :	alip
+-- Create date: 14 Maret 2023
+-- Description:	Update Modified Date on Price_items table
+-- =============================================
+
+CREATE TRIGGER [Master].[Tr_Master_Update_Modified_date]
+ON [Master].[price_items]
+AFTER INSERT
+AS
+BEGIN
+    UPDATE Master.price_items
+    SET prit_modified_date = GETDATE()
+    WHERE prit_id IN (SELECT prit_id FROM inserted)
+END;

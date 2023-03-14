@@ -502,8 +502,7 @@ BEGIN
   END
 END;
 GO
-
--- ============================================================
+-- =============================================
 -- Author:		Gabi 
 -- Create date: GetDate()
 -- Description:	Trigger to update totalRoom,totalAmount in Booking_orders

@@ -224,69 +224,121 @@ GO
 -- =============================================
 CREATE TRIGGER [Payment].[CalculateUserAccountCredit]
    ON  [Payment].[payment_transaction]
-   AFTER INSERT
+    INSTEAD OF INSERT
 AS
 BEGIN
-	-- SET NOCOUNT ON added to prevent extra result sets from
+    -- SET NOCOUNT ON added to prevent extra result sets from
 	-- interfering with SELECT statements.
 	SET NOCOUNT ON
-		DECLARE @tar_account As nvarchar(50)
-		DECLARE @src_account As nvarchar(50)
-		DECLARE @transaction_type As nvarchar(10)
-		DECLARE @xpse As Money
 
-		SELECT @src_account = patr_source_id FROM inserted;
-		SELECT @tar_account = patr_target_id FROM inserted;
-		SELECT @transaction_type = patr_type FROM inserted;
-		SELECT @xpse = (patr_credit + patr_debet) FROM inserted
+    DECLARE @tar_account As NVARCHAR(50)
+            ,@src_account As NVARCHAR(50)
+            ,@transaction_type As NVARCHAR(10)
+            ,@total_amount AS MONEY
+            ,@src_user_id AS INT
+            ,@tar_user_id AS INT
+            ,@transaction_note AS NVARCHAR(MAX)
+	        ,@order_number AS VARCHAR(55)
+	        ,@trx_number_ref AS VARCHAR(55)
+	        ,@pay_method AS NCHAR(5)
 
-    -- Insert statements for trigger here
-		-- TOP UP
-		IF @transaction_type = 'TP'
-		BEGIN
-			EXECUTE [Payment].[spTopUpTransaction]
-				 @source_account = @src_account
-				,@target_account = @tar_account
-				,@expense = @xpse
-		END
+	SET @order_number = null;
+	SET @trx_number_ref = null;
 
-		-- TRANSFER BOOKING
-		IF @transaction_type = 'TRB'
-		BEGIN
-			EXECUTE [Payment].[spTopUpTransaction]
-				 @source_account = @src_account
-				,@target_account = @tar_account
-				,@expense = @xpse
-		END
+    -- filling variable
+    SELECT @src_account = patr_source_id,
+           @tar_account = patr_target_id,
+           @src_user_id = patr_user_id,
+           @order_number = patr_order_number,
+           @trx_number_ref = patr_trx_number_ref,
+           @transaction_type = TRIM(patr_type),
+           @transaction_note = patr_note
+      FROM inserted;
 
-		-- REPAYMENT
-		IF @transaction_type = 'RPY'
-		BEGIN
-			EXECUTE [Payment].[spTopUpTransaction]
-				 @source_account = @src_account
-				,@target_account = @tar_account
-				,@expense = @xpse
-		END
+    SELECT @total_amount = boor_total_ammount,
+           @pay_method = boor_pay_type
+    FROM Booking.booking_orders
+    WHERE boor_order_number = @order_number
 
-		-- REFUND
-		IF @transaction_type = 'RF'
-		BEGIN
-			EXECUTE [Payment].[spTopUpTransaction]
-				 @source_account = @tar_account
-				,@target_account = @src_account
-				,@expense =  @xpse
-		END
+    -- check if the payment method is 'cash' just ignore it
+    -- CR = credit_card
+    -- D = debet
+    -- PG = payment / payment_gateway
+    IF (@pay_method IN ('D', 'CR', 'PG'))
+    BEGIN
+        IF (@transaction_type = 'RF' OR @transaction_type = 'RPY')
+        BEGIN
+            SELECT @src_account = patr_target_id,
+                   @tar_account = patr_source_id,
+                   @total_amount = Payment.fnRefundAmount((patr_credit + patr_debet), default)
+              FROM Payment.payment_transaction
+             WHERE patr_trx_number = @trx_number_ref
+        END
 
-		-- ORDER MENU
-		IF @transaction_type = 'ORM'
-		BEGIN
-			EXECUTE [Payment].[spTopUpTransaction]
-				 @source_account = @src_account
-				,@target_account = @tar_account
-				,@expense = @xpse
-		END
+        -- 	TOP UP
+        IF @transaction_type = 'TP'
+        BEGIN
+            EXECUTE [Payment].[spTopUpTransaction]
+                 @src_account
+                ,@total_amount
+        END
 
-		SELECT patr_id FROM inserted;
+        -- TRANSFER BOOKING
+        IF @transaction_type = 'TRB'
+        BEGIN
+            EXEC [Payment].[spCalculationTranferBooking]
+                @src_account,
+                @tar_account,
+                @order_number,
+                @total_amount OUTPUT
+        END
+
+        -- insert credit transaction
+        INSERT INTO [Payment].[payment_transaction](
+                        patr_trx_number, patr_debet, patr_credit, patr_type, patr_note,
+                        patr_order_number, patr_source_id, patr_target_id, patr_trx_number_ref, patr_user_id)
+             VALUES (Payment.fnFormatedTransactionId(IDENT_CURRENT('Payment.[payment_transaction]'), @transaction_type), 0,
+                    @total_amount, @transaction_type,@transaction_note, @order_number, @src_account, @tar_account, @trx_number_ref, @src_user_id);
+
+        -- ORDER MENU
+    --     IF @transaction_type = 'ORM'
+    --     BEGIN
+    --         EXECUTE [Payment].[spTransferBookingTransaction]
+    --              @src_account
+    --             ,@tar_account
+    --             ,@total_amount
+    --     END
+
+        -- REFUND
+        IF @transaction_type = 'RF'
+        BEGIN
+            EXECUTE [Payment].[spRefundTransaction]
+                @trx_number_ref,
+                default
+        END
+
+        SELECT @tar_user_id = usac_user_id
+          FROM Payment.user_accounts
+         WHERE usac_account_number = @tar_account;
+
+        -- insert debet transaction
+        INSERT INTO [Payment].[payment_transaction](
+                    patr_trx_number, patr_debet, patr_credit, patr_type, patr_note,
+                    patr_order_number, patr_source_id, patr_target_id, patr_trx_number_ref, patr_user_id)
+            VALUES (Payment.fnFormatedTransactionId(IDENT_CURRENT('Payment.[payment_transaction]'), @transaction_type),
+                    @total_amount, 0, @transaction_type, @transaction_note, @order_number, @src_account, @tar_account, @trx_number_ref, @tar_user_id);
+
+
+            -- REPAYMENT
+    -- 		IF @transaction_type = 'RPY'
+    -- 		BEGIN
+    -- 			EXECUTE [Payment].[spTopUpTransaction]
+    -- 				 @source_account = @src_account
+    -- 				,@target_account = @tar_account
+    -- 				,@expense = @total_amount
+    -- 		END
+    -- 		SELECT patr_id FROM inserted;
+    END
 END
 GO
 
@@ -884,5 +936,43 @@ BEGIN
     IF @@TRANCOUNT > 0 ROLLBACK TRANSACTION;
     THROW;
   END CATCH;
+END;
+GO
+GO
+-- =============================================
+-- Author:		Gabi 
+-- Create date: GetDate()
+-- Description:	Trigger to update totalRoom,totalAmount in Booking_orders
+-- =============================================
+
+CREATE OR ALTER TRIGGER Booking.TrToRoomAndTotalAmountUpdate
+ON booking.booking_order_detail
+AFTER INSERT, DELETE, UPDATE 
+AS
+BEGIN
+	SET XACT_ABORT ON;
+  	UPDATE Booking.booking_orders
+  	SET 
+	-- Update the boor_total_room column for each affected boorId
+		boor_total_room = 
+		(
+			SELECT COUNT(d.borde_id)
+			FROM Booking.booking_order_detail d
+			WHERE borde_boor_id = boor_id
+  		),
+	-- Update the boor_total_amount column for each affected boorId
+		boor_total_ammount=
+		(
+			SELECT SUM(d.borde_subtotal)
+			FROM Booking.booking_order_detail d
+			WHERE borde_boor_id=boor_id
+		)
+  WHERE boor_id IN (
+    SELECT borde_boor_id
+    FROM inserted
+    UNION
+    SELECT borde_boor_id
+    FROM deleted
+  )
 END;
 GO

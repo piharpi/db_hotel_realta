@@ -794,10 +794,18 @@ SET IDENTITY_INSERT Payment.user_accounts OFF
 -- SET IDENTITY_INSERT Payment.payment_transaction ON
 -- DISABLE TRIGGER [Payment].[CalculateUserAccountCredit] ON [Payment].[payment_transaction];
 
+-- pay_type 'debet'
 EXECUTE [Payment].[spCreateTransferBooking]
        'BO#20221127-0001'
        ,'431-2388-93'
        ,1
+GO
+
+-- pay_type 'cash',  ignored
+EXECUTE [Payment].[spCreateTransferBooking]
+       'BO#20221127-0002'
+       ,'123-2993-32'
+       ,2
 GO
 -- INSERT
 --   INTO Payment.payment_transaction(patr_debet, patr_credit, patr_type, patr_note, patr_modified_date,

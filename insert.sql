@@ -965,7 +965,7 @@ SET IDENTITY_INSERT Payment.user_accounts OFF
 EXECUTE [Payment].[spCreateTransferBooking]
        'BO#20221127-0001'
        ,'431-2388-93'
-       ,1
+       ,8
 GO
 
 -- pay_type 'cash',  ignored
@@ -986,14 +986,14 @@ EXECUTE [Payment].[spCreateTransferRefund]
     'BO#20221127-0001',
     1
 GO
--- INSERT
---   INTO Payment.payment_transaction(patr_debet, patr_credit, patr_type, patr_note, patr_modified_date,
---                                   patr_order_number, patr_source_id, patr_target_id, patr_trx_number_ref, patr_user_id)
--- VALUES (0, 769999, 'TRB', 'Tranfer Booking Note', CURRENT_TIMESTAMP, 'BO#20221127-0001', '431-2388-93', '131-3456-78', null, 1);
--- INSERT
---   INTO Payment.payment_transaction(patr_debet, patr_credit, patr_type, patr_note, patr_modified_date,
---                                   patr_order_number, patr_source_id, patr_target_id, patr_trx_number_ref, patr_user_id)
--- VALUES (0, 100000, 'ORM', 'Order Menu', CURRENT_TIMESTAMP, 'MENUS#20221127-0001', '123-2993-32', '131-3456-78', null, 2);
+
+EXECUTE [Payment].[spCreateTransferTopUp]
+    '992-1923-39',
+    '087363155421',
+    4,
+    20000
+GO
+
 -- INSERT
 --   INTO Payment.payment_transaction(patr_debet, patr_credit, patr_type, patr_note, patr_modified_date,
 --                                   patr_order_number, patr_source_id, patr_target_id, patr_trx_number_ref, patr_user_id)

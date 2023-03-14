@@ -248,18 +248,22 @@ BEGIN
     -- filling variable
     SELECT @src_account = patr_source_id,
            @tar_account = patr_target_id,
+           @total_amount = patr_credit,
            @src_user_id = patr_user_id,
            @order_number = patr_order_number,
            @transaction_type = TRIM(patr_type),
            @transaction_note = patr_note
       FROM inserted;
 
-    SELECT @total_amount = boor_total_ammount,
-           @pay_method = boor_pay_type
-    FROM Booking.booking_orders
-    WHERE boor_order_number = @order_number
+    IF (@transaction_type = 'TRB')
+    BEGIN
+        SELECT @total_amount = boor_total_ammount,
+               @pay_method = boor_pay_type
+        FROM Booking.booking_orders
+        WHERE boor_order_number = @order_number
+    END
 
-    IF (@pay_method IS NULL)
+    IF (@transaction_type = 'ORM')
     BEGIN
         SELECT @total_amount = orme_total_amount,
                @pay_method = orme_pay_type
@@ -292,6 +296,7 @@ BEGIN
         BEGIN
             EXECUTE [Payment].[spTopUpTransaction]
                  @src_account
+                ,@tar_account
                 ,@total_amount
         END
 

@@ -677,6 +677,25 @@ GO
 -- Create date: 13 March 2023
 -- Description:	Store Procedure for create transfer booking
 -- =============================================
+CREATE OR ALTER PROCEDURE [Payment].[spCreateTransferTopUp]
+   @source_account VARCHAR(50)
+   ,@target_account VARCHAR(50)
+   ,@boor_user_id INT
+   ,@amount AS MONEY
+AS
+BEGIN
+    INSERT
+      INTO Payment.payment_transaction(patr_credit, patr_type, patr_note,
+                                      patr_source_id, patr_target_id, patr_user_id)
+    VALUES (@amount, 'TP', 'Top Up Note', @source_account, @target_account, @boor_user_id);
+END
+GO
+
+-- =============================================
+-- Author:		Harpi
+-- Create date: 13 March 2023
+-- Description:	Store Procedure for create transfer booking
+-- =============================================
 CREATE PROCEDURE [Payment].[spCreateTransferBooking]
        @boor_order_number VARCHAR(50)
        ,@boor_card_number VARCHAR(50)
@@ -919,7 +938,8 @@ BEGIN
         BEGIN TRANSACTION
 
             -- set value @source_usac_type
-            SELECT @source_usac_type = usac_type, @usac_current_saldo = usac_saldo
+            SELECT @source_usac_type = usac_type,
+                   @usac_current_saldo = usac_saldo
               FROM Payment.user_accounts
              WHERE usac_account_number = @source_account
 
@@ -937,19 +957,14 @@ BEGIN
                         ROLLBACK
                 END
 
-                UPDATE Payment.user_accounts
-                   SET usac_saldo = usac_saldo - @amount,
-                       usac_modified_date = GETDATE()
-                 WHERE usac_account_number = @source_account;
-            END
-
-            -- to fintech
-            IF (@target_usac_type = 'payment')
-            BEGIN
-                UPDATE Payment.user_accounts
-                   SET usac_saldo = usac_saldo + @amount,
-                       usac_modified_date = GETDATE()
-                 WHERE usac_account_number = @target_account;
+                -- to fintech
+                IF (@target_usac_type = 'payment')
+                BEGIN
+                    EXECUTE [Payment].spTranferMoney
+                        @source_account
+                        ,@target_account
+                        ,@amount
+                END
             END
         COMMIT TRANSACTION
     END TRY

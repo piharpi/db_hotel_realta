@@ -501,7 +501,7 @@ BEGIN
     WHERE hotel_id IN (SELECT hotel_id FROM inserted)
   END
 END;
-
+GO
 -- =============================================
 -- Author:		Gabi 
 -- Create date: GetDate()
@@ -538,3 +538,4 @@ BEGIN
     FROM deleted
   )
 END;
+GO

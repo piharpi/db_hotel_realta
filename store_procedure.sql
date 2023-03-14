@@ -1110,56 +1110,6 @@ BEGIN
 END
 GO
 
--- =====================================================
--- Author:		Gabriel
--- Create date: 14 March 2023
--- Description:	Procedure for insert booking_order_detail
--- ======================================================
-
-CREATE OR ALTER procedure booking.sp_insert_booking_order_detail
-	@borde_boor_id int,
-	@borde_faci_id int,
-	@borde_checkin datetime,
-	@borde_checkout datetime,
-	@borde_discount smallmoney=NULL
-AS
-BEGIN
-	SET XACT_ABORT ON
-	DECLARE @faci_price money = (select faci_low_price from Hotel.facilities where faci_id=@borde_faci_id)
-	DECLARE @faci_tax smallmoney = (select faci_tax_rate from Hotel.facilities where faci_id=@borde_faci_id)
-
-	-- insert borde
-	INSERT INTO Booking.booking_order_detail
-	(
-		borde_boor_id,
-		borde_faci_id,
-		borde_checkin,
-		borde_checkout,
-		borde_price,
-		borde_adults,
-		borde_kids,
-		borde_extra,
-		borde_discount,
-		borde_tax
-	)
-    VALUES
-	(
-		@borde_boor_id,
-		@borde_faci_id,
-		@borde_checkin,
-		@borde_checkout,
-		@faci_price,
-		0,--bordeAdults
-		0,--bordeKids
-		0,--bordeExtra
-		0,--bordeDiscount,
-		@faci_tax
-	);
-	-- get borde_id for insertion into booking_order_detail_extra
-    select SCOPE_IDENTITY();
-END
-GO
-
 CREATE OR ALTER procedure booking.sp_insert_booking_order_detail
 	@borde_boor_id int,
 	@borde_faci_id int,
@@ -1297,3 +1247,50 @@ Create Procedure [Purchasing].[spDeleteVendor]
 
 END
 GO
+
+
+-- =============================================
+-- Author:		Alip
+-- Create date: 14 March 2023
+-- Description:	Store Procedure Price_items
+-- =============================================
+
+CREATE PROCEDURE [Master].[AddOrUpdatePriceItem]
+    @pritid int = NULL,
+    @pritname nvarchar(55),
+    @prittype nvarchar(15),
+    @pritprice money,
+    @pritdescription nvarchar(255),
+    @priticonurl nvarchar(255)
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    BEGIN TRY
+        BEGIN TRAN
+
+        IF @pritid IS NOT NULL -- Update existing price item
+        BEGIN
+            UPDATE [Master].[price_items]
+            SET prit_name = @pritname,
+                prit_type = @prittype,
+                prit_price = @pritprice,
+                prit_description = @pritdescription,
+                prit_icon_url = @priticonurl,
+                prit_modified_date = GETDATE()
+            WHERE prit_id = @pritid
+        END
+        ELSE -- Insert new price item
+        BEGIN
+            INSERT INTO Master.price_items(prit_name, prit_type, prit_price, prit_description, prit_icon_url, prit_modified_date)
+            VALUES (@pritname, @prittype, @pritprice, @pritdescription, @priticonurl, GETDATE())
+        END
+
+        COMMIT TRAN
+    END TRY
+    BEGIN CATCH
+        ROLLBACK TRAN;
+        THROW;
+    END CATCH
+END
+

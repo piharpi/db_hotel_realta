@@ -480,13 +480,13 @@ GO
 
 CREATE OR ALTER TRIGGER Hotel.tr_Hotels_ModifiedDate
 ON Hotel.Hotels
-AFTER INSERT, UPDATE 
+AFTER INSERT, UPDATE
 AS
 BEGIN
     SET NOCOUNT ON;
     IF NOT UPDATE(hotel_rating_star)
     BEGIN
-        UPDATE Hotel.Hotels 
+        UPDATE Hotel.Hotels
         SET hotel_modified_date = GETDATE()
         FROM inserted
         WHERE Hotels.hotel_id = inserted.hotel_id
@@ -578,12 +578,12 @@ BEGIN
     DECLARE @faci_low_price MONEY
     DECLARE @faci_high_price MONEY
 
-    SELECT 
+    SELECT
         @faci_user_id = faci_user_id,
         @faci_hotel_id = faci_hotel_id,
         @faci_low_price = faci_low_price,
         @faci_high_price = faci_high_price,
-        @faci_rate_price = 
+        @faci_rate_price =
         (
 		CASE
 			WHEN faci_discount IS NULL AND faci_tax_rate IS NULL THEN (faci_high_price + faci_low_price) / 2
@@ -592,7 +592,7 @@ BEGIN
 			ELSE (((faci_high_price + faci_low_price) / 2) - (((faci_high_price + faci_low_price) / 2) * faci_discount/100)) + (((faci_high_price + faci_low_price) / 2) - (((faci_high_price + faci_low_price) / 2) * faci_discount/100)) * (faci_tax_rate/100)
 		END
 	)
-    FROM inserted   
+    FROM inserted
 
     IF NOT EXISTS (SELECT 1 FROM Hotel.Hotels WHERE hotel_id = @faci_hotel_id)
     BEGIN
@@ -600,45 +600,45 @@ BEGIN
         ROLLBACK TRANSACTION
         RETURN;
     END
-    
+
     IF NOT EXISTS (SELECT 1 FROM Users.user_roles WHERE usro_user_id = @faci_user_id AND usro_role_id IN (2, 4))
     BEGIN
         RAISERROR ('User does not exist or you do not have permission', 16, 1)
         ROLLBACK TRANSACTION
         RETURN;
     END
-    
-    IF EXISTS (SELECT faci_low_price, faci_high_price 
-               FROM inserted 
-               WHERE faci_high_price < faci_low_price) 
-    BEGIN 
-        RAISERROR ('High price cannot be lower than low price', 16, 1) 
-        ROLLBACK TRANSACTION
-        RETURN;
-    END 
 
-    IF (@faci_rate_price > @faci_high_price OR @faci_rate_price < @faci_low_price) 
-    BEGIN 
-        RAISERROR ('Rate price cannot be lower than low price OR cannot be higher than high price', 16, 1) 
+    IF EXISTS (SELECT faci_low_price, faci_high_price
+               FROM inserted
+               WHERE faci_high_price < faci_low_price)
+    BEGIN
+        RAISERROR ('High price cannot be lower than low price', 16, 1)
         ROLLBACK TRANSACTION
         RETURN;
-    END 
+    END
+
+    IF (@faci_rate_price > @faci_high_price OR @faci_rate_price < @faci_low_price)
+    BEGIN
+        RAISERROR ('Rate price cannot be lower than low price OR cannot be higher than high price', 16, 1)
+        ROLLBACK TRANSACTION
+        RETURN;
+    END
 
 
     BEGIN TRY
         INSERT INTO Hotel.Facilities (faci_name, faci_description, faci_max_number, faci_measure_unit,										faci_room_number, faci_startdate, faci_enddate, faci_low_price,											faci_high_price, faci_rate_price, faci_discount, faci_tax_rate,
 									  faci_modified_date, faci_cagro_id, faci_hotel_id, faci_user_id,
-									  faci_expose_price) 
-        SELECT 
-            i.faci_name, 
-            i.faci_description, 
+									  faci_expose_price)
+        SELECT
+            i.faci_name,
+            i.faci_description,
             i.faci_max_number,
             i.faci_measure_unit,
             i.faci_room_number,
             i.faci_startdate,
             i.faci_enddate,
-            i.faci_low_price, 
-            i.faci_high_price, 
+            i.faci_low_price,
+            i.faci_high_price,
             @faci_rate_price,
             i.faci_discount,
             i.faci_tax_rate,
@@ -649,19 +649,19 @@ BEGIN
             i.faci_expose_price
         FROM inserted i
     END TRY
-    
+
 BEGIN CATCH
         ROLLBACK TRANSACTION
     -- Handle the exception here, for example by logging the error
 		DECLARE @ErrorMessage NVARCHAR(4000);
 		DECLARE @ErrorSeverity INT;
 		DECLARE @ErrorState INT;
-		
-		SELECT 
+
+		SELECT
 			@ErrorMessage = ERROR_MESSAGE(),
 			@ErrorSeverity = ERROR_SEVERITY(),
 			@ErrorState = ERROR_STATE();
-			
+
 		RAISERROR (@ErrorMessage, @ErrorSeverity, @ErrorState);
 END CATCH
 END;
@@ -677,7 +677,7 @@ GO
 
 CREATE OR ALTER TRIGGER Hotel.Facilities_update_validation
 ON Hotel.Facilities
-AFTER UPDATE 
+AFTER UPDATE
 AS
 BEGIN
     DECLARE @faci_id INT;
@@ -691,7 +691,7 @@ BEGIN
     DECLARE @faci_high_price MONEY;
     DECLARE @faci_rate_price MONEY;
 
-    SELECT 
+    SELECT
         @faci_id = faci_id,
         @faci_user_id = faci_user_id,
         @faci_hotel_id = faci_hotel_id,
@@ -701,7 +701,7 @@ BEGIN
         @faci_tax_rate = faci_tax_rate,
         @faci_low_price = faci_low_price,
         @faci_high_price = faci_high_price,
-        @faci_rate_price = 
+        @faci_rate_price =
         (
 		CASE
 			WHEN faci_discount IS NULL AND faci_tax_rate IS NULL THEN (faci_high_price + faci_low_price) / 2
@@ -710,7 +710,7 @@ BEGIN
 			ELSE (((faci_high_price + faci_low_price) / 2) - (((faci_high_price + faci_low_price) / 2) * faci_discount/100)) + (((faci_high_price + faci_low_price) / 2) - (((faci_high_price + faci_low_price) / 2) * faci_discount/100)) * (faci_tax_rate/100)
 		END
 	)
-    FROM inserted   
+    FROM inserted
 
     IF NOT EXISTS (SELECT 1 FROM Hotel.Hotels WHERE hotel_id = @faci_hotel_id)
     BEGIN
@@ -718,44 +718,44 @@ BEGIN
         ROLLBACK TRANSACTION
         RETURN;
     END
-    
+
     IF NOT EXISTS (SELECT 1 FROM Users.user_roles WHERE usro_user_id = @faci_user_id AND usro_role_id IN (2, 4))
     BEGIN
         RAISERROR ('User does not exist or you do not have permission', 16, 1)
         ROLLBACK TRANSACTION
         RETURN;
     END
-    
-    IF EXISTS (SELECT faci_low_price, faci_high_price 
-               FROM inserted 
-               WHERE faci_high_price < faci_low_price) 
-    BEGIN 
-        RAISERROR ('High price cannot be lower than low price', 16, 1) 
-        ROLLBACK TRANSACTION
-        RETURN;
-    END 
 
-    IF (@faci_rate_price > @faci_high_price OR @faci_rate_price < @faci_low_price) 
-    BEGIN 
-        RAISERROR ('Rate price cannot be lower than low price OR cannot be higher than high price', 16, 1) 
+    IF EXISTS (SELECT faci_low_price, faci_high_price
+               FROM inserted
+               WHERE faci_high_price < faci_low_price)
+    BEGIN
+        RAISERROR ('High price cannot be lower than low price', 16, 1)
         ROLLBACK TRANSACTION
         RETURN;
-    END 
-    
+    END
+
+    IF (@faci_rate_price > @faci_high_price OR @faci_rate_price < @faci_low_price)
+    BEGIN
+        RAISERROR ('Rate price cannot be lower than low price OR cannot be higher than high price', 16, 1)
+        ROLLBACK TRANSACTION
+        RETURN;
+    END
+
 
     IF UPDATE(faci_startdate)
 		OR UPDATE(faci_enddate)
 		OR UPDATE(faci_low_price)
-		OR UPDATE(faci_high_price) 
-		OR UPDATE(faci_rate_price) 
-		OR UPDATE(faci_discount) 
+		OR UPDATE(faci_high_price)
+		OR UPDATE(faci_rate_price)
+		OR UPDATE(faci_discount)
 		OR UPDATE(faci_tax_rate)
     BEGIN
         BEGIN TRANSACTION
-			UPDATE Hotel.Facilities 
-			SET 
+			UPDATE Hotel.Facilities
+			SET
 				faci_rate_price = @faci_rate_price
-			WHERE 
+			WHERE
 				faci_id = @faci_id
 
 			INSERT INTO Hotel.Facility_Price_History (faph_startdate, faph_enddate, faph_low_price, faph_high_price, faph_rate_price, faph_discount, faph_tax_rate, faph_modified_date, faph_faci_id, faph_user_id)
@@ -768,19 +768,19 @@ GO
 -- =============================================
 -- Author	  :	Alvan Ganteng
 -- Create date: 14 Mei 2023
--- Description:	Trigger for auto insert 
---				into table Hotel.Facility_Price_History 
+-- Description:	Trigger for auto insert
+--				into table Hotel.Facility_Price_History
 -- =============================================
 
 CREATE OR ALTER TRIGGER Hotel.tr_hotel_facilities_price_history
 ON Hotel.Facilities
-AFTER INSERT 
+AFTER INSERT
 AS
 BEGIN
   SET NOCOUNT ON;
 
   DECLARE @faph_startdate DATETIME
-  DECLARE @faph_enddate DATETIME  
+  DECLARE @faph_enddate DATETIME
   DECLARE @faph_modified_date DATETIME
   DECLARE @faph_low_price MONEY;
   DECLARE @faph_high_price MONEY;
@@ -790,9 +790,9 @@ BEGIN
   DECLARE @faph_faci_id INT;
   DECLARE @faph_user_id INT;
 
-  SELECT @faph_startdate = faci_startdate, @faph_enddate = faci_enddate, @faph_low_price = faci_low_price, 
-  @faph_high_price = faci_high_price, @faph_rate_price = faci_rate_price, @faph_discount = faci_discount, 
-  @faph_modified_date = faci_modified_date, @faph_tax_rate = faci_tax_rate, @faph_faci_id = faci_id, @faph_user_id = faci_user_id 
+  SELECT @faph_startdate = faci_startdate, @faph_enddate = faci_enddate, @faph_low_price = faci_low_price,
+  @faph_high_price = faci_high_price, @faph_rate_price = faci_rate_price, @faph_discount = faci_discount,
+  @faph_modified_date = faci_modified_date, @faph_tax_rate = faci_tax_rate, @faph_faci_id = faci_id, @faph_user_id = faci_user_id
   FROM inserted;
 
   INSERT INTO Hotel.Facility_Price_History (faph_startdate, faph_enddate, faph_low_price, faph_high_price, faph_rate_price, faph_discount, faph_tax_rate, faph_modified_date, faph_faci_id, faph_user_id)
@@ -814,7 +814,7 @@ AS
 BEGIN
     DECLARE @fapho_faci_id INT
 
-    SELECT 
+    SELECT
         @fapho_faci_id = fapho_faci_id
     FROM inserted
 
@@ -850,7 +850,7 @@ BEGIN
     DECLARE @fapho_faci_id INT
     DECLARE @fapho_primary INT
 
-    SELECT 
+    SELECT
         @fapho_faci_id = fapho_faci_id,
         @fapho_primary =  fapho_primary
     FROM inserted
@@ -874,7 +874,7 @@ BEGIN
 			AND (p.fapho_primary IS NULL OR p.fapho_primary = 0);
         END
 
-    IF NOT EXISTS (SELECT * FROM inserted WHERE fapho_primary = 1 AND fapho_faci_id = @fapho_faci_id) 
+    IF NOT EXISTS (SELECT * FROM inserted WHERE fapho_primary = 1 AND fapho_faci_id = @fapho_faci_id)
         BEGIN
             UPDATE Hotel.Facility_Photos
             SET fapho_primary = 1
@@ -889,12 +889,12 @@ GO
 -- Author	  :	Alvan Ganteng
 -- Create date: 9 Mei 2023
 -- Description:	Trigger for checker insert for fapho_primary
---				the value will be '1' if it first record 
+--				the value will be '1' if it first record
 -- =============================================
 
 CREATE OR ALTER TRIGGER Hotel.tr_facility_photos_fapho_primary
 ON Hotel.Facility_Photos
-AFTER INSERT 
+AFTER INSERT
 AS
 BEGIN
   SET NOCOUNT ON;
@@ -906,22 +906,22 @@ BEGIN
     DECLARE @fapho_id INT
     DECLARE @fapho_primary INT
 
-    SELECT 
+    SELECT
         @fapho_id = fapho_id,
         @fapho_faci_id = fapho_faci_id,
         @fapho_primary = fapho_primary
     FROM inserted
 
     -- If any row is updated, check if the value of fapho_primary is changed to 1
-    IF NOT EXISTS (SELECT TOP 1 * 
-				   FROM Hotel.Facility_Photos 
-				   WHERE fapho_primary = 1 
-					AND fapho_faci_id = @fapho_faci_id) 
+    IF NOT EXISTS (SELECT TOP 1 *
+				   FROM Hotel.Facility_Photos
+				   WHERE fapho_primary = 1
+					AND fapho_faci_id = @fapho_faci_id)
 				   AND (@fapho_primary = 0)
     BEGIN
       -- Only allow one record with fapho_primary = 1 for each faci_id
       UPDATE Hotel.Facility_Photos
-      SET 
+      SET
         fapho_primary = 1
       WHERE fapho_id = @fapho_id
     END
@@ -940,21 +940,21 @@ END;
 GO
 GO
 -- =============================================
--- Author:		Gabi 
+-- Author:		Gabi
 -- Create date: GetDate()
 -- Description:	Trigger to update totalRoom,totalAmount in Booking_orders
 -- =============================================
 
 CREATE OR ALTER TRIGGER Booking.TrToRoomAndTotalAmountUpdate
 ON booking.booking_order_detail
-AFTER INSERT, DELETE, UPDATE 
+AFTER INSERT, DELETE, UPDATE
 AS
 BEGIN
 	SET XACT_ABORT ON;
   	UPDATE Booking.booking_orders
-  	SET 
+  	SET
 	-- Update the boor_total_room column for each affected boorId
-		boor_total_room = 
+		boor_total_room =
 		(
 			SELECT COUNT(d.borde_id)
 			FROM Booking.booking_order_detail d
@@ -974,5 +974,22 @@ BEGIN
     SELECT borde_boor_id
     FROM deleted
   )
+END;
+GO
+
+-- =============================================
+-- Author	  :	alip
+-- Create date: 14 Maret 2023
+-- Description:	Update Modified Date on Price_items table
+-- =============================================
+
+CREATE TRIGGER [Master].[Tr_Master_Update_Modified_date]
+ON [Master].[price_items]
+AFTER INSERT
+AS
+BEGIN
+    UPDATE Master.price_items
+    SET prit_modified_date = GETDATE()
+    WHERE prit_id IN (SELECT prit_id FROM inserted)
 END;
 GO

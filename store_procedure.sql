@@ -137,9 +137,9 @@ GO
 -- =============================================
 -- Author:		Harpi
 -- Create date: 9 Januari 2023
--- Description:	Stored procedure for updating payment_transaction 
+-- Description:	Stored procedure for updating payment_transaction (UNUSED)
 -- =============================================
-CREATE PROCEDURE Payment.spUpdatePaymentTransaction 
+CREATE PROCEDURE Payment.spUpdatePaymentTransaction
 	-- Add the parameters for the stored procedure here
 	@id int
 	,@trx_number nvarchar(55)
@@ -634,8 +634,9 @@ GO
 -- Create date: 13 Februari 2023
 -- Description:	Store Procedure for refund transfer
 -- =============================================
-CREATE PROCEDURE [Payment].[spRefundTransaction]
-    @trx_number_ref AS VARCHAR(50)
+CREATE OR ALTER PROCEDURE [Payment].[spRefundTransaction]
+    @trx_number_ref AS VARCHAR(50),
+    @refund_rate AS FLOAT
     AS
     BEGIN
         BEGIN TRY
@@ -647,7 +648,7 @@ CREATE PROCEDURE [Payment].[spRefundTransaction]
 
                 SET @source_account = '131-3456-78';
 
-                SELECT @refund_amount = Payment.fnRefundAmount((patr_credit + patr_debet), default),
+                SELECT @refund_amount = Payment.fnRefundAmount((patr_credit + patr_debet), @refund_rate),
                        @refund_age = DATEDIFF(day, patr_modified_date, GETDATE()),
                        @target_account = patr_source_id
                 FROM Payment.payment_transaction
@@ -676,55 +677,119 @@ GO
 
 -- =============================================
 -- Author:		Harpi
+-- Create date: 13 March 2023
+-- Description:	Store Procedure for create transfer booking
+-- =============================================
+CREATE PROCEDURE [Payment].[spCreateTransferBooking]
+       @boor_order_number VARCHAR(50)
+       ,@boor_card_number VARCHAR(50)
+       ,@boor_user_id INT
+AS
+BEGIN
+    INSERT
+      INTO Payment.payment_transaction(patr_type, patr_note, patr_order_number, patr_source_id, patr_target_id, patr_user_id)
+    VALUES ('TRB', 'Transfer Booking Note', @boor_order_number, @boor_card_number, '131-3456-78', @boor_user_id);
+END
+GO
+
+-- =============================================
+-- Author:		Harpi
+-- Create date: 13 March 2023
+-- Description:	Store Procedure for tranfer money (manipulation)
+-- =============================================
+CREATE OR ALTER PROCEDURE [Payment].spTranferMoney
+    @source_account AS VARCHAR(50),
+    @target_account AS VARCHAR(50),
+    @amount AS MONEY
+  AS BEGIN
+    BEGIN TRY
+        BEGIN TRANSACTION
+            -- from source account
+           UPDATE Payment.user_accounts
+              SET usac_saldo = usac_saldo - @amount,
+                  usac_modified_date = GETDATE()
+            WHERE usac_account_number = @source_account;
+
+            -- to target account
+            UPDATE Payment.user_accounts
+               SET usac_saldo = usac_saldo + @amount,
+                   usac_modified_date = GETDATE()
+             WHERE usac_account_number = @target_account;
+        COMMIT TRANSACTION
+    END TRY
+    BEGIN CATCH
+        ROLLBACK;
+    END CATCH
+END
+GO
+
+-- =============================================
+-- Author:		Harpi
 -- Create date: 8 January 2023
 -- Description:	Store Procedure for transfer booking transaction
 -- =============================================
-CREATE PROCEDURE [Payment].[spTransferBookingTransaction]
+CREATE OR ALTER PROC [Payment].[spCalculationTranferBooking]
     @source_account AS NVARCHAR(50),
     @target_account AS NVARCHAR(50),
-    @amount AS MONEY
+    @order_number AS NVARCHAR(50),
+    @total_amount AS MONEY OUTPUT
     AS
     BEGIN
         SET NOCOUNT ON;
         BEGIN TRY
             BEGIN TRANSACTION
-                DECLARE @source_usac_type varchar(50);
-                DECLARE @target_usac_type varchar(50);
-                DECLARE @usac_current_saldo AS MONEY;
+                DECLARE @user_payment_method varchar(10);
+                DECLARE @user_current_saldo AS MONEY;
+                DECLARE @total_down_payment AS MONEY;
+                DECLARE @payment_option AS NCHAR(2);
 
-                -- set value @source_usac_type
-                SELECT @source_usac_type = usac_type, @usac_current_saldo = usac_saldo
+                SELECT @total_amount = boor_total_ammount,
+                       @total_down_payment = boor_down_payment,
+                       @payment_option = TRIM(boor_is_paid),
+                       @user_payment_method = boor_pay_type
+                FROM Booking.booking_orders
+                WHERE boor_order_number = @order_number
+
+                -- set value @user_current_saldo
+                SELECT @user_current_saldo = usac_saldo
                   FROM Payment.user_accounts
                  WHERE usac_account_number = @source_account
 
-                -- set value @target_usac_type
-                SELECT @target_usac_type = usac_type
-                  FROM Payment.user_accounts
-                 WHERE usac_account_number = @target_account
-
-                -- top up from user bank account
-                IF (@source_usac_type = 'debet' OR @source_usac_type = 'credit_card' OR @source_usac_type = 'payment')
+                -- check if the payment method is 'cash' just ignore it
+                -- CR = credit_card
+                -- D = debet
+                -- PG = payment / payment_gateway
+                IF (@user_payment_method IN ('D', 'CR', 'PG'))
                 BEGIN
-                    IF @source_usac_type = 'debet' OR @source_usac_type = 'payment'
+                    IF @user_payment_method = 'D' OR @user_payment_method = 'PG'
                     BEGIN
-                        IF @usac_current_saldo-@amount < 0
-                            ROLLBACK  -- seharusnya ditambahkan ke kolom bayar kurang
+                        -- check if payment option is 'Down Payment'
+                        IF (@payment_option = 'DP' AND (@user_current_saldo - @total_down_payment) < 0)
+                            ROLLBACK -- TODO : Tambahkan feature untuk pemberitahuan bahwa saldo kurang utk dp!
+
+                        -- check if payment options is 'Paid'
+                        IF (@payment_option = 'P' AND (@user_current_saldo - @total_amount) < 0)
+                            ROLLBACK -- TODO : Tambahkan feature untuk pemberitahuan bahwa saldo kurang!
                     END
 
-                    UPDATE Payment.user_accounts
-                       SET usac_saldo = usac_saldo - @amount,
-                           usac_modified_date = GETDATE()
-                     WHERE usac_account_number = @source_account;
-                END
+                    -- change total_amount if transaction is 'Down Payment'
+                    SET @total_amount = @total_down_payment IF @payment_option = 'DP'
 
-                -- to realta hotel account
-                IF (@target_usac_type = 'debet' AND @target_account = '131-3456-78')
-                BEGIN
-                    UPDATE Payment.user_accounts
-                       SET usac_saldo = usac_saldo + @amount,
-                           usac_modified_date = GETDATE()
-                     WHERE usac_account_number = @target_account;
+                    -- TODO : check apakah lunas atau tidak , jika lunas status paid jika tidak maka lainya!
+                    -- paying booking order from user account to realta hotel account
+                    EXECUTE [Payment].spTranferMoney
+                            @source_account
+                            ,@target_account
+                            ,@total_amount
                 END
+                        -- IF (@@ROWCOUNT > 0)
+--                     BEGIN
+--                            UPDATE [Booking].[booking_orders]
+--                             SET boor_is_paid = 'P'
+--                             WHERE boor_order_number = @order_number;
+--
+--                            SELECT 'SUCCESS' AS STATUS
+--                     END
             COMMIT TRANSACTION
         END TRY
         BEGIN CATCH
@@ -1026,6 +1091,7 @@ BEGIN
 
     COMMIT;
 END
+GO
 
 -- =============================================
 -- Author:		Eri
@@ -1033,31 +1099,34 @@ END
 -- Description:	Store Procedure SignIn
 -- =============================================
 
-CREATE PROCEDURE [users].[SignIn]
+CREATE PROCEDURE [Users].[SpSignIn]
     @userEmail NVARCHAR(256),
     @userPassword NVARCHAR(50),
     @responseMessage NVARCHAR(250)='' OUTPUT
 AS
 BEGIN
-
     SET NOCOUNT ON
 
     DECLARE @userID INT
 
-	SET @userID = (select a.user_id FROM users.users a
-	JOIN users.user_password b
-	ON a.user_id=b.uspa_user_id
-	WHERE a.user_email=@userEmail
-	AND b.uspa_passwordHash=HASHBYTES('SHA2_512', @userPassword+b.uspa_passwordSalt))
+    SET @userID = (
+        SELECT a.user_id 
+        FROM users.users a
+        JOIN users.user_password b ON a.user_id = b.uspa_user_id
+        WHERE a.user_email = @userEmail AND 
+              b.uspa_passwordHash = HASHBYTES('SHA2_512', @userPassword + CONVERT(NVARCHAR(36), b.uspa_passwordSalt))
+    )
 
-	IF(@userID IS NOT NULL)
+    IF (@userID IS NOT NULL)
     BEGIN
-		SET @responseMessage='Login Success'
+        SET @responseMessage = 'Login Success'
     END
     ELSE
-        SET @responseMessage='Authentication Invalid'
-
+    BEGIN
+        SET @responseMessage = 'Authentication Invalid'
+    END
 END
+GO
 
 -- =============================================
 -- Author:		Eri
@@ -1065,38 +1134,288 @@ END
 -- Description:	Store Procedure SignUp
 -- =============================================
 
-CREATE PROCEDURE [users].[SignUp]
+CREATE PROCEDURE [Users].[SpSignUp]
     @userName NVARCHAR(50), 
-	@userEmail NVARCHAR(256),
+    @userEmail NVARCHAR(256),
     @userPassword NVARCHAR(50),
-	@userPhoneNumber NVARCHAR(25),
+    @userPhoneNumber NVARCHAR(25),
     @responseMessage NVARCHAR(250) OUTPUT
 AS
 BEGIN
     SET NOCOUNT ON
 
-    DECLARE @salt UNIQUEIDENTIFIER=NEWID()
+    DECLARE @salt UNIQUEIDENTIFIER = NEWID()
+    DECLARE @hashedPassword VARBINARY(64) = HASHBYTES('SHA2_512', @userPassword + CAST(@salt AS NVARCHAR(36)))
+
     BEGIN TRY
         INSERT INTO users.[Users] (user_full_name, user_email, user_phone_number)
-		VALUES(@userName, @userEmail, @userPhoneNumber)
+        VALUES (@userName, @userEmail, @userPhoneNumber)
 
-		DECLARE @userID INT
+        DECLARE @userID INT = SCOPE_IDENTITY()
 
-    SET @userID =(SELECT TOP 1 user_id FROM [users].[Users] WHERE user_email=@userEmail)
-	IF(@userID IS NOT NULL)
-    BEGIN
-		SET IDENTITY_INSERT users.user_password ON;
-        INSERT INTO users.[user_password] (uspa_user_id, uspa_passwordHash, uspa_passwordSalt)
-        VALUES(@userID, HASHBYTES('SHA2_512', @userPassword+'1234567890'), '1234567890')
-		SET IDENTITY_INSERT users.user_password OFF;
-		SET @responseMessage='Success'
-    END
-    ELSE
-        SET @responseMessage='Failed'
+        IF (@userID IS NOT NULL)
+        BEGIN
+			SET IDENTITY_INSERT users.user_password ON;
+            INSERT INTO users.[user_password] (uspa_user_id, uspa_passwordHash, uspa_passwordSalt)
+            VALUES (@userID, @hashedPassword, @salt)
+			SET IDENTITY_INSERT users.user_password OFF;
+            SET @responseMessage = 'Success'
+        END
+        ELSE
+            SET @responseMessage = 'Failed'
 
     END TRY
     BEGIN CATCH
-        SET @responseMessage=ERROR_MESSAGE() 
+        SET @responseMessage = ERROR_MESSAGE() 
+    END CATCH
+END
+GO
+
+-- Author:		Gabriel
+-- Create date: 14 March 2023
+-- Description:	Procedure for insert booking_orders
+-- =============================================
+
+CREATE OR ALTER procedure booking.sp_insert_booking_orders
+	@boor_hotel_id as int,
+	@boor_user_id as int,
+	@boor_pay_type as nchar(2),
+	@boor_is_paid as nchar(2),
+	@boor_down_payment as money =0
+AS
+BEGIN
+	-- declare abort on action
+	SET XACT_ABORT ON;
+
+	-- declare and retriving latest id,order_date and generate order_number
+	DECLARE @boor_order_id INT = IDENT_CURRENT('Booking.booking_orders');
+	DECLARE @boor_order_date DATE = GETDATE();
+	DECLARE @boor_order_number VARCHAR(50);
+	-- generate order number
+	SET @boor_order_number =
+		CONCAT
+		(
+			'BO#',
+			CONVERT(VARCHAR(10), @boor_order_date, 112),
+			'-',
+			RIGHT('0000' + CAST(@boor_order_id+1 AS VARCHAR(4)), 4)
+		);
+
+	--retrive member type from users
+	declare @member_type nvarchar(15) = COALESCE((select usme_memb_name from Users.user_members where usme_user_id=@boor_user_id),'');
+	--retrive
+	declare @boor_type nvarchar(15) = COALESCE((select user_type from Users.users where user_id=@boor_user_id),'I');
+
+	INSERT INTO
+		Booking.booking_orders
+		(
+			boor_hotel_id,
+			boor_user_id,
+			boor_order_number,
+			boor_order_date,
+			boor_pay_type,
+			boor_is_paid,
+			boor_type,
+			boor_member_type
+		)
+		VALUES
+		(
+			@boor_hotel_id,
+			@boor_user_id,
+			@boor_order_number,
+			@boor_order_date,
+			@boor_pay_type,
+			@boor_is_paid,
+			@boor_type,
+			@member_type
+		);
+	--insert to booking_orders
+	select SCOPE_IDENTITY();
+
+END
+GO
+
+CREATE OR ALTER procedure booking.sp_insert_booking_order_detail
+	@borde_boor_id int,
+	@borde_faci_id int,
+	@borde_checkin datetime,
+	@borde_checkout datetime,
+	@borde_discount smallmoney=NULL
+AS
+BEGIN
+	SET XACT_ABORT ON
+	DECLARE @faci_price money = (select faci_rate_price from Hotel.facilities where faci_id=@borde_faci_id)
+	DECLARE @faci_tax smallmoney = (select faci_tax_rate/faci_rate_price from Hotel.facilities where faci_id=@borde_faci_id)
+
+	-- Insert borde
+	INSERT INTO Booking.booking_order_detail
+	(
+		borde_boor_id,
+		borde_faci_id,
+		borde_checkin,
+		borde_checkout,
+		borde_price,
+		borde_adults,
+		borde_kids,
+		borde_extra,
+		borde_discount,
+		borde_tax
+	)
+    VALUES
+	(
+		@borde_boor_id,
+		@borde_faci_id,
+		@borde_checkin,
+		@borde_checkout,
+		@faci_price,
+		0,--bordeAdults
+		0,--bordeKids
+		0,--bordeExtra
+		0,--bordeDiscount,
+		@faci_tax
+	);
+	-- get borde_id for insertion into booking_order_detail_extra
+    select SCOPE_IDENTITY();
+END
+GO
+
+-- ============================================================
+-- Author:		Gabriel
+-- Create date: 14 March 2023
+-- Description:	Procedure for insert booking_order_detail_extra
+-- =============================================================
+
+CREATE OR ALTER PROCEDURE Booking.sp_insert_booking_extra
+	@boex_borde_id int,
+	@boex_prit_id int,
+	@boex_qty smallint,
+	@boex_measure_unit nvarchar(50)
+AS
+BEGIN
+	SET XACT_ABORT ON
+	DECLARE @prit_price smallmoney=(select prit_price from Master.price_items where prit_id=@boex_prit_id);
+	INSERT INTO Booking.booking_order_detail_extra
+	(
+		boex_borde_id,
+		boex_prit_id,
+		boex_price,
+		boex_qty,
+		boex_measure_unit
+	)
+	VALUES
+	(
+		@boex_borde_id,
+		@boex_prit_id,
+		@prit_price,
+		@boex_qty,
+		@boex_measure_unit
+	)
+    select SCOPE_IDENTITY();
+END
+GO
+
+-- =============================================
+-- Author:		Hafiz
+-- Create date: 14 March 2023
+-- Description:	Creata Store Procedure Find Vendor by Id
+-- =============================================
+Create Procedure [Purchasing].[spFindById]
+	@id int
+	AS
+	BEGIN
+	SET NOCOUNT ON;
+
+	BEGIN TRANSACTION;
+	-- memulai transaction
+	BEGIN TRY
+		SELECT
+			vendor_entity_id AS VendorEntityId,
+			vendor_name AS VendorName,
+			vendor_active AS VendorActive,
+			vendor_priority AS VendorPriority,
+			vendor_register_date AS VendorRegisterDate,
+			vendor_weburl AS VendorWeburl,
+			vendor_modified_date AS VendorModifiedDate
+		From [Purchasing].[vendor]
+		WHERE vendor_entity_id = @id;
+    COMMIT TRANSACTION; -- commit transaction jika tidak ada error
+    END TRY
+    BEGIN CATCH
+        ROLLBACK TRANSACTION; -- rollback transaction jika terjadi error
+        THROW;
+    END CATCH
+END
+GO
+
+-- =============================================
+-- Author:		Hafiz
+-- Create date: 14 March 2023
+-- Description:	Creata Store Procedure Delete Vendor by Id
+-- =============================================
+Create Procedure [Purchasing].[spDeleteVendor]
+	@id int
+	AS
+	BEGIN
+	SET NOCOUNT ON;
+
+	BEGIN TRANSACTION;
+		BEGIN TRY
+			Delete From [Purchasing].[vendor]
+			WHERE vendor_entity_id = @id;
+		COMMIT TRANSACTION; -- commit transaction jika tidak ada error
+    END TRY
+
+    BEGIN CATCH
+        ROLLBACK TRANSACTION; -- rollback transaction jika terjadi error
+        THROW;
     END CATCH
 
 END
+GO
+
+
+-- =============================================
+-- Author:		Alip
+-- Create date: 14 March 2023
+-- Description:	Store Procedure Price_items
+-- =============================================
+
+CREATE PROCEDURE [Master].[AddOrUpdatePriceItem]
+    @pritid int = NULL,
+    @pritname nvarchar(55),
+    @prittype nvarchar(15),
+    @pritprice money,
+    @pritdescription nvarchar(255),
+    @priticonurl nvarchar(255)
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    BEGIN TRY
+        BEGIN TRAN
+
+        IF @pritid IS NOT NULL -- Update existing price item
+        BEGIN
+            UPDATE [Master].[price_items]
+            SET prit_name = @pritname,
+                prit_type = @prittype,
+                prit_price = @pritprice,
+                prit_description = @pritdescription,
+                prit_icon_url = @priticonurl,
+                prit_modified_date = GETDATE()
+            WHERE prit_id = @pritid
+        END
+        ELSE -- Insert new price item
+        BEGIN
+            INSERT INTO Master.price_items(prit_name, prit_type, prit_price, prit_description, prit_icon_url, prit_modified_date)
+            VALUES (@pritname, @prittype, @pritprice, @pritdescription, @priticonurl, GETDATE())
+        END
+
+        COMMIT TRAN
+    END TRY
+    BEGIN CATCH
+        ROLLBACK TRAN;
+        THROW;
+    END CATCH
+END
+GO

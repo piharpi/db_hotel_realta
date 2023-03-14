@@ -61,7 +61,7 @@ CREATE TABLE Master.provinces (
   prov_id int IDENTITY (1, 1),
   prov_name nvarchar(85) NOT NULL,
   prov_country_id int CONSTRAINT pk_prov_id PRIMARY KEY(prov_id),
-  CONSTRAINT fk_prov_country_name FOREIGN KEY(prov_country_id) REFERENCES Master.country(country_id)
+  CONSTRAINT fk_prov_country_id FOREIGN KEY(prov_country_id) REFERENCES Master.country(country_id)
 	ON DELETE CASCADE
 	ON UPDATE CASCADE
 );
@@ -70,8 +70,9 @@ CREATE TABLE Master.address (
   addr_id int IDENTITY(1, 1),
   addr_line1 nvarchar(255) NOT NULL,
   addr_line2 nvarchar(255),
+  addr_city NVARCHAR(25) NOT NULL,
   addr_postal_code nvarchar(5),
-  addr_spatial_location geography,
+  addr_spatial_location NVARCHAR(100),
   addr_prov_id int,
   CONSTRAINT pk_addr_id PRIMARY KEY(addr_id),
   CONSTRAINT fk_addr_prov_id FOREIGN KEY(addr_prov_id) REFERENCES Master.provinces(prov_id)
@@ -114,6 +115,7 @@ CREATE TABLE Master.price_items (
   prit_price money NOT NULL,
   prit_description nvarchar(255),
   prit_type nvarchar(15) NOT NULL CHECK (prit_type IN ('SNACK', 'FACILITY', 'SOFTDRINK', 'FOOD', 'SERVICE')),
+  prit_icon_url NVARCHAR(255),
   prit_modified_date datetime,
   CONSTRAINT pk_prit_id PRIMARY KEY(prit_id)
 );
@@ -136,7 +138,7 @@ CREATE TABLE Users.users (
   user_full_name nvarchar (55) DEFAULT 'guest' NOT NULL,
   user_type nvarchar (15) CHECK(user_type IN('T','C','I','E')),
   user_company_name nvarchar (255),
-  user_email nvarchar(256),
+  user_email nvarchar(256) UNIQUE,
   user_phone_number nvarchar (25) UNIQUE NOT NULL,
   user_modified_date datetime,
 	CONSTRAINT pk_user_id PRIMARY KEY(user_id)
@@ -207,8 +209,8 @@ CREATE TABLE Users.bonus_points (
 
 CREATE TABLE Users.user_password (
   uspa_user_id int IDENTITY(1,1),
-  uspa_passwordHash varchar(128),
-  uspa_passwordSalt varchar(10),
+  uspa_passwordHash UNIQUEIDENTIFIER,
+  uspa_passwordSalt UNIQUEIDENTIFIER,
 	CONSTRAINT pk_uspa_user_id PRIMARY KEY(uspa_user_id),
 	CONSTRAINT fk_uspa_user_id FOREIGN KEY (uspa_user_id) REFERENCES users.users (user_id)
 );
@@ -230,11 +232,11 @@ CREATE TABLE Hotel.Hotels
   -- END UPDATE
   hotel_rating_star numeric(2,1) NULL,
   hotel_phonenumber nvarchar(25) NOT NULL,
+  hotel_modified_date datetime NULL,
   -- Primary Key
   hotel_addr_id INT NOT NULL,
   hotel_addr_description nvarchar(500) NULL,
   -- Add this later, on production
-  hotel_modified_date datetime NULL,
   CONSTRAINT hotel_addr_id_fk FOREIGN KEY (hotel_addr_id) REFERENCES Master.Address(addr_id)
 );
 
@@ -273,12 +275,13 @@ CREATE TABLE Hotel.Facilities
   faci_description nvarchar(255) NULL,
   faci_max_number INT NULL,
   faci_measure_unit VARCHAR(15) NULL CHECK(faci_measure_unit IN('people','beds')),
-  faci_room_number nvarchar(6) NOT NULL,
+  faci_room_number nvarchar(15) NOT NULL,
   faci_startdate datetime NOT NULL,
-  faci_endate datetime NOT NULL,
+  faci_enddate datetime NOT NULL,
   faci_low_price MONEY NOT NULL,
   faci_high_price MONEY NOT NULL,
-  faci_rate_price MONEY NOT NULL,
+  faci_rate_price MONEY NULL,
+  faci_expose_price TINYINT NOT NULL CHECK(faci_expose_price IN(1,2,3)),
   faci_discount SMALLMONEY NULL,
   faci_tax_rate SMALLMONEY NULL,
   faci_modified_date datetime NULL,
@@ -301,22 +304,22 @@ IF OBJECT_ID('Hotel.Facility_Price_History', 'U') IS NOT NULL
 DROP TABLE Hotel.Facility_Price_History
 
 -- Create the table in the specified schema
-CREATE TABLE Hotel.Facility_Price_History
+create table hotel.facility_price_history
 (
-  faph_id INT IDENTITY(1,1) NOT NULL CONSTRAINT faph_id_pk PRIMARY KEY, -- primary key column
-  faph_startdate datetime NOT NULL,
-  faph_enddate datetime NOT NULL,
-  faph_low_price MONEY NOT NULL,
-  faph_high_price MONEY NOT NULL,
-  faph_rate_price MONEY NOT NULL,
-  faph_discount SMALLMONEY NOT NULL,
-  faph_tax_rate SMALLMONEY NOT NULL,
+  faph_id int identity(1,1) not null constraint faph_id_pk primary key, -- primary key column
+  faph_startdate datetime not null,
+  faph_enddate datetime not null,
+  faph_low_price money not null,
+  faph_high_price money not null,
+  faph_rate_price money not null,
+  faph_discount smallmoney null,
+  faph_tax_rate smallmoney null,
   faph_modified_date datetime,
-  -- FOREIGN KEY
-  faph_faci_id INT NOT NULL,
-  faph_user_id int NOT NULL,
-  -- Add this later, on production
-  CONSTRAINT faph_faci_id_fk FOREIGN KEY (faph_faci_id) REFERENCES Hotel.Facilities(faci_id) ON DELETE CASCADE ON UPDATE CASCADE,
+  -- foreign key
+  faph_faci_id int not null,
+  faph_user_id int not null,
+  -- add this later, on production
+  constraint faph_faci_id_fk foreign key (faph_faci_id) references hotel.facilities(faci_id) on delete cascade on update cascade,
 );
 
 
@@ -329,14 +332,17 @@ DROP TABLE Hotel.Facility_Photos
 CREATE TABLE Hotel.Facility_Photos
 (
   fapho_id INT IDENTITY(1,1) NOT NULL CONSTRAINT fapho_id_pk PRIMARY KEY, -- primary key column
-  fapho_thumbnail_filename nvarchar(50) NULL,
-  fapho_photo_filename nvarchar(50) NULL,
+  fapho_photo_filename nvarchar(150) NULL,
+  fapho_thumbnail_filename nvarchar(150) NOT NULL,
+  fapho_original_filename nvarchar(150) NULL,
+  fapho_file_size smallint NULL,
+  fapho_file_type nvarchar(50) NULL,
   fapho_primary BIT NULL CHECK(fapho_primary IN(0,1)),
   fapho_url nvarchar(255) NULL,
   fapho_modified_date datetime,
   -- FOREIGN KEY
   fapho_faci_id INT NOT NULL,
-  CONSTRAINT fapho_faci_id_pk FOREIGN KEY (fapho_faci_id) REFERENCES Hotel.Facilities(faci_id) ON DELETE CASCADE ON UPDATE CASCADE
+  CONSTRAINT fapho_faci_id_fk FOREIGN KEY (fapho_faci_id) REFERENCES Hotel.Facilities(faci_id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 
@@ -466,7 +472,7 @@ CREATE TABLE Booking.booking_orders(
 	boor_total_ammount MONEY, -- sum(borde_subtotal)
 	boor_down_payment MONEY, -- on update
 	boor_pay_type NCHAR(2) NOT NULL, CHECK(boor_pay_type IN ('CR', 'C', 'D', 'PG')),
-	boor_is_paid NCHAR(2) NOT NULL CHECK (boor_is_paid IN ('DP','P','R ')),
+	boor_is_paid NCHAR(2) NOT NULL CHECK (boor_is_paid IN ('DP','P','R')),
 	boor_type NVARCHAR(15) NOT NULL CHECK (boor_type IN ('T','C','I')),
 	boor_cardnumber NVARCHAR(25), -- on insert on update
 	boor_member_type NVARCHAR(15), -- ambil dari usme_memb_name(fk user_id)
@@ -494,7 +500,7 @@ CREATE TABLE Booking.booking_order_detail(
 	borde_extra MONEY, -- sum(boex_subtotal) dari borde_id yg sama
 	borde_discount SMALLMONEY, -- faci_discount+sum(spof_discount) -> lewat soco_id
 	borde_tax SMALLMONEY, -- ngambil default faci_tax_rate
-	borde_subtotal AS borde_price+(borde_price*borde_tax)-(borde_price+borde_discount),
+	borde_subtotal AS (borde_price+(borde_price*borde_tax))-(borde_price*borde_discount),
 	borde_faci_id INTEGER,
 	CONSTRAINT pk_borde_id_boor_id PRIMARY KEY (borde_id, borde_boor_id),
 	CONSTRAINT fk_border_boor_id FOREIGN KEY(borde_boor_id)	REFERENCES Booking.booking_orders(boor_id),
@@ -672,8 +678,8 @@ CREATE TABLE Payment.user_accounts(
 CREATE TABLE Payment.payment_transaction(
     patr_id int IDENTITY(1,1) PRIMARY KEY,
 	patr_trx_number nvarchar(55) UNIQUE,
-	patr_debet money default(0) not null,
-	patr_credit money default(0) not null,
+	patr_debet money default(0),
+	patr_credit money default(0),
 	patr_type nchar(3) NOT NULL,
 	patr_note nvarchar(255),
 	patr_modified_date datetime DEFAULT(GETDATE()),

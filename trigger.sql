@@ -548,7 +548,7 @@ BEGIN
 
     IF NOT EXISTS (SELECT 1 FROM Users.user_roles WHERE usro_user_id = @hore_user_id AND usro_role_id IN (1, 5))
     BEGIN
-        RAISERROR ('User does not exist or you do not have permission', 16, 1);
+        PRINT('User does not exist or you do not have permission');
         RETURN;
     END
 

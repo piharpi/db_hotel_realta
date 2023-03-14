@@ -972,7 +972,7 @@ GO
 EXECUTE [Payment].[spCreateTransferBooking]
        'BO#20221127-0002'
        ,'123-2993-32'
-       ,2
+       ,1
 GO
 
 -- transaction order_menus, pay_type 'debet'
@@ -980,6 +980,11 @@ EXECUTE [Payment].[spCreateTransferOrderMenu]
        'MENUS#20220101-00001'
        ,'431-2388-93'
        ,1
+GO
+
+EXECUTE [Payment].[spCreateTransferRefund]
+    'BO#20221127-0001',
+    1
 GO
 -- INSERT
 --   INTO Payment.payment_transaction(patr_debet, patr_credit, patr_type, patr_note, patr_modified_date,

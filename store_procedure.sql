@@ -635,8 +635,9 @@ GO
 -- Description:	Store Procedure for refund transfer
 -- =============================================
 CREATE OR ALTER PROCEDURE [Payment].[spRefundTransaction]
-    @trx_number_ref AS VARCHAR(50),
-    @refund_rate AS FLOAT
+    @trx_number AS VARCHAR(50),
+    @refund_rate AS FLOAT = 50,
+    @total_amount AS MONEY OUTPUT
     AS
     BEGIN
         BEGIN TRY
@@ -652,21 +653,17 @@ CREATE OR ALTER PROCEDURE [Payment].[spRefundTransaction]
                        @refund_age = DATEDIFF(day, patr_modified_date, GETDATE()),
                        @target_account = patr_source_id
                 FROM Payment.payment_transaction
-                WHERE patr_trx_number = @trx_number_ref
+                WHERE patr_trx_number = @trx_number
 
 --                 IF (@refund_amount > 0.0 AND @refund_age < 7)
 --                 BEGIN
-                    -- refund from realta bank account
-                    UPDATE Payment.user_accounts
-                       SET usac_saldo = usac_saldo - @refund_amount,
-                           usac_modified_date = GETDATE()
-                     WHERE usac_account_number = @source_account;
-
-                    -- to customer user account
-                    UPDATE Payment.user_accounts
-                       SET usac_saldo = usac_saldo + @refund_amount,
-                           usac_modified_date = GETDATE()
-                     WHERE usac_account_number = @target_account;
+                    -- refund from realta bank account to customer user account
+                    EXECUTE [Payment].spTranferMoney
+                            @source_account
+                            ,@target_account
+                            ,@refund_amount
+--
+                    SET @total_amount = @refund_amount;
 --                 END
             COMMIT TRANSACTION
         END TRY
@@ -706,6 +703,22 @@ BEGIN
     INSERT
       INTO Payment.payment_transaction(patr_type, patr_note, patr_order_number, patr_source_id, patr_target_id, patr_user_id)
     VALUES ('ORM', 'Transfer Order Menu Note', @orme_order_number, @orme_card_number, '131-3456-78', @orme_user_id);
+END
+GO
+
+-- =============================================
+-- Author:		Harpi
+-- Create date: 13 March 2023
+-- Description:	Store Procedure for create transfer refund money
+-- =============================================
+CREATE OR ALTER PROCEDURE [Payment].[spCreateTransferRefund]
+       @boor_order_number VARCHAR(50)
+       ,@boor_user_id INT
+AS
+BEGIN
+    INSERT
+      INTO Payment.payment_transaction(patr_type, patr_note, patr_order_number, patr_user_id)
+    VALUES ('RF', '*Refund Booking Order', @boor_order_number, @boor_user_id);
 END
 GO
 

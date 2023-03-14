@@ -676,8 +676,8 @@ CREATE TABLE Payment.user_accounts(
 CREATE TABLE Payment.payment_transaction(
     patr_id int IDENTITY(1,1) PRIMARY KEY,
 	patr_trx_number nvarchar(55) UNIQUE,
-	patr_debet money default(0),
-	patr_credit money default(0),
+	patr_debet money default(0.0),
+	patr_credit money default(0.0),
 	patr_type nchar(3) NOT NULL,
 	patr_note nvarchar(255),
 	patr_modified_date datetime DEFAULT(GETDATE()),

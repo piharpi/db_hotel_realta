@@ -239,18 +239,17 @@ BEGIN
             ,@tar_user_id AS INT
             ,@transaction_note AS NVARCHAR(MAX)
 	        ,@order_number AS VARCHAR(55)
-	        ,@trx_number_ref AS VARCHAR(55)
+	        ,@trx_number AS VARCHAR(55)
 	        ,@pay_method AS NCHAR(5) = null
 
 	SET @order_number = null;
-	SET @trx_number_ref = null;
+	SET @trx_number = null;
 
     -- filling variable
     SELECT @src_account = patr_source_id,
            @tar_account = patr_target_id,
            @src_user_id = patr_user_id,
            @order_number = patr_order_number,
-           @trx_number_ref = patr_trx_number_ref,
            @transaction_type = TRIM(patr_type),
            @transaction_note = patr_note
       FROM inserted;
@@ -272,15 +271,20 @@ BEGIN
     -- CR = credit_card
     -- D = debet
     -- PG = payment / payment_gateway
-    IF (@pay_method IN ('D', 'CR', 'PG'))
+    IF (@pay_method IN ('D', 'CR', 'PG')
+            OR @transaction_type = 'RF'
+            OR @transaction_type = 'RPY'
+            OR @transaction_type = 'TP')
     BEGIN
         IF (@transaction_type = 'RF' OR @transaction_type = 'RPY')
         BEGIN
-            SELECT @src_account = patr_target_id,
-                   @tar_account = patr_source_id,
-                   @total_amount = Payment.fnRefundAmount((patr_credit + patr_debet), default)
+            SELECT TOP 1 @src_account = patr_target_id,
+                       @tar_account = patr_source_id,
+                       @trx_number = patr_trx_number
               FROM Payment.payment_transaction
-             WHERE patr_trx_number = @trx_number_ref
+             WHERE patr_order_number = @order_number AND patr_user_id = @src_user_id;
+
+               SET @order_number = null;
         END
 
         -- 	TOP UP
@@ -311,20 +315,34 @@ BEGIN
                 @total_amount OUTPUT
         END
 
+        -- REFUND
+        IF @transaction_type = 'RF'
+        BEGIN
+            EXECUTE [Payment].[spRefundTransaction]
+                @trx_number,
+                default,
+                @total_amount OUTPUT
+        END
+
+            -- REPAYMENT
+    -- 		IF @transaction_type = 'RPY'
+    -- 		BEGIN
+    -- 			EXECUTE [Payment].[spTopUpTransaction]
+    -- 				 @source_account = @src_account
+    -- 				,@target_account = @tar_account
+    -- 				,@expense = @total_amount
+    -- 		END
+
+        SELECT @src_user_id = usac_user_id
+          FROM Payment.user_accounts
+         WHERE usac_account_number = @src_account
+
         -- insert credit transaction
         INSERT INTO [Payment].[payment_transaction](
                     patr_trx_number, patr_debet, patr_credit, patr_type, patr_note,
                     patr_order_number, patr_source_id, patr_target_id, patr_trx_number_ref, patr_user_id)
              VALUES (Payment.fnFormatedTransactionId(IDENT_CURRENT('Payment.[payment_transaction]'), @transaction_type), 0,
-                    @total_amount, @transaction_type,@transaction_note, @order_number, @src_account, @tar_account, @trx_number_ref, @src_user_id);
-
-        -- REFUND
-        IF @transaction_type = 'RF'
-        BEGIN
-            EXECUTE [Payment].[spRefundTransaction]
-                @trx_number_ref,
-                default
-        END
+                    @total_amount, @transaction_type,@transaction_note, @order_number, @src_account, @tar_account, @trx_number, @src_user_id);
 
         SELECT @tar_user_id = usac_user_id
           FROM Payment.user_accounts
@@ -335,17 +353,8 @@ BEGIN
                     patr_trx_number, patr_debet, patr_credit, patr_type, patr_note,
                     patr_order_number, patr_source_id, patr_target_id, patr_trx_number_ref, patr_user_id)
             VALUES (Payment.fnFormatedTransactionId(IDENT_CURRENT('Payment.[payment_transaction]'), @transaction_type),
-                    @total_amount, 0, @transaction_type, @transaction_note, @order_number, @src_account, @tar_account, @trx_number_ref, @tar_user_id);
+                    @total_amount, 0, @transaction_type, @transaction_note, @order_number, @src_account, @tar_account, @trx_number, @tar_user_id);
 
-
-            -- REPAYMENT
-    -- 		IF @transaction_type = 'RPY'
-    -- 		BEGIN
-    -- 			EXECUTE [Payment].[spTopUpTransaction]
-    -- 				 @source_account = @src_account
-    -- 				,@target_account = @tar_account
-    -- 				,@expense = @total_amount
-    -- 		END
     -- 		SELECT patr_id FROM inserted;
     END
 END

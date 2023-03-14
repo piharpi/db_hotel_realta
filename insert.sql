@@ -7,6 +7,7 @@ GO
 
 DBCC CHECKIDENT ('Purchasing.purchase_order_header', RESEED, 1);
 GO
+
 DELETE Purchasing.purchase_order_detail;
 DELETE Purchasing.stock_detail;
 DELETE Purchasing.stock_photo;
@@ -16,6 +17,9 @@ DELETE Purchasing.vendor;
 DELETE Purchasing.cart;
 
 -- DELETE MODULE Payment
+DBCC CHECKIDENT ('Payment.payment_transaction', RESEED, 1);
+GO
+
 DELETE Payment.payment_transaction;
 DELETE Payment.payment_gateway;
 DELETE Payment.entity;
@@ -85,15 +89,11 @@ DBCC CHECKIDENT ('Master.address', RESEED, 1);
 GO
 DBCC CHECKIDENT ('Master.price_items', RESEED, 1);
 GO
-DBCC CHECKIDENT ('Master.members', RESEED, 1);
-GO
 DBCC CHECKIDENT ('Master.service_task', RESEED, 1);
 GO
 DBCC CHECKIDENT ('Master.category_group', RESEED, 1);
 GO
 DBCC CHECKIDENT ('Master.policy', RESEED, 1);
-GO
-DBCC CHECKIDENT ('Master.policy_category_group', RESEED, 1);
 GO
 
 -- DELETE MODULE Master
@@ -121,7 +121,7 @@ SET IDENTITY_INSERT Master.Regions OFF;
 -- ORDER by region_code ASC
 
 SET IDENTITY_INSERT Master.Country ON;
-INSERT INTO Master.country (country_id, country_name, country_region_id) VALUES 
+INSERT INTO Master.country (country_id, country_name, country_region_id) VALUES
 (1, 'Indonesia', 1), (2, 'Thailand', 1), (3, 'Japan', 1), (4, 'Germany', 2), (5, 'France', 2),
 (6, 'United States', 3), (7, 'Canada', 3), (8, 'Brazil', 4), (9, 'Argentina', 4), (10, 'South Africa', 5);
 SET IDENTITY_INSERT Master.Country OFF;
@@ -129,24 +129,23 @@ SET IDENTITY_INSERT Master.Country OFF;
 -- ORDER by country_id ASC
 
 SET IDENTITY_INSERT Master.Provinces ON;
-INSERT INTO Master.provinces (prov_id, prov_name, prov_country_id) VALUES 
-(1, 'Jakarta', 1), 
-(2, 'Bali', 1), 
-(3, 'Chiang Mai', 2), 
-(4, 'Tokyo', 3), 
+INSERT INTO Master.provinces (prov_id, prov_name, prov_country_id) VALUES
+(1, 'Jakarta', 1),
+(2, 'Bali', 1),
+(3, 'Chiang Mai', 2),
+(4, 'Tokyo', 3),
 (5, 'Berlin', 4),
-(6, 'Paris', 5), 
-(7, 'California', 6), 
-(8, 'New York', 6), 
-(9, 'Ontario', 7), 
+(6, 'Paris', 5),
+(7, 'California', 6),
+(8, 'New York', 6),
+(9, 'Ontario', 7),
 (10, 'Sao Paulo', 8),
-(11, 'Buenos Aires', 9), 
-(12, 'Cape Town', 10), 
-(13, 'Durban', 10), 
-(14, 'Gauteng', 10), 
+(11, 'Buenos Aires', 9),
+(12, 'Cape Town', 10),
+(13, 'Durban', 10),
+(14, 'Gauteng', 10),
 (15, 'Nairobi', 3);
 SET IDENTITY_INSERT Master.Provinces OFF;
-SET IDENTITY_INSERT Payment.payment_transaction OFF;
 
 -- SELECT*FROM Master.provinces
 -- ORDER BY prov_id
@@ -207,7 +206,7 @@ SET IDENTITY_INSERT Master.policy OFF;
 SET IDENTITY_INSERT Master.price_items ON;
 
 INSERT INTO Master.price_items (prit_id, prit_name, prit_price, prit_description, prit_type, prit_icon_url)
-VALUES 
+VALUES
   (1, 'Minuman Soda', 15000, 'Minuman soda dingin dalam kaleng', 'SOFTDRINK', 'https://example.com/soda.png'),
   (2, 'Coklat Panas', 25000, 'Coklat panas dengan marshmallow di atasnya', 'SNACK', 'https://example.com/chocolate.png'),
   (3, 'Layanan Pijat Kepala', 120000, 'Layanan pijat kepala selama 30 menit', 'SERVICE', 'https://example.com/head-massage.png'),
@@ -276,14 +275,14 @@ SET IDENTITY_INSERT Users.users ON;
 INSERT INTO users.users (user_id, user_full_name, user_type, user_company_name, user_email, user_phone_number, user_modified_date)
 VALUES (1,'John Smith', 'T', 'Acme Inc.', 'john.smith@acme.com', '123-456-7890', GETDATE()),
 	   (2,'Jane Doe', 'C', 'XYZ Corp.', 'jane.doe@xyz.com', '123-456-7891', GETDATE()),
-	   (3,'Bob Johnson', 'I', 'ABC Inc.', 'bob.johnson@abc.com', '123-456-7892', GETDATE()),
+	   (3,'Account Realta', 'C', 'Hotel Realta.', 'realta@hotel.com', '033-456-7899', GETDATE()),
 	   (4,'Samantha Williams', 'T', 'Def Corp.', 'samantha.williams@def.com', '123-456-7893', GETDATE()),
 	   (5,'Michael Brown', 'C', 'Ghi Inc.', 'michael.brown@ghi.com', '123-456-7894', GETDATE()),
 	   (6,'Emily Davis', 'I', 'Jkl Ltd.', 'emily.davis@jkl.com', '123-456-7895', GETDATE()),
 	   (7,'William Thompson', 'T', 'Mno Inc.', 'william.thompson@mno.com', '123-456-7896', GETDATE()),
 	   (8,'Ashley Johnson', 'C', 'Pqr Corp.', 'ashley.johnson@pqr.com', '123-456-7897', GETDATE()),
 	   (9,'David Anderson', 'I', 'Stu Inc.', 'david.anderson@stu.com', '123-456-7898', GETDATE()),
-	   (10,'Jessica Smith', 'T', 'Vwx Corp.', 'jessica.smith@vwx.com', '123-456-7899', GETDATE()),
+	   (10,'Bob Johnson', 'I', 'ABC Inc.', 'bob.johnson@abc.com', '123-456-7892', GETDATE()),
 	   (11,'David Brown', 'T', 'Example Co', 'david.brown@example.com', '555-555-1222', GETDATE()),
 	   (12,'Jessica Smith', 'C', 'Test Inc', 'jessica.smith@test.com', '555-555-1223', GETDATE()),
 	   (13,'James Johnson', 'I', 'Acme Inc', 'james.johnson@acme.com', '555-555-1224', GETDATE()),
@@ -335,7 +334,7 @@ VALUES
 (7, 2),
 (8, 3),
 (9, 4),
-(10, 5),
+(10, 2),
 (11, 1),
 (12, 2),
 (13, 3),
@@ -408,103 +407,267 @@ SET IDENTITY_INSERT users.bonus_points OFF;
 -- select * from users.bonus_points;
 
 -- INSERT MODULE Hotel
-INSERT INTO Hotel.Hotels (hotel_name, hotel_description, hotel_rating_star, hotel_phonenumber, hotel_modified_date, hotel_addr_id, hotel_status)
-VALUES
-('Hotel Amaris Palembang', 'Hotel bintang 3 dengan fasilitas yang lengkap dan modern di Palembang', 3, '+62 823 3456 7891', '2022-01-01', 1, 0),
-('Grand Clarion Hotel Palembang', 'Hotel bintang 4 dengan kamar yang luas dan nyaman di Palembang', 4, '+62 823 1234 5678', '2022-02-01', 2, 0),
-('Aston Hotel Palembang', 'Hotel bintang 5 dengan fasilitas spa dan kolam renang di Palembang', 5, '+62 823 9012 3456', '2022-03-01', 3, 0),
-('Hotel Santika Palembang', 'Hotel bintang 3 dengan fasilitas kelas atas di Palembang', 3, '+62 823 7890 1234', '2022-04-01', 3, 0),
-('Ibis Hotel Palembang', NULL, 3, '+62 823 4567 8901', '2022-05-01', 2, 0),
-('Grand Mercure Hotel Palembang', 'Hotel bintang 4 dengan fasilitas mewah di Palembang', 4, '+62 823 1234 5679', '2022-06-01', 5, 0),
-('Marriott Hotel Palembang', 'Hotel bintang 5 dengan fasilitas spa dan fitness center di Palembang', 5, '+62 823 9012 3457', '2022-07-01', 1, 0),
-('Zest Hotel Palembang', 'Hotel bintang 3 dengan desain modern dan nyaman di Palembang', NULL, '+62 823 7890 1235', '2022-08-01', 4, 0),
-('The Westin Hotel Palembang', 'Hotel bintang 4 dengan fasilitas kelas atas di Palembang', 4, '+62 823 4567 8902', '2022-09-01', 5, 0),
-('Swiss-Belhotel Palembang', 'Hotel bintang 5 dengan fasilitas mewah di Palembang', 5, '+62 823 1234 5680', NULL, 4, 0)
+--* DATA HOTEL *--
+INSERT INTO Hotel.Hotels (hotel_name, hotel_description, hotel_status, hotel_phonenumber, hotel_addr_id, hotel_addr_description, hotel_modified_date)
+VALUES ('Grand Hyatt Jakarta', 'Luxury hotel in the heart of Jakarta', 1, '+62 21 29921234', 4, 'Jl. M. H. Thamrin No.30, Jakarta Pusat', GETDATE());
 
+INSERT INTO Hotel.Hotels (hotel_name, hotel_description, hotel_status, hotel_phonenumber, hotel_addr_id, hotel_addr_description, hotel_modified_date)
+VALUES ('Aston Priority Simatupang Hotel & Conference Center', 'Contemporary hotel in South Jakarta', 0, '+62 21 78838777', 5, 'Jl. Let. Jend. T.B. Simatupang Kav. 9 Kebagusan Pasar Minggu, Jakarta Selatan', GETDATE());
+
+INSERT INTO Hotel.Hotels (hotel_name, hotel_description, hotel_status, hotel_phonenumber, hotel_addr_id, hotel_addr_description, hotel_modified_date)
+VALUES ('The Trans Luxury Hotel Bandung', 'Luxury hotel in Bandung', 0, '+62 22 87348888', 6, 'Jl. Gatot Subroto No. 289, Bandung, Jawa Barat', GETDATE());
+
+INSERT INTO Hotel.Hotels (hotel_name, hotel_description, hotel_status, hotel_phonenumber, hotel_addr_id, hotel_addr_description, hotel_modified_date)
+VALUES ('Padma Resort Ubud', 'Resort with rice field views in Ubud', 1, '+62 361 3011111', 7, 'Banjar Carik, Desa Puhu, Payangan, Gianyar, Bali', GETDATE());
+
+INSERT INTO Hotel.Hotels (hotel_name, hotel_description, hotel_status, hotel_phonenumber, hotel_addr_id, hotel_addr_description, hotel_modified_date)
+VALUES ('Four Seasons Resort Bali at Sayan', 'Luxury resort in the heart of Bali', 0, '+62 361 977577', 8, 'Sayan, Ubud, Bali', GETDATE());
+
+INSERT INTO Hotel.Hotels (hotel_name, hotel_description, hotel_status, hotel_phonenumber, hotel_addr_id, hotel_addr_description, hotel_modified_date)
+VALUES ('The Stones - Legian, Bali', 'Beachfront hotel in Legian, Bali', 1, '+62 361 3005888', 9, 'Jl. Raya Pantai Kuta, Banjar Legian Kelod, Legian, Bali', GETDATE());
+
+INSERT INTO Hotel.Hotels (hotel_name, hotel_description, hotel_status, hotel_phonenumber, hotel_addr_id, hotel_addr_description, hotel_modified_date)
+VALUES ('Aryaduta Makassar', 'City hotel in Makassar', 1, '+62 411 871111', 4, 'Jl. Somba Opu No. 297, Makassar, Sulawesi Selatan', GETDATE());
+
+INSERT INTO Hotel.Hotels (hotel_name, hotel_description, hotel_status, hotel_phonenumber, hotel_modified_date, hotel_addr_id, hotel_addr_description)
+VALUES ('Hotel Tugu Malang', 'Hotel mewah dengan desain klasik Indonesia', 0, '(0341) 363891', GETDATE(), 5, 'Jl. Tugu No. 3, Klojen, Malang');
+
+INSERT INTO Hotel.Hotels (hotel_name, hotel_description, hotel_status, hotel_phonenumber, hotel_modified_date, hotel_addr_id, hotel_addr_description)
+VALUES ('The Shalimar Boutique Hotel', 'Hotel butik bintang 4 dengan taman tropis', 0, '(0341) 550888', GETDATE(), 5, 'Jalan Salak No. 38-42, Oro Oro Dowo, Klojen, Malang');
+
+INSERT INTO Hotel.Hotels (hotel_name, hotel_description, hotel_status, hotel_phonenumber, hotel_modified_date, hotel_addr_id, hotel_addr_description)
+VALUES ('Hotel Santika Premiere Malang', 'Hotel bintang 4 dengan restoran dan kolam renang', 1, '(0341) 405405', GETDATE(), 5, 'Jl. Letjen S. Parman No. 60, Malang');
+
+INSERT INTO Hotel.Hotels (hotel_name, hotel_description, hotel_status, hotel_phonenumber, hotel_modified_date, hotel_addr_id, hotel_addr_description)
+VALUES ('Ijen Suites Resort & Convention', 'Hotel mewah dengan kolam renang dan spa', 1, '(0341) 404888', GETDATE(), 5, 'Jalan Raya Kahuripan No. 16, Tlogomas, Malang');
+
+INSERT INTO Hotel.Hotels (hotel_name, hotel_description, hotel_status, hotel_phonenumber, hotel_modified_date, hotel_addr_id, hotel_addr_description)
+VALUES ('Atria Hotel Malang', 'Hotel mewah dengan pemandangan pegunungan', 0, '(0341) 402888', GETDATE(), 5, 'Jl. Letjen Sutoyo No.79, Klojen, Malang');
+
+INSERT INTO Hotel.Hotels (hotel_name, hotel_description, hotel_status, hotel_phonenumber, hotel_modified_date, hotel_addr_id, hotel_addr_description)
+VALUES ('Jambuluwuk Batu Resort', 'Resor bintang 4 dengan taman dan kolam renang', 0, '(0341) 596333', GETDATE(), 5, 'Jl. Trunojoyo No.99, Oro Oro Ombo, Batu, Malang');
+
+INSERT INTO Hotel.Hotels (hotel_name, hotel_description, hotel_status, hotel_phonenumber, hotel_modified_date, hotel_addr_id, hotel_addr_description)
+VALUES ('Aria Gajayana Hotel', 'Hotel mewah dengan pemandangan pegunungan', 0, '(0341) 320188', GETDATE(), 5, 'Jl. Hayam Wuruk No. 5, Klojen, Malang');
+
+INSERT INTO Hotel.Hotels (hotel_name, hotel_description, hotel_status, hotel_phonenumber, hotel_modified_date, hotel_addr_id, hotel_addr_description)
+VALUES ('The Batu Hotel & Villas', 'Hotel mewah dengan kolam renang dan restoran', 1, '(0341) 512555', GETDATE(), 5, 'Jalan Raya Selecta No.1');
 -- select * from Hotel.hotels
 
-INSERT INTO Hotel.Facilities (faci_name, faci_description, faci_max_number, faci_measure_unit, 
-faci_room_number, faci_startdate, faci_endate, faci_low_price, faci_high_price, faci_rate_price, 
-faci_discount, faci_tax_rate, faci_cagro_id, faci_hotel_id, faci_user_id)
+--* DATA REVIEWS *--
+-- Data 1
+INSERT INTO Hotel.Hotel_Reviews (hore_user_review, hore_rating, hore_created_on, hore_user_id, hore_hotel_id)
 VALUES
-('Pool', 'Outdoor pool with sun loungers and parasols', 100, 'people', 'POOL01', '2022-01-01', '2022-12-31', 50000, 100000, 75000, 25000, 10000, 6, 1, 2); -- POOL
+('Hotel ini sangat menyenangkan!', 5, GETDATE(), 1, 1);
+INSERT INTO Hotel.Hotel_Reviews (hore_user_review, hore_rating, hore_created_on, hore_user_id, hore_hotel_id)
+VALUES
+('Pelayanan hotel sangat baik', 4, GETDATE(), 5, 1);
+INSERT INTO Hotel.Hotel_Reviews (hore_user_review, hore_rating, hore_created_on, hore_user_id, hore_hotel_id)
+VALUES
+('Kamar hotel sangat bersih dan nyaman', 5, GETDATE(), 6, 1);
+INSERT INTO Hotel.Hotel_Reviews (hore_user_review, hore_rating, hore_created_on, hore_user_id, hore_hotel_id)
+VALUES
+('Sangat puas dengan penginapan ini', 1, GETDATE(), 10, 1);
+INSERT INTO Hotel.Hotel_Reviews (hore_user_review, hore_rating, hore_created_on, hore_user_id, hore_hotel_id)
+VALUES
+('Sarapan paginya enak dan bervariasi', 1, GETDATE(), 11, 1);
 
---Checker Trigger
-INSERT INTO Hotel.Facilities (faci_name, faci_description, faci_max_number, faci_measure_unit, 
-faci_room_number, faci_startdate, faci_endate, faci_low_price, faci_high_price, faci_rate_price, 
-faci_discount, faci_tax_rate, faci_cagro_id, faci_hotel_id, faci_user_id)
+-- Data 2
+INSERT INTO Hotel.Hotel_Reviews (hore_user_review, hore_rating, hore_created_on, hore_user_id, hore_hotel_id)
 VALUES
-('Restaurant', NULL, 100, 'people', 'REST01', '2022-01-01', '2022-12-31', 40000, 80000, 60000, 25000, 10000, 2, 1, 2) -- RESTAURANT
-INSERT INTO Hotel.Facilities (faci_name, faci_description, faci_max_number, faci_measure_unit, 
-faci_room_number, faci_startdate, faci_endate, faci_low_price, faci_high_price, faci_rate_price, 
-faci_discount, faci_tax_rate, faci_cagro_id, faci_hotel_id, faci_user_id)
+('Saya suka kamar mandinya yang luas', 4, GETDATE(), 1, 2);
+INSERT INTO Hotel.Hotel_Reviews (hore_user_review, hore_rating, hore_created_on, hore_user_id, hore_hotel_id)
 VALUES
-('Gym', 'Fully equipped gym with treadmills stationary bikes, and weights', 50, 'people', 'GYM01', '2022-01-01', '2022-12-31', 30000, 50000, 40000, 25000, 10000, 4, 1, 2) -- GYM
-,('Metting Room', 'Meeting room Luxury, and body treatments', NULL, 'people', 'MTG01', '2022-01-01', '2022-12-31', 80000, 120000, 100000, 25000, 10000, 3, 1, 2) -- MEETING
-,('Deluxe Room', 'Kamar luas dengan fasilitas mewah, termasuk kamar mandi pribadi dengan shower dan bathtub', 2, NULL, 'DLR01', '2022-01-01', '2022-01-30', 200000, 250000, 230000, 25000, 10000, 1, 1, 2)
-,('Superior Room', 'Kamar standar dengan fasilitas lengkap, termasuk kamar mandi pribadi dengan shower', 2,'beds', 'SPR01', '2022-01-01', '2022-01-30', 150000, 180000, 160000, NULL, 10000, 1, 1, 2)
-,('Family Room', 'Kamar untuk keluarga, dengan 2 tempat tidur single dan 1 tempat tidur double, serta fasilitas lengkap', 4,'beds', 'FMR01', '2022-01-01', '2022-01-30', 250000, 300000, 270000, 25000, NULL, 1, 1, 2)
-,('Standard Room', 'Kamar standar dengan fasilitas sederhana, termasuk kamar mandi pribadi dengan shower', 2,'beds', 'STR01','2022-01-01', '2022-01-30', 100000, 125000, 115000, 25000, 10000, 1, 1, 2)
-,('Double Room', 'Kamar dengan 2 tempat tidur single, serta fasilitas lengkap', 2,'beds', 'DBR01', '2022-01-01', '2022-01-30', 150000, 175000, 160000, 25000, 10000, 1, 1, 2)
+('Lokasi hotelnya sangat dekat dengan pusat kota', 4, GETDATE(), 5, 2);
+INSERT INTO Hotel.Hotel_Reviews (hore_user_review, hore_rating, hore_created_on, hore_user_id, hore_hotel_id)
+VALUES
+('Makanan di restoran hotelnya enak', 5, GETDATE(), 6, 2);
+INSERT INTO Hotel.Hotel_Reviews (hore_user_review, hore_rating, hore_created_on, hore_user_id, hore_hotel_id)
+VALUES
+('Pengalaman menginap yang menyenangkan', 5, GETDATE(), 10, 2);
+INSERT INTO Hotel.Hotel_Reviews (hore_user_review, hore_rating, hore_created_on, hore_user_id, hore_hotel_id)
+VALUES
+('Pelayanan receptionistnya ramah dan cepat', 5, GETDATE(), 11, 2);
+INSERT INTO Hotel.Hotel_Reviews (hore_user_review, hore_rating, hore_created_on, hore_user_id, hore_hotel_id)
+VALUES
+('Hotel yang direkomendasikan', 5, GETDATE(), 15, 2);
+
+-- Data 3
+INSERT INTO Hotel.Hotel_Reviews (hore_user_review, hore_rating, hore_created_on, hore_user_id, hore_hotel_id)
+VALUES
+('Kamar hotelnya luas dan bersih', 5, GETDATE(), 1, 3);
+INSERT INTO Hotel.Hotel_Reviews (hore_user_review, hore_rating, hore_created_on, hore_user_id, hore_hotel_id)
+VALUES
+('Sarapan paginya enak dan bergizi', 4, GETDATE(), 5, 3);
+INSERT INTO Hotel.Hotel_Reviews (hore_user_review, hore_rating, hore_created_on, hore_user_id, hore_hotel_id)
+VALUES
+('Fasilitas hotelnya lengkap', 5, GETDATE(), 6, 3);
+INSERT INTO Hotel.Hotel_Reviews (hore_user_review, hore_rating, hore_created_on, hore_user_id, hore_hotel_id)
+VALUES
+('Sangat puas dengan pelayanan hotelnya', 5, GETDATE(), 10, 3);
+INSERT INTO Hotel.Hotel_Reviews (hore_user_review, hore_rating, hore_created_on, hore_user_id, hore_hotel_id)
+VALUES
+('Harga yang sangat terjangkau', 5, GETDATE(), 11, 3);
+INSERT INTO Hotel.Hotel_Reviews (hore_user_review, hore_rating, hore_created_on, hore_user_id, hore_hotel_id)
+VALUES
+('Saya suka dengan suasana hotelnya yang tenang', 5, GETDATE(), 15, 3);
+
+--DATA 4
+INSERT INTO Hotel.Hotel_Reviews (hore_user_review, hore_rating, hore_created_on, hore_user_id, hore_hotel_id)
+VALUES
+('Hotel yang bagus untuk staycation', 5, GETDATE(), 1, 4);
+INSERT INTO Hotel.Hotel_Reviews (hore_user_review, hore_rating, hore_created_on, hore_user_id, hore_hotel_id)
+VALUES
+('Pemandangannya indah dari kamar', 4, GETDATE(), 5, 4);
+INSERT INTO Hotel.Hotel_Reviews (hore_user_review, hore_rating, hore_created_on, hore_user_id, hore_hotel_id)
+VALUES
+('Tempat yang pas untuk liburan keluarga', 5, GETDATE(), 6, 4);
+INSERT INTO Hotel.Hotel_Reviews (hore_user_review, hore_rating, hore_created_on, hore_user_id, hore_hotel_id)
+VALUES
+('Saya akan merekomendasikan hotel ini ke teman', 5, GETDATE(), 10, 4);
+INSERT INTO Hotel.Hotel_Reviews (hore_user_review, hore_rating, hore_created_on, hore_user_id, hore_hotel_id)
+VALUES
+('Sangat menyenangkan menginap di hotel ini', 5, GETDATE(), 11, 4);
+INSERT INTO Hotel.Hotel_Reviews (hore_user_review, hore_rating, hore_created_on, hore_user_id, hore_hotel_id)
+VALUES
+('Layanan hotelnya memuaskan', 5, GETDATE(), 15, 4);
+
+-- DATA 5
+INSERT INTO Hotel.Hotel_Reviews (hore_user_review, hore_rating, hore_created_on, hore_user_id, hore_hotel_id)
+VALUES
+('Kamar hotelnya bersih dan nyaman', 5, GETDATE(), 1, 5);
+INSERT INTO Hotel.Hotel_Reviews (hore_user_review, hore_rating, hore_created_on, hore_user_id, hore_hotel_id)
+VALUES
+('Lokasi hotelnya sangat dekat dengan pusat kota', 4, GETDATE(), 5, 5);
+INSERT INTO Hotel.Hotel_Reviews (hore_user_review, hore_rating, hore_created_on, hore_user_id, hore_hotel_id)
+VALUES
+('Pelayanan yang sangat baik', 5, GETDATE(), 6, 5);
+INSERT INTO Hotel.Hotel_Reviews (hore_user_review, hore_rating, hore_created_on, hore_user_id, hore_hotel_id)
+VALUES 
+('Hotel yang cocok untuk perjalanan bisnis', 5, GETDATE(), 10, 5);
+INSERT INTO Hotel.Hotel_Reviews (hore_user_review, hore_rating, hore_created_on, hore_user_id, hore_hotel_id)
+VALUES 
+('Saya suka kolam renangnya yang besar', 4, GETDATE(), 11, 5);
+INSERT INTO Hotel.Hotel_Reviews (hore_user_review, hore_rating, hore_created_on, hore_user_id, hore_hotel_id)
+VALUES 
+('Hotelnya direkomendasikan untuk liburan keluarga', 5, GETDATE(), 15, 5);
+
+
+--* DATA FACILITIES *--
+--DATA 1
+INSERT INTO Hotel.Facilities (faci_name, faci_description, faci_max_number, faci_measure_unit, faci_room_number, faci_startdate, faci_enddate, faci_low_price, faci_high_price, faci_expose_price, faci_discount, faci_tax_rate, faci_modified_date, faci_cagro_id, faci_hotel_id, faci_user_id)
+VALUES
+('Single Room', 'Cozy and comfortable room with a single bed', 1, 'beds', '101', '2023-03-14 14:00:00', '2023-03-16 12:00:00', 500000, 700000, 1, NULL, 10, GETDATE(), 1, 1, 2);
+INSERT INTO Hotel.Facilities (faci_name, faci_description, faci_max_number, faci_measure_unit, faci_room_number, faci_startdate, faci_enddate, faci_low_price, faci_high_price, faci_expose_price, faci_discount, faci_tax_rate, faci_modified_date, faci_cagro_id, faci_hotel_id, faci_user_id)
+VALUES
+('Double Room', 'Spacious room with a double bed', 2, 'beds', '102', '2023-03-14 14:00:00', '2023-03-16 12:00:00', 700000, 900000, 1, NULL, 10, GETDATE(), 1, 1, 2);
+INSERT INTO Hotel.Facilities (faci_name, faci_description, faci_max_number, faci_measure_unit, faci_room_number, faci_startdate, faci_enddate, faci_low_price, faci_high_price, faci_expose_price, faci_discount, faci_tax_rate, faci_modified_date, faci_cagro_id, faci_hotel_id, faci_user_id)
+VALUES
+('Twin Room', 'Room with two single beds', 2, 'beds', '103', '2023-03-14 14:00:00', '2023-03-16 12:00:00', 600000, 800000, 1, NULL, 10, GETDATE(), 1, 1, 2);
+INSERT INTO Hotel.Facilities (faci_name, faci_description, faci_max_number, faci_measure_unit, faci_room_number, faci_startdate, faci_enddate, faci_low_price, faci_high_price, faci_expose_price, faci_discount, faci_tax_rate, faci_modified_date, faci_cagro_id, faci_hotel_id, faci_user_id)
+VALUES
+('Deluxe Room', 'Luxurious room with a king-size bed and a sofa', 3, 'beds', '104', '2023-03-14 14:00:00', '2023-03-16 12:00:00', 1000000, 1500000, 1, NULL, 10, GETDATE(), 1, 1, 2);
+INSERT INTO Hotel.Facilities (faci_name, faci_description, faci_max_number, faci_measure_unit, faci_room_number, faci_startdate, faci_enddate, faci_low_price, faci_high_price, faci_expose_price, faci_discount, faci_tax_rate, faci_modified_date, faci_cagro_id, faci_hotel_id, faci_user_id)
+VALUES
+('Restaurant', 'Fine dining restaurant with a wide selection of menu', 50, 'people', 'R101', '2023-03-14 08:00:00', '2023-03-15 22:00:00', 500000, 1000000, 2, NULL, 10, GETDATE(), 2, 1, 2);
+INSERT INTO Hotel.Facilities (faci_name, faci_description, faci_max_number, faci_measure_unit, faci_room_number, faci_startdate, faci_enddate, faci_low_price, faci_high_price, faci_expose_price, faci_discount, faci_tax_rate, faci_modified_date, faci_cagro_id, faci_hotel_id, faci_user_id)
+VALUES
+('Meeting Room', 'Meeting room with modern facilities and equipment', 30, 'people', 'M101', '2023-03-14 08:00:00', '2023-03-15 18:00:00', 750000, 1250000, 2, NULL, 10, GETDATE(), 3, 1, 2);
+INSERT INTO Hotel.Facilities (faci_name, faci_description, faci_max_number, faci_measure_unit, faci_room_number, faci_startdate, faci_enddate, faci_low_price, faci_high_price, faci_expose_price, faci_discount, faci_tax_rate, faci_modified_date, faci_cagro_id, faci_hotel_id, faci_user_id)
+VALUES
+('Gym', 'Fitness center with state-of-the-art equipment', NULL, 'people', 'G101', '2023-03-14 06:00:00', '2023-03-16 22:00:00', 100000, 150000, 3, NULL, 10, GETDATE(), 4, 1, 2);
+INSERT INTO Hotel.Facilities (faci_name, faci_description, faci_max_number, faci_measure_unit, faci_room_number, faci_startdate, faci_enddate, faci_low_price, faci_high_price, faci_expose_price, faci_discount, faci_tax_rate, faci_modified_date, faci_cagro_id, faci_hotel_id, faci_user_id)
+VALUES
+('Swimming Pool', 'Outdoor swimming pool with a view of the city', NULL, 'people', 'SP101', '2023-03-14 08:00:00', '2023-03-16 18:00:00', 200000, 300000, 3, NULL, 10, GETDATE(), 6, 1, 2);
 
 
 --DATA 2
-INSERT INTO Hotel.Facilities (faci_name, faci_description, faci_max_number, faci_measure_unit, 
-faci_room_number, faci_startdate, faci_endate, faci_low_price, faci_high_price, faci_rate_price, 
-faci_discount, faci_tax_rate, faci_cagro_id, faci_hotel_id, faci_user_id)
+INSERT INTO Hotel.Facilities (faci_name, faci_description, faci_max_number, faci_measure_unit, faci_room_number, faci_startdate, faci_enddate, faci_low_price, faci_high_price, faci_expose_price, faci_discount, faci_tax_rate, faci_cagro_id, faci_hotel_id, faci_user_id, faci_modified_date)
 VALUES
-('Restaurant', 'Fine dining restaurant serving international cuisine', 100, 'people', 'REST02', '2022-01-01', '2022-12-31', 40000, 80000, 60000, 25000, 10000, 2, 2, 4) -- RESTAURANT
-,('Pool', 'Outdoor pool with sun loungers and parasols', 100, 'people', 'POOL02', '2022-01-01', '2022-12-31', 50000, 100000, 75000, 25000, 10000, 6, 2, 4) -- POOL
-,('Gym', 'Fully equipped gym with treadmills, stationary bikes, and weights', 50, 'people', 'GYM02', '2022-01-01', '2022-12-31',20000, 30000, 25000, 25000, 10000, 4, 2, 4) -- GYM
-,('Deluxe Room', 'Kamar luas dengan fasilitas mewah, termasuk kamar mandi pribadi dengan shower dan bathtub', 2, 'beds', 'DLR02', '2022-01-01', '2022-01-30', 200000, 250000, 230000, 25000, 10000, 1, 2, 4)
-,('Superior Room', 'Kamar standar dengan fasilitas lengkap, termasuk kamar mandi pribadi dengan shower', 2, 'beds', 'SPR02', '2022-01-01', '2022-01-30', 150000, 180000, 160000, 25000, 10000, 1, 2, 4)
-,('Family Room', 'Kamar untuk keluarga, dengan 2 tempat tidur single dan 1 tempat tidur double, serta fasilitas lengkap', 4, 'beds', 'FMR02', '2022-01-01', '2022-01-30', 250000, 300000, 270000, 25000, 10000, 1, 2, 4)
-,('Standard Room', 'Kamar standar dengan fasilitas sederhana, termasuk kamar mandi pribadi dengan shower', 2, 'beds', 'STR02', '2022-01-01', '2022-01-30', 100000, 125000, 115000, 25000, 10000, 1, 2, 4)
-,('Double Room', 'Kamar dengan 2 tempat tidur single, serta fasilitas lengkap', 2, 'beds', 'DBR02', '2022-01-01', '2022-01-30', 150000, 175000, 160000, 25000, 10000, 1, 2, 4)
+('Deluxe Room', 'A comfortable room with a king-size bed and a balcony', 2, 'beds', 'DR-101', '2023-04-01', '2023-04-07', 900000, 1000000, 1, NULL, NULL, 1, 2, 4, GETDATE());
+INSERT INTO Hotel.Facilities (faci_name, faci_description, faci_max_number, faci_measure_unit, faci_room_number, faci_startdate, faci_enddate, faci_low_price, faci_high_price, faci_expose_price, faci_discount, faci_tax_rate, faci_cagro_id, faci_hotel_id, faci_user_id, faci_modified_date)
+VALUES
+('Twin Room', 'A cozy room with two twin-size beds', 2, 'beds', 'TR-201', '2023-04-01', '2023-04-07', 700000, 800000, 1, NULL, NULL, 1, 2, 4, GETDATE());
+INSERT INTO Hotel.Facilities (faci_name, faci_description, faci_max_number, faci_measure_unit, faci_room_number, faci_startdate, faci_enddate, faci_low_price, faci_high_price, faci_expose_price, faci_discount, faci_tax_rate, faci_cagro_id, faci_hotel_id, faci_user_id, faci_modified_date)
+VALUES
+('Family Room', 'A spacious room with a king-size bed and two twin-size beds', 4, 'beds', 'FR-301', '2023-04-01', '2023-04-07', 1200000, 1400000, 1, NULL, NULL, 1, 2, 4, GETDATE());
+INSERT INTO Hotel.Facilities (faci_name, faci_description, faci_max_number, faci_measure_unit, faci_room_number, faci_startdate, faci_enddate, faci_low_price, faci_high_price, faci_expose_price, faci_discount, faci_tax_rate, faci_cagro_id, faci_hotel_id, faci_user_id, faci_modified_date)
+VALUES
+('Standard Room', 'A basic room with a queen-size bed', 2, 'beds', 'SR-401', '2023-04-01', '2023-04-07', 500000, 600000, 1, NULL, NULL, 1, 2, 4, GETDATE());
+INSERT INTO Hotel.Facilities (faci_name, faci_description, faci_max_number, faci_measure_unit, faci_room_number, faci_startdate, faci_enddate, faci_low_price, faci_high_price, faci_expose_price, faci_discount, faci_tax_rate, faci_cagro_id, faci_hotel_id, faci_user_id, faci_modified_date)
+VALUES
+('The Garden', 'A cozy restaurant with a beautiful garden view', 60, 'people', 'GDN-101', '2023-04-01', '2023-04-07', 5000000, 6000000, 1, NULL, NULL, 2, 2, 4, GETDATE());
+INSERT INTO Hotel.Facilities (faci_name, faci_description, faci_max_number, faci_measure_unit, faci_room_number, faci_startdate, faci_enddate, faci_low_price, faci_high_price, faci_expose_price, faci_discount, faci_tax_rate, faci_cagro_id, faci_hotel_id, faci_user_id, faci_modified_date)
+VALUES
+('The Spa', 'A relaxing spa with various treatments and facilities', 10, 'people', 'SPA-201', '2023-04-01', '2023-04-07', 15000000, 18000000, 1, NULL, NULL, 5, 2, 4, GETDATE());
+INSERT INTO Hotel.Facilities (faci_name, faci_description, faci_max_number, faci_measure_unit, faci_room_number, faci_startdate, faci_enddate, faci_low_price, faci_high_price, faci_expose_price, faci_discount, faci_tax_rate, faci_cagro_id, faci_hotel_id, faci_user_id, faci_modified_date)
+VALUES
+('The Meeting Room', 'A functional meeting room with modern amenities', 25, 'people', 'MTG-301', '2023-04-01', '2023-04-07', 3000000, 3500000, 1, NULL, NULL, 3, 2, 4, GETDATE());;
 
 
 --DATA 3
-INSERT INTO Hotel.Facilities (faci_name, faci_description, faci_max_number, faci_measure_unit, 
-faci_room_number, faci_startdate, faci_endate, faci_low_price, faci_high_price, faci_rate_price, 
-faci_discount, faci_tax_rate, faci_cagro_id, faci_hotel_id, faci_user_id)
+INSERT INTO Hotel.Facilities
+(faci_name, faci_description, faci_max_number, faci_measure_unit, faci_room_number, faci_startdate, faci_enddate, faci_low_price, faci_high_price, faci_rate_price, faci_expose_price, faci_discount, faci_tax_rate, faci_modified_date, faci_cagro_id, faci_hotel_id, faci_user_id)
 VALUES
-('Restaurant', 'Fine dining restaurant serving international cuisine', 100, 'people', 'REST03', '2022-01-01', '2022-12-31', 40000, 80000, 60000, 25000, 10000, 2, 3, 7) -- RESTAURANT
-,('Swimming Pool', 'Our hotel has a large outdoor swimming pool with a depth of 1.5 meters', 50, 'people', 'POOL3', '2022-01-01', '2022-12-31', 50000, 100000, 75000, 25000, 10000, 6, 3, 7) -- SWIMING POOL
-,('Fitness Center', 'Our hotel has a fully equipped fitness center open 24 hours a day', 30, 'people', 'FIT3', '2022-01-01', '2022-12-31', 30000, 50000, 40000, 25000, 10000, 4, 3, 7) -- GYM
-,('Aula', 'Our hotel has a traditional Aula that can accommodate up to 10 people', 10, 'people', 'AULA3', '2022-01-01', '2022-12-31', 25000, 35000, 30000, 25000, 10000, 1, 3, 7) -- AULA
-,('Deluxe Room', 'Kamar luas dengan fasilitas mewah, termasuk kamar mandi pribadi dengan shower dan bathtub', 2, 'beds', 'DLR03', '2022-01-01', '2022-01-30', 200000, 250000, 230000, 25000, 10000, 1, 3, 7)
-,('Superior Room', 'Kamar standar dengan fasilitas lengkap, termasuk kamar mandi pribadi dengan shower', 2, 'beds', 'SPR03', '2022-01-01', '2022-01-30', 150000, 180000, 160000, 25000, 10000, 1, 3, 7)
-,('Family Room', 'Kamar untuk keluarga, dengan 2 tempat tidur single dan 1 tempat tidur double, serta fasilitas lengkap', 4, 'beds', 'FMR03', '2022-01-01', '2022-01-30', 250000, 300000, 270000, 25000, 10000, 1, 3, 7)
-,('Standard Room', 'Kamar standar dengan fasilitas sederhana, termasuk kamar mandi pribadi dengan shower', 2, 'beds', 'STR03', '2022-01-01', '2022-01-30', 100000, 125000, 115000, 25000, 10000, 1, 3, 7)
-,('Double Room', 'Kamar dengan 2 tempat tidur single, serta fasilitas lengkap', 2, 'beds', 'DBR03', '2022-01-01', '2022-01-30', 150000, 175000, 160000, 25000, 10000, 1, 3, 7)
-
-INSERT INTO Hotel.Hotel_Reviews (hore_user_review, hore_rating, hore_created_on, hore_user_id, hore_hotel_id)
-VALUES 
-('Pengalaman menginap di hotel ini sangat menyenangkan.', 5, '2022-01-01', 1, 1);
-
--- THIS CHECKER FOR TRIGGER
-INSERT INTO Hotel.Hotel_Reviews (hore_user_review, hore_rating, hore_created_on, hore_user_id, hore_hotel_id)
-VALUES 
-('Saya sangat puas dengan pelayanan di hotel ini.', 4, '2022-01-02', 6, 1);
-INSERT INTO Hotel.Hotel_Reviews (hore_user_review, hore_rating, hore_created_on, hore_user_id, hore_hotel_id)
-VALUES 
-('Kamar yang kami tempati cukup luas dan bersih, tapi ada beberapa masalah dengan AC yang berisik.', 3, '2022-01-03', 6, 1), 
-('Deskripsi ini sengaja di buat untuk pengecekan nilai NULL natinya', 1, NULL, 10, 1);
-
-INSERT INTO Hotel.Facility_Photos (fapho_thumbnail_filename, fapho_photo_filename, fapho_primary, fapho_url, fapho_modified_date, fapho_faci_id)
-VALUES ('thumbnail1.jpg', 'photo1.jpg', 1, 'https://example.com/thumbnail1', GETDATE(), 1),
-       ('thumbnail2.jpg', 'photo2.jpg', 0, 'https://example.com/thumbnail2', GETDATE(), 1),
-       ('thumbnail3.jpg', 'photo3.jpg', 0, 'https://example.com/thumbnail3', GETDATE(), 2),
-       ('thumbnail4.jpg', 'photo4.jpg', 1, 'https://example.com/thumbnail4', GETDATE(), 2),
-       ('thumbnail5.jpg', 'photo5.jpg', 0, 'https://example.com/thumbnail5', GETDATE(), 3);
-
-INSERT INTO Hotel.Facility_Photos (fapho_thumbnail_filename, fapho_photo_filename, fapho_primary, fapho_url, fapho_modified_date, fapho_faci_id)
-VALUES ('thumbnail6.jpg', 'photo6.jpg', 1, 'https://example.com/thumbnail6', GETDATE(), 3);
-
-INSERT INTO Hotel.Facility_Photos (fapho_thumbnail_filename, fapho_photo_filename, fapho_primary, fapho_url, fapho_modified_date, fapho_faci_id)
-VALUES ('thumbnail7.jpg', 'photo7.jpg', 1, 'https://example.com/thumbnail7', GETDATE(), 3);
+('Deluxe Room', 'Spacious room with modern amenities', 2, 'beds', 'D01', '2023-03-14', '2023-03-16', 1000000, 1500000, NULL, 1, 10, 10, GETDATE(), 1, 3, 9);
+INSERT INTO Hotel.Facilities
+(faci_name, faci_description, faci_max_number, faci_measure_unit, faci_room_number, faci_startdate, faci_enddate, faci_low_price, faci_high_price, faci_rate_price, faci_expose_price, faci_discount, faci_tax_rate, faci_modified_date, faci_cagro_id, faci_hotel_id, faci_user_id)
+VALUES
+('Superior Room', 'Cozy room with city view', 2, 'beds', 'D02', '2023-03-14', '2023-03-16', 900000, 1200000, NULL, 1, NULL, NULL, GETDATE(), 1, 3, 9);
+INSERT INTO Hotel.Facilities
+(faci_name, faci_description, faci_max_number, faci_measure_unit, faci_room_number, faci_startdate, faci_enddate, faci_low_price, faci_high_price, faci_rate_price, faci_expose_price, faci_discount, faci_tax_rate, faci_modified_date, faci_cagro_id, faci_hotel_id, faci_user_id)
+VALUES
+('Pool Villa', 'Private villa with pool access', 2, 'people', 'PV01', '2023-03-14', '2023-03-16', 3000000, 3500000, NULL, 1, NULL, NULL, GETDATE(), 1, 3, 9);
+INSERT INTO Hotel.Facilities
+(faci_name, faci_description, faci_max_number, faci_measure_unit, faci_room_number, faci_startdate, faci_enddate, faci_low_price, faci_high_price, faci_rate_price, faci_expose_price, faci_discount, faci_tax_rate, faci_modified_date, faci_cagro_id, faci_hotel_id, faci_user_id)
+VALUES
+('Meeting Room 1', 'Suitable for small meetings', 20, 'people', 'M01', '2023-03-14', '2023-03-16', 1500000, 2000000, NULL, 1, NULL, NULL, GETDATE(), 3, 3, 9);
+INSERT INTO Hotel.Facilities
+(faci_name, faci_description, faci_max_number, faci_measure_unit, faci_room_number, faci_startdate, faci_enddate, faci_low_price, faci_high_price, faci_rate_price, faci_expose_price, faci_discount, faci_tax_rate, faci_modified_date, faci_cagro_id, faci_hotel_id, faci_user_id)
+VALUES
+('Gym', 'Fully equipped gym with personal trainer', 50, 'people', 'G01', '2023-03-14', '2023-03-16', 750000, 1000000, NULL, 1, 20, 10, GETDATE(), 4, 3, 9);
+INSERT INTO Hotel.Facilities
+(faci_name, faci_description, faci_max_number, faci_measure_unit, faci_room_number, faci_startdate, faci_enddate, faci_low_price, faci_high_price, faci_rate_price, faci_expose_price, faci_discount, faci_tax_rate, faci_modified_date, faci_cagro_id, faci_hotel_id, faci_user_id)
+VALUES
+('Sauna', 'Relaxing sauna for your wellness', 10, 'people', 'S01', '2023-03-14', '2023-03-16', 300000, 400000, NULL, 1, NULL, NULL, GETDATE(), 6, 3, 9);
+INSERT INTO Hotel.Facilities
+(faci_name, faci_description, faci_max_number, faci_measure_unit, faci_room_number, faci_startdate, faci_enddate, faci_low_price, faci_high_price, faci_rate_price, faci_expose_price, faci_discount, faci_tax_rate, faci_modified_date, faci_cagro_id, faci_hotel_id, faci_user_id)
+VALUES
+('Ballroom', 'Elegant ballroom for your event', 100, 'people', 'B01', '2023-03-14', '2023-03-16', 10000000, 15000000, NULL, 1, 10, 10, GETDATE(), 7, 3, 9);
 
 
+--* DATA Facility Photos *--
+INSERT INTO Hotel.Facility_Photos (fapho_photo_filename, fapho_thumbnail_filename, fapho_original_filename, fapho_file_size, fapho_file_type, fapho_primary, fapho_url, fapho_modified_date, fapho_faci_id)
+SELECT 'photo1.jpg', 'thumb1.jpg', 'orig1.jpg', 1024, 'jpg', 0, 'https://example.com/photo1.jpg', GETDATE(), faci_id FROM Hotel.Facilities
+UNION ALL
+SELECT 'photo2.jpg', 'thumb2.jpg', 'orig2.jpg', 2048, 'jpg', 0, 'https://example.com/photo2.jpg', GETDATE(), faci_id FROM Hotel.Facilities
+UNION ALL
+SELECT 'photo3.jpg', 'thumb3.jpg', 'orig3.jpg', 3072, 'jpg', 0, 'https://example.com/photo3.jpg', GETDATE(), faci_id FROM Hotel.Facilities;
+
+DECLARE @fapho_id INT
+DECLARE @fapho_faci_id INT
+
+DECLARE curFacilityPhotos CURSOR FOR
+SELECT fapho_id, fapho_faci_id
+FROM Hotel.Facility_Photos
+
+OPEN curFacilityPhotos
+
+FETCH NEXT FROM curFacilityPhotos INTO @fapho_id, @fapho_faci_id
+
+WHILE @@FETCH_STATUS = 0
+BEGIN
+    UPDATE Hotel.Facility_Photos
+    SET fapho_primary = 0
+    WHERE fapho_id = @fapho_id AND fapho_faci_id = @fapho_faci_id
+
+    FETCH NEXT FROM curFacilityPhotos INTO @fapho_id, @fapho_faci_id
+END
+
+CLOSE curFacilityPhotos
+DEALLOCATE curFacilityPhotos;
+-- SELECT * FROM Hotel.Facility_Photos WHERE fapho_faci_id=1
+-- END OF HOTEL --
 
 -- INSERT MODULE HR
 SET IDENTITY_INSERT hr.job_role ON
@@ -643,45 +806,28 @@ SET IDENTITY_INSERT Booking.special_offers OFF
 
 
 SET IDENTITY_INSERT Booking.booking_orders ON
-INSERT INTO Booking.booking_orders (boor_id, boor_order_number,boor_order_date, boor_total_room ,boor_pay_type, boor_is_paid, boor_type, boor_user_id, boor_hotel_id)
-VALUES (1, 'BO#20221127-0001', '2023-01-27', 4,'C', 'DP', 'T', 1, 1),
-       (2, 'BO#20221127-0002', '2023-01-27', 4,'C', 'P', 'C', 2, 2),
-       (3, 'BO#20221127-0003', '2023-01-27', 4,'D', 'R', 'I', 3, 3),
-       (4, 'BO#20221127-0004', '2023-01-27', 4,'C', 'DP', 'T', 4, 4),
-       (5, 'BO#20221127-0005', '2023-01-27', 4,'D', 'P', 'C', 5, 5),
-       (6, 'BO#20221127-0006', '2023-01-27', 4,'C', 'R', 'I', 6, 6),
-       (7, 'BO#20221127-0007', '2023-01-27', 4,'D', 'DP', 'T', 7, 7),
-       (8, 'BO#20221127-0008', '2023-01-27', 4,'C', 'P', 'C', 8, 8),
-       (9, 'BO#20221127-0009', '2023-01-27', 4,'C', 'R', 'I', 9, 9),
-       (10, 'BO#20221127-0010', '2023-01-27', 3,'C', 'DP', 'T', 10, 10),
-       (11, 'BO#20221127-0011', '2023-01-27', 3,'D', 'P', 'C', 9, 9),
-       (12, 'BO#20221127-0012', '2023-01-27', 3,'D', 'R', 'I', 10, 10),
-       (13, 'BO#20221127-0013', '2023-01-27', 3,'D', 'DP', 'T', 7, 7),
-       (14, 'BO#20221127-0014', '2023-01-27', 3,'C', 'P', 'C', 2, 1),
-       (15, 'BO#20221127-0015', '2023-01-27', 3,'D', 'R', 'I', 8, 5),
-       (16, 'BO#20221127-0016', '2023-01-27', 3,'D', 'DP', 'T', 7, 6),
-       (17, 'BO#20221127-0017', '2023-01-27', 3,'C', 'P', 'C', 1, 7)
+INSERT INTO Booking.booking_orders (boor_id,boor_order_number, 	boor_order_date, boor_total_room, boor_total_ammount, boor_down_payment,
+                                    boor_pay_type,boor_is_paid,boor_type, boor_cardnumber, boor_user_id,boor_hotel_id)
+VALUES (1, 'BO#20221127-0001', '2023-01-27', 3,500000,200000,'D', 'DP', 'T', '431-2388-93', 1, 1),
+       (2, 'BO#20221127-0002', '2023-01-27', 4,300000,0,'C', 'P', 'C', '123-2993-32',2, 2),
+       (3, 'BO#20221127-0003', '2023-01-27', 4,300000,200000,'D', 'DP', 'T', '087363155421',4, 3),
+       (4, 'BO#20221127-0004', '2023-01-27', 4,150000,50000,'PG', 'DP', 'C', '11-1111-1111', 8, 4),
+       (5, 'BO#20221127-0005', '2023-01-27', 4,500000,2000,'C', 'P', 'C', '571-2939-23', 7, 5)
 SET IDENTITY_INSERT Booking.booking_orders OFF
 -- SELECT*FROM Booking.booking_orders
 
 SET IDENTITY_INSERT Booking.booking_order_detail ON
 INSERT INTO Booking.booking_order_detail (borde_boor_id, borde_id, borde_checkin, borde_checkout, borde_adults, borde_kids, borde_price, borde_extra, borde_discount, borde_tax, borde_faci_id)
-VALUES (1, 1, '2022-11-27', '2022-11-28', 2, 0, 100, 0, 0, 10, 1),
-       (2, 2, '2022-11-27', '2022-11-28', 2, 1, 120, 20, 10, 12, 2),
-       (3, 3, '2022-11-27', '2022-11-28', 3, 0, 150, 30, 20, 15, 3),
-       (4, 4, '2022-11-27', '2022-11-28', 2, 2, 200, 40, 30, 20, 4),
-       (5, 5, '2022-11-27', '2022-11-28', 1, 1, 250, 50, 40, 25, 5),
-       (6, 6, '2022-11-27', '2022-11-28', 4, 0, 300, 60, 50, 30, 6),
-       (7, 7, '2022-11-27', '2022-11-28', 2, 3, 350, 70, 60, 35, 7),
-       (8, 8, '2022-11-27', '2022-11-28', 3, 2, 400, 80, 70, 40, 8),
-       (9, 9, '2022-11-27', '2022-11-28', 1, 4, 450, 90, 80, 45, 9),
-       (10, 10, '2022-11-27', '2022-11-28', 4, 1, 500, 100, 90, 50, 1),
-       (11, 11, '2022-11-27', '2022-11-28', 2, 0, 550, 110, 100, 55, 1),
-       (12, 12, '2022-11-27', '2022-11-28', 3, 1, 600, 120, 110, 60, 2),
-       (13, 13, '2022-11-27', '2022-11-28', 1, 2, 650, 130, 120, 65, 3),
-       (14, 14, '2022-11-27', '2022-11-28', 4, 0, 700, 140, 130, 70, 4),
-       (15, 15, '2022-11-27', '2022-11-28', 2, 3, 750, 150, 140, 75, 5),
-       (16, 16, '2022-11-27', '2022-11-28', 3, 2, 800, 160, 150, 80, 6)
+VALUES (1, 1, '2022-11-27', '2022-11-28', 2, 0, 100, 0, 0, 10, 5),
+       (1, 2, '2022-11-27', '2022-11-28', 2, 1, 120, 20, 10, 12, 6),
+       (2, 3, '2022-11-27', '2022-11-28', 3, 0, 150, 30, 20, 15, 7),
+       (2, 4, '2022-11-27', '2022-11-28', 2, 2, 200, 40, 30, 20, 5),
+       (3, 5, '2022-11-27', '2022-11-28', 1, 1, 250, 50, 40, 25, 5),
+       (3, 6, '2022-11-27', '2022-11-28', 4, 0, 300, 60, 50, 30, 5),
+       (4, 7, '2022-11-27', '2022-11-28', 2, 3, 350, 70, 60, 35, 6),
+       (4, 8, '2022-11-27', '2022-11-28', 3, 2, 400, 80, 70, 40, 8),
+       (5, 9, '2022-11-27', '2022-11-28', 1, 4, 450, 90, 80, 45, 6),
+       (5, 10, '2022-11-27', '2022-11-28', 4, 1, 500, 100, 90, 50, 6)
 SET IDENTITY_INSERT Booking.booking_order_detail OFF
 -- SELECT*FROM Booking.booking_order_detail
 
@@ -697,17 +843,7 @@ VALUES (1, 10, 2, 'people', 1, 1),
        (7, 40, 8, 'people', 7, 3),
        (8, 45, 9, 'unit', 8, 4),
        (9, 50, 10, 'kg', 9, 3),
-       (10, 55, 11, 'people', 10, 2),
-       (11, 60, 12, 'unit', 11, 1),
-       (12, 65, 13, 'kg', 12, 2),
-       (13, 70, 14, 'people', 13, 3),
-       (14, 75, 15, 'unit', 14, 4),
-       (15, 80, 16, 'kg', 15, 5),
-       (16, 85, 17, 'people', 16, 2),
-       (17, 90, 18, 'unit', 1, 1),
-       (18, 95, 19, 'kg', 2, 2),
-       (19, 100, 20, 'people', 3, 2),
-       (20, 105, 21, 'unit', 4, 3)
+       (10, 55, 11, 'people', 10, 2)
 SET IDENTITY_INSERT Booking.booking_order_detail_extra OFF
 -- SELECT*FROM Booking.booking_order_detail_extra
 
@@ -720,9 +856,7 @@ VALUES (1, 1, 1),
        (5, 5, 5),
        (6, 6, 6),
        (7, 7, 7),
-       (8, 8, 8),
-       (9, 9, 9),
-       (10, 10, 1)
+       (8, 8, 8)
 SET IDENTITY_INSERT Booking.special_offer_coupons OFF
 -- SELECT*FROM Booking.special_offer_coupons
 
@@ -737,13 +871,7 @@ VALUES
     (7,'2022-11-27',  2),
     (8,'2022-11-27',  3),
     (9,'2022-11-27',  1),
-    (10, '2022-11-27', 4),
-    (11, '2022-11-27', 2),
-    (12, '2022-11-27', 3),
-    (13, '2022-11-27', 1),
-    (14, '2022-11-27', 4),
-    (15, '2022-11-27', 2),
-    (16, '2022-11-27', 3)
+    (10, '2022-11-27', 4)
 -- select * from Booking.user_breakfast
 
 -- INSERT MODULE RESTO
@@ -837,7 +965,7 @@ ENABLE TRIGGER [Payment].[InsertBankEntityId] ON [Payment].bank;
 DISABLE TRIGGER [Payment].[InsertPaymentEntityId] ON [Payment].payment_gateway;
 INSERT
   INTO Payment.payment_gateway(paga_entity_id, paga_code, paga_name, paga_modified_date)
-VALUES (8, 'GOPAY', 'PT. Dompet Anak Bangsa', CURRENT_TIMESTAMP),
+VALUES (8, 'GOTO', 'PT. Dompet Anak Bangsa', CURRENT_TIMESTAMP),
        (9, 'OVO', 'PT. Visionet Internasional', CURRENT_TIMESTAMP),
        (10, 'DANA', 'PT. Espay Debit Indonesia', CURRENT_TIMESTAMP),
        (11, 'SHOPEEPAY', 'Shopee', CURRENT_TIMESTAMP),
@@ -849,35 +977,65 @@ ENABLE TRIGGER [Payment].[InsertPaymentEntityId] ON [Payment].payment_gateway;
 
 -- SELECT*FROM payment.payment_gateway;
 
+SET IDENTITY_INSERT Payment.user_accounts ON
 -- user_accounts
 INSERT
-  INTO Payment.user_accounts(usac_entity_id, usac_user_id, usac_account_number, usac_saldo, usac_type, usac_expmonth, usac_expyear, usac_modified_date)
-VALUES (1, 1, '6271263188999', 1000000, 'debet', 11, 22, CURRENT_TIMESTAMP),
-       (2, 2, '8012372737662', 1000000, 'credit card', 12, 27, CURRENT_TIMESTAMP),
-       (3, 3, '9712893896126', 1000000, 'debet', 03, 23, CURRENT_TIMESTAMP),
-       (4, 4, '8129387462674', 1000000, 'debet', 08, 24, CURRENT_TIMESTAMP),
-       (5, 5, '7781236462762', 1000000, 'debet', 09, 28, CURRENT_TIMESTAMP),
-       (6, 6, '1278287363663', 1000000, 'credit card', 02, 25, CURRENT_TIMESTAMP),
-       (7, 7, '6326361273712', 1000000, 'debet', 01, 26, CURRENT_TIMESTAMP),
-       (8, 8, '812327176263', 1000000, 'payment', 0, 0, CURRENT_TIMESTAMP),
-       (9, 9, '827363525152', 1000000, 'payment', 0, 0, CURRENT_TIMESTAMP),
-       (10, 10, '829283525152', 1000000, 'payment', 0, 0, CURRENT_TIMESTAMP),
-       (11, 11, '872363155421', 1000000, 'payment', 0, 0, CURRENT_TIMESTAMP),
-       (12, 12, '873652901212', 1000000, 'payment', 0, 0, CURRENT_TIMESTAMP),
-       (13, 13, '809283222364', 1000000, 'payment', 0, 0, CURRENT_TIMESTAMP),
-       (14, 14, '890128352546', 1000000, 'payment', 0, 0, CURRENT_TIMESTAMP),
-       (15, 15, '856272837172', 1000000, 'payment', 0, 0, CURRENT_TIMESTAMP);
+  INTO Payment.user_accounts(usac_id, usac_entity_id, usac_user_id, usac_account_number, usac_saldo, usac_type, usac_expmonth, usac_expyear, usac_modified_date)
+VALUES (1, 1, 1, '431-2388-93', 1000000, 'debet', 11, 22, CURRENT_TIMESTAMP),
+       (2, 1, 2, '123-2993-32', 0, 'credit_card', 12, 27, CURRENT_TIMESTAMP),
+       (3, 3, 3, '131-3456-78', 0, 'debet', 05, 25, CURRENT_TIMESTAMP), -- Hotel Realta Account
+       (4, 4, 4, '992-1923-39', 1000000, 'debet', 08, 24, CURRENT_TIMESTAMP),
+       (5, 5, 5, '727-1931-34', 0, 'debet', 09, 28, CURRENT_TIMESTAMP),
+       (6, 6, 6, '889-3921-22', 0, 'credit_card', 02, 25, CURRENT_TIMESTAMP),
+       (7, 7, 7, '571-2939-23', 1000000, 'debet', 01, 26, CURRENT_TIMESTAMP),
+       (8, 8, 8, '11-1111-1111', 500000, 'payment', null, null, CURRENT_TIMESTAMP),
+       (9, 9, 9, '0873635251525', 500000, 'payment', null, null, CURRENT_TIMESTAMP),
+       (10, 10, 10, '081289389126', 500000, 'payment', null, null, CURRENT_TIMESTAMP),
+       (11, 11, 4, '087363155421', 500000, 'payment', null, null, CURRENT_TIMESTAMP),
+       (12, 12, 12, '087365291212', 500000, 'payment', null, null, CURRENT_TIMESTAMP),
+       (13, 13, 13, '081928222364', 500000, 'payment', null, null, CURRENT_TIMESTAMP),
+       (14, 14, 14, '089012852546', 500000, 'payment', null, null, CURRENT_TIMESTAMP),
+       (15, 15, 15, '085627287172', 500000, 'payment', null, null, CURRENT_TIMESTAMP);
+SET IDENTITY_INSERT Payment.user_accounts OFF
 -- SELECT*FROM payment.user_accounts;
 
 -- payment_transactions
-SET IDENTITY_INSERT Payment.payment_transaction ON
-INSERT
-  INTO Payment.payment_transaction(patr_id, patr_trx_number, patr_debet, patr_credit, patr_type, patr_note, patr_modified_date,
-                                  patr_order_number, patr_source_id, patr_target_id, patr_trx_number_ref, patr_user_id)
-VALUES (1, 'TRB#20221127-0001', 150000, 150000, 'TRB', 'Tranfer Booking', CURRENT_TIMESTAMP, 'BO#20221127-0001', '6271263188999', '8012372737662', 'TRB#20221127-0001', 1),
-       (2, 'TRB#20221127-0002', 150000, 150000, 'ORM', 'Order Menu', CURRENT_TIMESTAMP, 'MENUS#20221127-0001', '8012372737662', '6271263188999', 'TRB#20221127-0002', 2);
-SET IDENTITY_INSERT Payment.payment_transaction OFF;
--- SELECT*FROM payment.payment_transaction;
+-- SET IDENTITY_INSERT Payment.payment_transaction ON
+-- DISABLE TRIGGER [Payment].[CalculateUserAccountCredit] ON [Payment].[payment_transaction];
+
+-- pay_type 'debet'
+EXECUTE [Payment].[spCreateTransferBooking]
+       'BO#20221127-0001'
+       ,'431-2388-93'
+       ,1
+GO
+
+-- pay_type 'cash',  ignored
+EXECUTE [Payment].[spCreateTransferBooking]
+       'BO#20221127-0002'
+       ,'123-2993-32'
+       ,2
+GO
+-- INSERT
+--   INTO Payment.payment_transaction(patr_debet, patr_credit, patr_type, patr_note, patr_modified_date,
+--                                   patr_order_number, patr_source_id, patr_target_id, patr_trx_number_ref, patr_user_id)
+-- VALUES (0, 769999, 'TRB', 'Tranfer Booking Note', CURRENT_TIMESTAMP, 'BO#20221127-0001', '431-2388-93', '131-3456-78', null, 1);
+-- INSERT
+--   INTO Payment.payment_transaction(patr_debet, patr_credit, patr_type, patr_note, patr_modified_date,
+--                                   patr_order_number, patr_source_id, patr_target_id, patr_trx_number_ref, patr_user_id)
+-- VALUES (0, 100000, 'ORM', 'Order Menu', CURRENT_TIMESTAMP, 'MENUS#20221127-0001', '123-2993-32', '131-3456-78', null, 2);
+-- INSERT
+--   INTO Payment.payment_transaction(patr_debet, patr_credit, patr_type, patr_note, patr_modified_date,
+--                                   patr_order_number, patr_source_id, patr_target_id, patr_trx_number_ref, patr_user_id)
+-- VALUES (0, 235000, 'TP', 'Top Up Note', CURRENT_TIMESTAMP,  null, '992-1923-39', '087363155421', null, 4);
+-- INSERT
+--   INTO Payment.payment_transaction(patr_debet, patr_credit, patr_type, patr_note, patr_modified_date,
+--                                   patr_order_number, patr_source_id, patr_target_id, patr_trx_number_ref, patr_user_id)
+-- VALUES (0, 0, 'RF', '*Refund Order Menu', CURRENT_TIMESTAMP,  null, null, null, Payment.fnFormatedTransactionId(3, 'ORM'), 2);
+
+-- SET IDENTITY_INSERT Payment.payment_transaction OFF;
+-- ENABLE TRIGGER [Payment].CalculateUserAccountCredit ON [Payment].payment_transaction;
+-- SELECT*FROM payment.payment_transaction; debet 869999.0000
 
 -- PURCHASING INSERT
 DISABLE TRIGGER [Purchasing].[InsertVendorEntityId] ON [Purchasing].vendor;

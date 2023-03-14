@@ -232,15 +232,15 @@ BEGIN
 	SET NOCOUNT ON
 
     DECLARE @tar_account As NVARCHAR(50)
-    DECLARE @src_account As NVARCHAR(50)
-    DECLARE @transaction_type As NVARCHAR(10)
-    DECLARE @credit AS MONEY
-    DECLARE @debet AS MONEY
-    DECLARE @src_user_id AS INT
-    DECLARE @tar_user_id AS INT
-    DECLARE @transaction_note AS NVARCHAR(MAX)
-	DECLARE @order_number AS VARCHAR(55)
-	DECLARE @trx_number_ref AS VARCHAR(55)
+            ,@src_account As NVARCHAR(50)
+            ,@transaction_type As NVARCHAR(10)
+            ,@total_amount AS MONEY
+            ,@src_user_id AS INT
+            ,@tar_user_id AS INT
+            ,@transaction_note AS NVARCHAR(MAX)
+	        ,@order_number AS VARCHAR(55)
+	        ,@trx_number_ref AS VARCHAR(55)
+	        ,@pay_method AS NCHAR(5)
 
 	SET @order_number = null;
 	SET @trx_number_ref = null;
@@ -252,69 +252,82 @@ BEGIN
            @order_number = patr_order_number,
            @trx_number_ref = patr_trx_number_ref,
            @transaction_type = TRIM(patr_type),
-           @transaction_note = patr_note,
-           @credit = patr_credit,
-           @debet = patr_debet
+           @transaction_note = patr_note
       FROM inserted;
 
+    SELECT @total_amount = boor_total_ammount,
+           @pay_method = boor_pay_type
+    FROM Booking.booking_orders
+    WHERE boor_order_number = @order_number
+
+    -- check if the payment method is 'cash' just ignore it
+    -- CR = credit_card
+    -- D = debet
+    -- PG = payment / payment_gateway
+    IF (@pay_method IN ('D', 'CR', 'PG'))
+    BEGIN
 	IF (@transaction_type = 'RF' OR @transaction_type = 'RPY')
     BEGIN
         SELECT @src_account = patr_target_id,
                @tar_account = patr_source_id,
-               @credit = Payment.fnRefundAmount((patr_credit + patr_debet), default)
+                   @total_amount = Payment.fnRefundAmount((patr_credit + patr_debet), default)
         FROM Payment.payment_transaction
         WHERE patr_trx_number = @trx_number_ref
     END
 
-      INSERT INTO [Payment].[payment_transaction](
-                    patr_trx_number, patr_debet, patr_credit, patr_type, patr_note,
-                    patr_order_number, patr_source_id, patr_target_id, patr_trx_number_ref, patr_user_id)
-            VALUES (Payment.fnFormatedTransactionId(IDENT_CURRENT('Payment.[payment_transaction]'), @transaction_type), 0,
-                    @credit, @transaction_type,@transaction_note, @order_number,@src_account, @tar_account, @trx_number_ref, @src_user_id);
 -- 	TOP UP
     IF @transaction_type = 'TP'
     BEGIN
         EXECUTE [Payment].[spTopUpTransaction]
              @src_account
-            ,@tar_account
-            ,@credit
+                ,@total_amount
     END
 
 
     -- TRANSFER BOOKING
     IF @transaction_type = 'TRB'
     BEGIN
-        EXECUTE [Payment].[spTransferBookingTransaction]
-             @src_account
-            ,@tar_account
-            ,@credit
+            EXEC [Payment].[spCalculationTranferBooking]
+                @src_account,
+                @tar_account,
+                @order_number,
+                @total_amount OUTPUT
     END
 
+        -- insert credit transaction
+        INSERT INTO [Payment].[payment_transaction](
+                        patr_trx_number, patr_debet, patr_credit, patr_type, patr_note,
+                        patr_order_number, patr_source_id, patr_target_id, patr_trx_number_ref, patr_user_id)
+             VALUES (Payment.fnFormatedTransactionId(IDENT_CURRENT('Payment.[payment_transaction]'), @transaction_type), 0,
+                    @total_amount, @transaction_type,@transaction_note, @order_number, @src_account, @tar_account, @trx_number_ref, @src_user_id);
+
     -- ORDER MENU
-    IF @transaction_type = 'ORM'
-    BEGIN
-        EXECUTE [Payment].[spTransferBookingTransaction]
-             @src_account
-            ,@tar_account
-            ,@credit
-    END
+    --     IF @transaction_type = 'ORM'
+    --     BEGIN
+    --         EXECUTE [Payment].[spTransferBookingTransaction]
+    --              @src_account
+    --             ,@tar_account
+    --             ,@total_amount
+    --     END
 
     -- REFUND
     IF @transaction_type = 'RF'
     BEGIN
         EXECUTE [Payment].[spRefundTransaction]
-             @trx_number_ref
+                @trx_number_ref,
+                default
     END
 
     SELECT @tar_user_id = usac_user_id
       FROM Payment.user_accounts
      WHERE usac_account_number = @tar_account;
 
+        -- insert debet transaction
     INSERT INTO [Payment].[payment_transaction](
                 patr_trx_number, patr_debet, patr_credit, patr_type, patr_note,
                 patr_order_number, patr_source_id, patr_target_id, patr_trx_number_ref, patr_user_id)
         VALUES (Payment.fnFormatedTransactionId(IDENT_CURRENT('Payment.[payment_transaction]'), @transaction_type),
-                @credit, 0, @transaction_type, @transaction_note, @order_number, @src_account, @tar_account, @trx_number_ref, @tar_user_id);
+                    @total_amount, 0, @transaction_type, @transaction_note, @order_number, @src_account, @tar_account, @trx_number_ref, @tar_user_id);
 
 
 		-- REPAYMENT
@@ -323,10 +336,11 @@ BEGIN
 -- 			EXECUTE [Payment].[spTopUpTransaction]
 -- 				 @source_account = @src_account
 -- 				,@target_account = @tar_account
--- 				,@expense = @amount
+    -- 				,@expense = @total_amount
 -- 		END
 
 -- 		SELECT patr_id FROM inserted;
+    END
 END
 GO
 
@@ -466,29 +480,504 @@ GO
 --				without using field Hotel_rating_star
 -- =============================================
 
-CREATE OR ALTER TRIGGER Hotel.Hotel_Modified_Date_Automation
+CREATE OR ALTER TRIGGER Hotel.tr_Hotels_ModifiedDate
 ON Hotel.Hotels
-AFTER UPDATE
+AFTER INSERT, UPDATE
 AS
 BEGIN
-  IF UPDATE(hotel_name)
-	OR UPDATE(hotel_description)
-	OR UPDATE(hotel_status)
-	OR UPDATE(hotel_reason_status)
-	OR UPDATE(hotel_phonenumber)
-	OR UPDATE(hotel_addr_id)
-	OR UPDATE(hotel_addr_description)
-	OR
-		NOT EXISTS (
-			SELECT * FROM inserted JOIN deleted
-			ON inserted.hotel_id = deleted.hotel_id
-			WHERE inserted.hotel_rating_star <> deleted.hotel_rating_star)
+    SET NOCOUNT ON;
+    IF NOT UPDATE(hotel_rating_star)
   BEGIN
     UPDATE Hotel.Hotels
     SET hotel_modified_date = GETDATE()
-    WHERE hotel_id IN (SELECT hotel_id FROM inserted)
-  END
+        FROM inserted
+        WHERE Hotels.hotel_id = inserted.hotel_id
+    END
 END;
+GO
+
+
+-- =============================================
+-- Author	  :	Alvan Ganteng
+-- Create date: 14 Mei 2023
+-- Description:	Trigger for update hotel_rating_star into Hotel.Hotels
+--				from insert, update, delete from Hotel.Hotel_Reviews
+-- =============================================
+
+CREATE OR ALTER TRIGGER Hotel.tr_Hotel_Reviews_Rating_Star
+ON Hotel.Hotel_Reviews
+AFTER INSERT, UPDATE, DELETE
+AS
+BEGIN
+    SET NOCOUNT ON
+    DECLARE @hotel_id INT
+
+    IF EXISTS(SELECT 1 FROM inserted)
+        SET @hotel_id = (SELECT TOP 1 hore_hotel_id FROM inserted)
+    ELSE IF EXISTS(SELECT 1 FROM deleted)
+        SET @hotel_id = (SELECT TOP 1 hore_hotel_id FROM deleted)
+    ELSE
+        RETURN;
+
+    UPDATE Hotel.Hotels
+    SET hotel_rating_star = (
+        SELECT CAST(FORMAT(AVG(cast(hore_rating AS numeric(2,1))), 'N1') AS numeric (2,1))
+        FROM Hotel.Hotel_Reviews
+        WHERE hore_hotel_id = @hotel_id )
+    WHERE hotel_id = @hotel_id;
+END;
+GO
+
+
+-- =============================================
+-- Author	  :	Alvan Ganteng
+-- Create date: 14 Mei 2023
+-- Description:	Trigger for validate input only type 'user' or 'guest'
+--				in table Hotel.Hotel_Reviews
+-- =============================================
+
+-- DROP TRIGGER Hotel.Hotel_Reviews_insert_validation
+CREATE OR ALTER TRIGGER Hotel.Hotel_Reviews_insert_validation
+ON Hotel.Hotel_Reviews
+INSTEAD OF INSERT
+AS
+BEGIN
+    SET NOCOUNT ON
+    DECLARE @hore_user_id INT
+
+    SELECT @hore_user_id = hore_user_id
+    FROM inserted
+
+    IF NOT EXISTS (SELECT 1 FROM Users.user_roles WHERE usro_user_id = @hore_user_id AND usro_role_id IN (1, 5))
+    BEGIN
+        PRINT('User does not exist or you do not have permission');
+        RETURN;
+  END
+
+    INSERT INTO Hotel.Hotel_Reviews (hore_user_review, hore_rating, hore_created_on, hore_user_id, hore_hotel_id)
+    SELECT hore_user_review, hore_rating, hore_created_on, hore_user_id, hore_hotel_id
+    FROM inserted;
+END;
+GO
+
+
+-- =============================================
+-- Author	  :	Alvan Ganteng
+-- Create date: 14 Mei 2023
+-- Description:	Trigger to validate input only 'admin' or 'manager'
+--				handle faci_rate_price and checker for input price
+--				also insert for table Hotel.Facilities
+-- =============================================
+
+CREATE OR ALTER TRIGGER Hotel.Facilities_insert_validation
+ON Hotel.Facilities
+INSTEAD OF INSERT
+AS
+BEGIN
+    DECLARE @faci_user_id INT
+    DECLARE @faci_hotel_id INT
+    DECLARE @faci_rate_price MONEY
+    DECLARE @faci_low_price MONEY
+    DECLARE @faci_high_price MONEY
+
+    SELECT
+        @faci_user_id = faci_user_id,
+        @faci_hotel_id = faci_hotel_id,
+        @faci_low_price = faci_low_price,
+        @faci_high_price = faci_high_price,
+        @faci_rate_price =
+        (
+		CASE
+			WHEN faci_discount IS NULL AND faci_tax_rate IS NULL THEN (faci_high_price + faci_low_price) / 2
+			WHEN faci_discount IS NULL THEN (((faci_high_price + faci_low_price) / 2) + (((faci_high_price + faci_low_price) / 2) * (faci_tax_rate/100)))
+			WHEN faci_tax_rate IS NULL THEN (((faci_high_price + faci_low_price) / 2) - (((faci_high_price + faci_low_price) / 2) * (faci_discount/100)))
+			ELSE (((faci_high_price + faci_low_price) / 2) - (((faci_high_price + faci_low_price) / 2) * faci_discount/100)) + (((faci_high_price + faci_low_price) / 2) - (((faci_high_price + faci_low_price) / 2) * faci_discount/100)) * (faci_tax_rate/100)
+		END
+	)
+    FROM inserted
+
+    IF NOT EXISTS (SELECT 1 FROM Hotel.Hotels WHERE hotel_id = @faci_hotel_id)
+    BEGIN
+        RAISERROR ('Hotel does not exist or you do not have permission', 16, 1)
+        ROLLBACK TRANSACTION
+        RETURN;
+    END
+
+    IF NOT EXISTS (SELECT 1 FROM Users.user_roles WHERE usro_user_id = @faci_user_id AND usro_role_id IN (2, 4))
+    BEGIN
+        RAISERROR ('User does not exist or you do not have permission', 16, 1)
+        ROLLBACK TRANSACTION
+        RETURN;
+    END
+
+    IF EXISTS (SELECT faci_low_price, faci_high_price
+               FROM inserted
+               WHERE faci_high_price < faci_low_price)
+    BEGIN
+        RAISERROR ('High price cannot be lower than low price', 16, 1)
+        ROLLBACK TRANSACTION
+        RETURN;
+    END
+
+    IF (@faci_rate_price > @faci_high_price OR @faci_rate_price < @faci_low_price)
+    BEGIN
+        RAISERROR ('Rate price cannot be lower than low price OR cannot be higher than high price', 16, 1)
+        ROLLBACK TRANSACTION
+        RETURN;
+    END
+
+
+    BEGIN TRY
+        INSERT INTO Hotel.Facilities (faci_name, faci_description, faci_max_number, faci_measure_unit,										faci_room_number, faci_startdate, faci_enddate, faci_low_price,											faci_high_price, faci_rate_price, faci_discount, faci_tax_rate,
+									  faci_modified_date, faci_cagro_id, faci_hotel_id, faci_user_id,
+									  faci_expose_price)
+        SELECT
+            i.faci_name,
+            i.faci_description,
+            i.faci_max_number,
+            i.faci_measure_unit,
+            i.faci_room_number,
+            i.faci_startdate,
+            i.faci_enddate,
+            i.faci_low_price,
+            i.faci_high_price,
+            @faci_rate_price,
+            i.faci_discount,
+            i.faci_tax_rate,
+            GETDATE(),
+            i.faci_cagro_id,
+            i.faci_hotel_id,
+            i.faci_user_id,
+            i.faci_expose_price
+        FROM inserted i
+    END TRY
+
+BEGIN CATCH
+        ROLLBACK TRANSACTION
+    -- Handle the exception here, for example by logging the error
+		DECLARE @ErrorMessage NVARCHAR(4000);
+		DECLARE @ErrorSeverity INT;
+		DECLARE @ErrorState INT;
+
+		SELECT
+			@ErrorMessage = ERROR_MESSAGE(),
+			@ErrorSeverity = ERROR_SEVERITY(),
+			@ErrorState = ERROR_STATE();
+
+		RAISERROR (@ErrorMessage, @ErrorSeverity, @ErrorState);
+END CATCH
+END;
+GO
+
+
+-- =============================================
+-- Author	  :	Alvan Ganteng
+-- Create date: 14 Mei 2023
+-- Description:	Trigger to validate update into Hotel.Facilities
+--				with auto insert into Hotel.Facility_Price_History
+-- =============================================
+
+CREATE OR ALTER TRIGGER Hotel.Facilities_update_validation
+ON Hotel.Facilities
+AFTER UPDATE
+AS
+BEGIN
+    DECLARE @faci_id INT;
+    DECLARE @faci_user_id INT;
+    DECLARE @faci_hotel_id INT;
+	DECLARE @faci_startdate DATETIME;
+	DECLARE @faci_enddate DATETIME;
+	DECLARE @faci_discount SMALLMONEY;
+	DECLARE @faci_tax_rate SMALLMONEY;
+    DECLARE @faci_low_price MONEY;
+    DECLARE @faci_high_price MONEY;
+    DECLARE @faci_rate_price MONEY;
+
+    SELECT
+        @faci_id = faci_id,
+        @faci_user_id = faci_user_id,
+        @faci_hotel_id = faci_hotel_id,
+        @faci_startdate = faci_startdate,
+        @faci_enddate = faci_enddate,
+        @faci_discount = faci_discount,
+        @faci_tax_rate = faci_tax_rate,
+        @faci_low_price = faci_low_price,
+        @faci_high_price = faci_high_price,
+        @faci_rate_price =
+        (
+		CASE
+			WHEN faci_discount IS NULL AND faci_tax_rate IS NULL THEN (faci_high_price + faci_low_price) / 2
+			WHEN faci_discount IS NULL THEN (((faci_high_price + faci_low_price) / 2) + (((faci_high_price + faci_low_price) / 2) * (faci_tax_rate/100)))
+			WHEN faci_tax_rate IS NULL THEN (((faci_high_price + faci_low_price) / 2) - (((faci_high_price + faci_low_price) / 2) * (faci_discount/100)))
+			ELSE (((faci_high_price + faci_low_price) / 2) - (((faci_high_price + faci_low_price) / 2) * faci_discount/100)) + (((faci_high_price + faci_low_price) / 2) - (((faci_high_price + faci_low_price) / 2) * faci_discount/100)) * (faci_tax_rate/100)
+		END
+	)
+    FROM inserted
+
+    IF NOT EXISTS (SELECT 1 FROM Hotel.Hotels WHERE hotel_id = @faci_hotel_id)
+    BEGIN
+        RAISERROR ('Hotel does not exist or you do not have permission', 16, 1)
+        ROLLBACK TRANSACTION
+        RETURN;
+    END
+
+    IF NOT EXISTS (SELECT 1 FROM Users.user_roles WHERE usro_user_id = @faci_user_id AND usro_role_id IN (2, 4))
+    BEGIN
+        RAISERROR ('User does not exist or you do not have permission', 16, 1)
+        ROLLBACK TRANSACTION
+        RETURN;
+    END
+
+    IF EXISTS (SELECT faci_low_price, faci_high_price
+               FROM inserted
+               WHERE faci_high_price < faci_low_price)
+    BEGIN
+        RAISERROR ('High price cannot be lower than low price', 16, 1)
+        ROLLBACK TRANSACTION
+        RETURN;
+    END
+
+    IF (@faci_rate_price > @faci_high_price OR @faci_rate_price < @faci_low_price)
+    BEGIN
+        RAISERROR ('Rate price cannot be lower than low price OR cannot be higher than high price', 16, 1)
+        ROLLBACK TRANSACTION
+        RETURN;
+    END
+
+
+    IF UPDATE(faci_startdate)
+		OR UPDATE(faci_enddate)
+		OR UPDATE(faci_low_price)
+		OR UPDATE(faci_high_price)
+		OR UPDATE(faci_rate_price)
+		OR UPDATE(faci_discount)
+		OR UPDATE(faci_tax_rate)
+    BEGIN
+        BEGIN TRANSACTION
+			UPDATE Hotel.Facilities
+			SET
+				faci_rate_price = @faci_rate_price
+			WHERE
+				faci_id = @faci_id
+
+			INSERT INTO Hotel.Facility_Price_History (faph_startdate, faph_enddate, faph_low_price, faph_high_price, faph_rate_price, faph_discount, faph_tax_rate, faph_modified_date, faph_faci_id, faph_user_id)
+			VALUES (@faci_startdate, @faci_enddate, @faci_low_price, @faci_high_price, @faci_rate_price, @faci_discount, @faci_tax_rate, GETDATE(), @faci_id, @faci_user_id);
+        COMMIT TRANSACTION
+    END
+END;
+GO
+
+-- =============================================
+-- Author	  :	Alvan Ganteng
+-- Create date: 14 Mei 2023
+-- Description:	Trigger for auto insert
+--				into table Hotel.Facility_Price_History
+-- =============================================
+
+CREATE OR ALTER TRIGGER Hotel.tr_hotel_facilities_price_history
+ON Hotel.Facilities
+AFTER INSERT
+AS
+BEGIN
+  SET NOCOUNT ON;
+
+  DECLARE @faph_startdate DATETIME
+  DECLARE @faph_enddate DATETIME
+  DECLARE @faph_modified_date DATETIME
+  DECLARE @faph_low_price MONEY;
+  DECLARE @faph_high_price MONEY;
+  DECLARE @faph_rate_price MONEY;
+  DECLARE @faph_discount SMALLMONEY;
+  DECLARE @faph_tax_rate SMALLMONEY;
+  DECLARE @faph_faci_id INT;
+  DECLARE @faph_user_id INT;
+
+  SELECT @faph_startdate = faci_startdate, @faph_enddate = faci_enddate, @faph_low_price = faci_low_price,
+  @faph_high_price = faci_high_price, @faph_rate_price = faci_rate_price, @faph_discount = faci_discount,
+  @faph_modified_date = faci_modified_date, @faph_tax_rate = faci_tax_rate, @faph_faci_id = faci_id, @faph_user_id = faci_user_id
+  FROM inserted;
+
+  INSERT INTO Hotel.Facility_Price_History (faph_startdate, faph_enddate, faph_low_price, faph_high_price, faph_rate_price, faph_discount, faph_tax_rate, faph_modified_date, faph_faci_id, faph_user_id)
+  VALUES (@faph_startdate, @faph_enddate, @faph_low_price, @faph_high_price, @faph_rate_price, @faph_discount, @faph_tax_rate, @faph_modified_date, @faph_faci_id, @faph_user_id);
+END;
+GO
+
+-- =============================================
+-- Author	  :	Alvan Ganteng
+-- Create date: 14 Mei 2023
+-- Description:	Trigger to validate facility must have inserted
+--				and validate insert for Hotel.Facility Photos
+-- =============================================
+
+CREATE OR ALTER TRIGGER Hotel.Hotel_Facility_Photos_insert_validation
+ON Hotel.Facility_Photos
+INSTEAD OF INSERT
+AS
+BEGIN
+    DECLARE @fapho_faci_id INT
+
+    SELECT
+        @fapho_faci_id = fapho_faci_id
+    FROM inserted
+
+    IF NOT EXISTS (SELECT 1 FROM Hotel.Facilities WHERE faci_id = @fapho_faci_id)
+    BEGIN
+        RAISERROR ('Facility does not exist!', 16, 1);
+        ROLLBACK TRANSACTION;
+    END
+    ELSE
+    BEGIN
+        INSERT INTO Hotel.Facility_Photos (fapho_photo_filename, fapho_thumbnail_filename, fapho_original_filename, fapho_file_size, fapho_file_type, fapho_primary, fapho_url, fapho_modified_date, fapho_faci_id)
+		SELECT fapho_photo_filename, fapho_thumbnail_filename, fapho_original_filename, fapho_file_size, fapho_file_type, fapho_primary, fapho_url, fapho_modified_date, fapho_faci_id
+	    FROM inserted;
+    END
+END;
+GO
+
+
+-- =============================================
+-- Author	  :	Alvan Ganteng
+-- Create date: 14 Mei 2023
+-- Description:	Trigger for checker while update and delete
+--				primary must to have 1 record for value fapho_primary = 1
+-- =============================================
+
+CREATE OR ALTER TRIGGER Hotel.Hotel_Facility_Photos_update_primary_validation
+ON Hotel.Facility_Photos
+AFTER UPDATE, DELETE
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    DECLARE @fapho_faci_id INT
+    DECLARE @fapho_primary INT
+
+    SELECT
+        @fapho_faci_id = fapho_faci_id,
+        @fapho_primary =  fapho_primary
+    FROM inserted
+
+    IF (@fapho_primary = 1)
+        BEGIN
+			-- update other records with the same fapho_faci_id to have fapho_primary = 0
+			UPDATE p
+			SET fapho_primary = 0
+			FROM Hotel.Facility_Photos p
+			JOIN inserted i ON p.fapho_faci_id = i.fapho_faci_id
+			WHERE p.fapho_id <> i.fapho_id
+			AND (i.fapho_primary = 1 OR (i.fapho_primary IS NULL AND p.fapho_primary = 1));
+
+			-- set inserted records with fapho_primary = 1
+			UPDATE p
+			SET fapho_primary = 1
+			FROM Hotel.Facility_Photos p
+			JOIN inserted i ON p.fapho_id = i.fapho_id
+			WHERE i.fapho_primary = 1
+			AND (p.fapho_primary IS NULL OR p.fapho_primary = 0);
+        END
+
+    IF NOT EXISTS (SELECT * FROM inserted WHERE fapho_primary = 1 AND fapho_faci_id = @fapho_faci_id)
+        BEGIN
+            UPDATE Hotel.Facility_Photos
+            SET fapho_primary = 1
+            WHERE fapho_id = (
+            SELECT MIN(fapho_id) FROM hotel.Facility_Photos
+            WHERE fapho_faci_id = @fapho_faci_id )
+        END
+END;
+GO
+
+-- =============================================
+-- Author	  :	Alvan Ganteng
+-- Create date: 9 Mei 2023
+-- Description:	Trigger for checker insert for fapho_primary
+--				the value will be '1' if it first record
+-- =============================================
+
+CREATE OR ALTER TRIGGER Hotel.tr_facility_photos_fapho_primary
+ON Hotel.Facility_Photos
+AFTER INSERT
+AS
+BEGIN
+  SET NOCOUNT ON;
+
+  BEGIN TRY
+    -- Start transaction
+    BEGIN TRANSACTION
+    DECLARE @fapho_faci_id INT
+    DECLARE @fapho_id INT
+    DECLARE @fapho_primary INT
+
+    SELECT
+        @fapho_id = fapho_id,
+        @fapho_faci_id = fapho_faci_id,
+        @fapho_primary = fapho_primary
+    FROM inserted
+
+    -- If any row is updated, check if the value of fapho_primary is changed to 1
+    IF NOT EXISTS (SELECT TOP 1 *
+				   FROM Hotel.Facility_Photos
+				   WHERE fapho_primary = 1
+					AND fapho_faci_id = @fapho_faci_id)
+				   AND (@fapho_primary = 0)
+    BEGIN
+      -- Only allow one record with fapho_primary = 1 for each faci_id
+      UPDATE Hotel.Facility_Photos
+      SET
+        fapho_primary = 1
+      WHERE fapho_id = @fapho_id
+    END
+
+    -- Commit transaction
+    COMMIT TRANSACTION
+
+  END TRY
+
+  BEGIN CATCH
+    -- Rollback transaction in case of any errors
+    IF @@TRANCOUNT > 0 ROLLBACK TRANSACTION;
+    THROW;
+  END CATCH;
+END;
+GO
+GO
+-- =============================================
+-- Author:		Gabi
+-- Create date: GetDate()
+-- Description:	Trigger to update totalRoom,totalAmount in Booking_orders
+-- =============================================
+
+CREATE OR ALTER TRIGGER Booking.TrToRoomAndTotalAmountUpdate
+ON booking.booking_order_detail
+AFTER INSERT, DELETE, UPDATE
+AS
+BEGIN
+	SET XACT_ABORT ON;
+  	UPDATE Booking.booking_orders
+  	SET
+	-- Update the boor_total_room column for each affected boorId
+		boor_total_room =
+		(
+			SELECT COUNT(d.borde_id)
+			FROM Booking.booking_order_detail d
+			WHERE borde_boor_id = boor_id
+  		),
+	-- Update the boor_total_amount column for each affected boorId
+		boor_total_ammount=
+		(
+			SELECT SUM(d.borde_subtotal)
+			FROM Booking.booking_order_detail d
+			WHERE borde_boor_id=boor_id
+		)
+  WHERE boor_id IN (
+    SELECT borde_boor_id
+    FROM inserted
+    UNION
+    SELECT borde_boor_id
+    FROM deleted
+  )
+END;
+GO
 GO
 -- =============================================
 -- Author	  :	alip

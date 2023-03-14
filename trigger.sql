@@ -555,7 +555,7 @@ BEGIN
 	--check that paymend type is not cash. no sp exec needed
 	IF EXISTS(SELECT 1 FROM inserted WHERE boor_pay_type <> 'C')
 	BEGIN
-		DECLARE @boor_number int,
+		DECLARE @boor_number nvarchar(50),
 				@boor_account_number nvarchar(50),
 				@boor_user_Id int
 

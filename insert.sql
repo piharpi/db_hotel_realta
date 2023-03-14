@@ -32,6 +32,8 @@ DELETE Resto.order_menu_detail;
 DELETE Resto.resto_menus;
 
 -- DELETE MODULE Booking
+DBCC CHECKIDENT ('Booking.booking_orders', RESEED, 1);
+GO
 DELETE Booking.user_breakfast;
 DELETE Booking.special_offers;
 DELETE Booking.booking_order_detail_extra;
@@ -596,17 +598,16 @@ SET IDENTITY_INSERT Booking.special_offers OFF
 -- SELECT*FROM Booking.special_offers
 -- select * from Booking.special_offers;
 
-
 SET IDENTITY_INSERT Booking.booking_orders ON
-INSERT INTO Booking.booking_orders (boor_id,boor_order_number, 	boor_order_date, boor_total_room, boor_total_ammount, boor_down_payment,
-                                    boor_pay_type,boor_is_paid,boor_type, boor_cardnumber, boor_user_id,boor_hotel_id)
-VALUES (1, 'BO#20221127-0001', '2023-01-27', 3,500000,200000,'D', 'DP', 'T', '431-2388-93', 1, 1),
-       (2, 'BO#20221127-0002', '2023-01-27', 4,300000,0,'C', 'P', 'C', '123-2993-32',2, 2),
-       (3, 'BO#20221127-0003', '2023-01-27', 4,300000,200000,'D', 'DP', 'T', '087363155421',4, 3),
-       (4, 'BO#20221127-0004', '2023-01-27', 4,150000,50000,'PG', 'DP', 'C', '11-1111-1111', 8, 4),
-       (5, 'BO#20221127-0005', '2023-01-27', 4,500000,2000,'C', 'P', 'C', '571-2939-23', 7, 5)
+INSERT INTO Booking.booking_orders (boor_id,boor_order_number, 	boor_order_date, boor_total_room, boor_total_ammount, boor_down_payment,boor_pay_type,boor_is_paid,boor_type, boor_cardnumber, boor_user_id,boor_hotel_id)
+VALUES (1,'BO#20221127-0001', '2023-01-27', 3,500000,200000,'D', 'DP', 'T', '431-2388-93', 1, 1);
+INSERT INTO Booking.booking_orders (boor_id,boor_order_number, 	boor_order_date, boor_total_room, boor_total_ammount, boor_down_payment,boor_pay_type,boor_is_paid,boor_type, boor_cardnumber, boor_user_id,boor_hotel_id)
+VALUES (2,'BO#20221127-0002', '2023-01-27', 4,300000,0,'CR', 'P', 'C', '123-2993-32',2, 2);
+INSERT INTO Booking.booking_orders (boor_id,boor_order_number, 	boor_order_date, boor_total_room, boor_total_ammount, boor_down_payment,boor_pay_type,boor_is_paid,boor_type, boor_cardnumber, boor_user_id,boor_hotel_id)
+VALUES (3,'BO#20221127-0004', '2023-01-27', 4,150000,50000,'PG', 'DP', 'C', '11-1111-1111', 8, 4);
 SET IDENTITY_INSERT Booking.booking_orders OFF
 -- SELECT*FROM Booking.booking_orders
+
 
 SET IDENTITY_INSERT Booking.booking_order_detail ON
 INSERT INTO Booking.booking_order_detail (borde_boor_id, borde_id, borde_checkin, borde_checkout, borde_adults, borde_kids, borde_price, borde_extra, borde_discount, borde_tax, borde_faci_id)
@@ -616,10 +617,10 @@ VALUES (1, 1, '2022-11-27', '2022-11-28', 2, 0, 100, 0, 0, 10, 5),
        (2, 4, '2022-11-27', '2022-11-28', 2, 2, 200, 40, 30, 20, 5),
        (3, 5, '2022-11-27', '2022-11-28', 1, 1, 250, 50, 40, 25, 5),
        (3, 6, '2022-11-27', '2022-11-28', 4, 0, 300, 60, 50, 30, 5),
-       (4, 7, '2022-11-27', '2022-11-28', 2, 3, 350, 70, 60, 35, 6),
-       (4, 8, '2022-11-27', '2022-11-28', 3, 2, 400, 80, 70, 40, 8),
-       (5, 9, '2022-11-27', '2022-11-28', 1, 4, 450, 90, 80, 45, 6),
-       (5, 10, '2022-11-27', '2022-11-28', 4, 1, 500, 100, 90, 50, 6)
+       (1, 7, '2022-11-27', '2022-11-28', 2, 3, 350, 70, 60, 35, 6),
+       (2, 8, '2022-11-27', '2022-11-28', 3, 2, 400, 80, 70, 40, 8),
+       (3, 9, '2022-11-27', '2022-11-28', 1, 4, 450, 90, 80, 45, 6),
+       (2, 10, '2022-11-27', '2022-11-28', 4, 1, 500, 100, 90, 50, 6)
 SET IDENTITY_INSERT Booking.booking_order_detail OFF
 -- SELECT*FROM Booking.booking_order_detail
 
@@ -788,7 +789,7 @@ VALUES (1, 1, 1, '431-2388-93', 1000000, 'debet', 11, 22, CURRENT_TIMESTAMP),
        (13, 13, 13, '081928222364', 500000, 'payment', null, null, CURRENT_TIMESTAMP),
        (14, 14, 14, '089012852546', 500000, 'payment', null, null, CURRENT_TIMESTAMP),
        (15, 15, 15, '085627287172', 500000, 'payment', null, null, CURRENT_TIMESTAMP);
-SET IDENTITY_INSERT Payment.user_accounts OFF
+SET IDENTITY_INSERT Payment.user_accounts OFF;
 -- SELECT*FROM payment.user_accounts;
 
 -- payment_transactions
@@ -796,18 +797,18 @@ SET IDENTITY_INSERT Payment.user_accounts OFF
 -- DISABLE TRIGGER [Payment].[CalculateUserAccountCredit] ON [Payment].[payment_transaction];
 
 -- pay_type 'debet'
-EXECUTE [Payment].[spCreateTransferBooking]
-       'BO#20221127-0001'
-       ,'431-2388-93'
-       ,1
-GO
+-- EXECUTE [Payment].[spCreateTransferBooking]
+--        'BO#20221127-0001'
+--        ,'431-2388-93'
+--        ,1
+-- GO
 
--- pay_type 'cash',  ignored
-EXECUTE [Payment].[spCreateTransferBooking]
-       'BO#20221127-0002'
-       ,'123-2993-32'
-       ,2
-GO
+-- -- pay_type 'cash',  ignored
+-- EXECUTE [Payment].[spCreateTransferBooking]
+--        'BO#20221127-0002'
+--        ,'123-2993-32'
+--        ,2
+-- GO
 -- INSERT
 --   INTO Payment.payment_transaction(patr_debet, patr_credit, patr_type, patr_note, patr_modified_date,
 --                                   patr_order_number, patr_source_id, patr_target_id, patr_trx_number_ref, patr_user_id)

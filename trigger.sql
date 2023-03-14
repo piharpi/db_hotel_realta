@@ -240,7 +240,7 @@ BEGIN
             ,@transaction_note AS NVARCHAR(MAX)
 	        ,@order_number AS VARCHAR(55)
 	        ,@trx_number_ref AS VARCHAR(55)
-	        ,@pay_method AS NCHAR(5)
+	        ,@pay_method AS NCHAR(5) = null
 
 	SET @order_number = null;
 	SET @trx_number_ref = null;
@@ -259,6 +259,14 @@ BEGIN
            @pay_method = boor_pay_type
     FROM Booking.booking_orders
     WHERE boor_order_number = @order_number
+
+    IF (@pay_method IS NULL)
+    BEGIN
+        SELECT @total_amount = orme_total_amount,
+               @pay_method = orme_pay_type
+        FROM Resto.order_menus
+        WHERE orme_order_number = @order_number
+    END
 
     -- check if the payment method is 'cash' just ignore it
     -- CR = credit_card
@@ -293,21 +301,22 @@ BEGIN
                 @total_amount OUTPUT
         END
 
+        -- ORDER MENU
+        IF @transaction_type = 'ORM'
+        BEGIN
+            EXECUTE [Payment].[spCalculationTranferOrderMenu]
+                @src_account,
+                @tar_account,
+                @order_number,
+                @total_amount OUTPUT
+        END
+
         -- insert credit transaction
         INSERT INTO [Payment].[payment_transaction](
-                        patr_trx_number, patr_debet, patr_credit, patr_type, patr_note,
-                        patr_order_number, patr_source_id, patr_target_id, patr_trx_number_ref, patr_user_id)
+                    patr_trx_number, patr_debet, patr_credit, patr_type, patr_note,
+                    patr_order_number, patr_source_id, patr_target_id, patr_trx_number_ref, patr_user_id)
              VALUES (Payment.fnFormatedTransactionId(IDENT_CURRENT('Payment.[payment_transaction]'), @transaction_type), 0,
                     @total_amount, @transaction_type,@transaction_note, @order_number, @src_account, @tar_account, @trx_number_ref, @src_user_id);
-
-        -- ORDER MENU
-    --     IF @transaction_type = 'ORM'
-    --     BEGIN
-    --         EXECUTE [Payment].[spTransferBookingTransaction]
-    --              @src_account
-    --             ,@tar_account
-    --             ,@total_amount
-    --     END
 
         -- REFUND
         IF @transaction_type = 'RF'

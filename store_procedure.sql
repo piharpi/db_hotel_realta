@@ -695,6 +695,24 @@ GO
 -- =============================================
 -- Author:		Harpi
 -- Create date: 13 March 2023
+-- Description:	Store Procedure for create transfer orderMenu
+-- =============================================
+CREATE PROCEDURE [Payment].[spCreateTransferOrderMenu]
+       @orme_order_number VARCHAR(50)
+       ,@orme_card_number VARCHAR(50)
+       ,@orme_user_id INT
+AS
+BEGIN
+    INSERT
+      INTO Payment.payment_transaction(patr_type, patr_note, patr_order_number, patr_source_id, patr_target_id, patr_user_id)
+    VALUES ('ORM', 'Transfer Order Menu Note', @orme_order_number, @orme_card_number, '131-3456-78', @orme_user_id);
+END
+GO
+
+
+-- =============================================
+-- Author:		Harpi
+-- Create date: 13 March 2023
 -- Description:	Store Procedure for tranfer money (manipulation)
 -- =============================================
 CREATE OR ALTER PROCEDURE [Payment].spTranferMoney
@@ -790,6 +808,71 @@ CREATE OR ALTER PROC [Payment].[spCalculationTranferBooking]
 --
 --                            SELECT 'SUCCESS' AS STATUS
 --                     END
+            COMMIT TRANSACTION
+        END TRY
+        BEGIN CATCH
+            ROLLBACK
+        END CATCH
+    END
+GO
+
+-- =============================================
+-- Author:		Harpi
+-- Create date: 8 January 2023
+-- Description:	Store Procedure for transfer booking transaction
+-- =============================================
+CREATE OR ALTER PROC [Payment].[spCalculationTranferOrderMenu]
+    @source_account AS NVARCHAR(50),
+    @target_account AS NVARCHAR(50),
+    @order_number AS NVARCHAR(50),
+    @total_amount AS MONEY OUTPUT
+    AS
+    BEGIN
+        SET NOCOUNT ON;
+        BEGIN TRY
+            BEGIN TRANSACTION
+                DECLARE @user_payment_method varchar(10);
+                DECLARE @user_current_saldo AS MONEY;
+                DECLARE @payment_option AS NCHAR(2);
+
+                SELECT @total_amount = orme_total_amount,
+                       @payment_option = TRIM(orme_is_paid),
+                       @user_payment_method = orme_pay_type
+                FROM Resto.order_menus
+                WHERE orme_order_number = @order_number
+
+                -- set value @user_current_saldo
+                SELECT @user_current_saldo = usac_saldo
+                  FROM Payment.user_accounts
+                 WHERE usac_account_number = @source_account
+
+                -- check if the payment method is 'cash' just ignore it
+                -- CR = credit_card
+                -- D = debet
+                -- PG = payment / payment_gateway
+                IF (@user_payment_method IN ('D', 'CR', 'PG'))
+                BEGIN
+                    IF @user_payment_method = 'D' OR @user_payment_method = 'PG'
+                    BEGIN
+                        -- check if payment option is 'Down Payment'
+--                         IF (@payment_option = 'DP' AND (@user_current_saldo - @total_down_payment) < 0)
+--                             ROLLBACK -- TODO : Tambahkan feature untuk pemberitahuan bahwa saldo kurang utk dp!
+
+                        -- check if payment options is 'Paid'
+                       IF ((@user_current_saldo - @total_amount) < 0)
+                            ROLLBACK
+
+--                         IF (@payment_option = 'P' AND (@user_current_saldo - @total_amount) < 0)
+--                             ROLLBACK -- TODO : Tambahkan feature untuk pemberitahuan bahwa saldo kurang!
+                    END
+
+                    -- TODO : check apakah lunas atau tidak , jika lunas status paid jika tidak maka lainya!
+                    -- paying booking order from user account to realta hotel account
+                    EXECUTE [Payment].spTranferMoney
+                            @source_account
+                            ,@target_account
+                            ,@total_amount
+                END
             COMMIT TRANSACTION
         END TRY
         BEGIN CATCH

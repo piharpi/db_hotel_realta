@@ -227,7 +227,7 @@ CREATE TRIGGER [Payment].[CalculateUserAccountCredit]
     INSTEAD OF INSERT
 AS
 BEGIN
-	-- SET NOCOUNT ON added to prevent extra result sets from
+    -- SET NOCOUNT ON added to prevent extra result sets from
 	-- interfering with SELECT statements.
 	SET NOCOUNT ON
 
@@ -266,33 +266,32 @@ BEGIN
     -- PG = payment / payment_gateway
     IF (@pay_method IN ('D', 'CR', 'PG'))
     BEGIN
-	IF (@transaction_type = 'RF' OR @transaction_type = 'RPY')
-    BEGIN
-        SELECT @src_account = patr_target_id,
-               @tar_account = patr_source_id,
+        IF (@transaction_type = 'RF' OR @transaction_type = 'RPY')
+        BEGIN
+            SELECT @src_account = patr_target_id,
+                   @tar_account = patr_source_id,
                    @total_amount = Payment.fnRefundAmount((patr_credit + patr_debet), default)
-        FROM Payment.payment_transaction
-        WHERE patr_trx_number = @trx_number_ref
-    END
+              FROM Payment.payment_transaction
+             WHERE patr_trx_number = @trx_number_ref
+        END
 
--- 	TOP UP
-    IF @transaction_type = 'TP'
-    BEGIN
-        EXECUTE [Payment].[spTopUpTransaction]
-             @src_account
+        -- 	TOP UP
+        IF @transaction_type = 'TP'
+        BEGIN
+            EXECUTE [Payment].[spTopUpTransaction]
+                 @src_account
                 ,@total_amount
-    END
+        END
 
-
-    -- TRANSFER BOOKING
-    IF @transaction_type = 'TRB'
-    BEGIN
+        -- TRANSFER BOOKING
+        IF @transaction_type = 'TRB'
+        BEGIN
             EXEC [Payment].[spCalculationTranferBooking]
                 @src_account,
                 @tar_account,
                 @order_number,
                 @total_amount OUTPUT
-    END
+        END
 
         -- insert credit transaction
         INSERT INTO [Payment].[payment_transaction](
@@ -301,7 +300,7 @@ BEGIN
              VALUES (Payment.fnFormatedTransactionId(IDENT_CURRENT('Payment.[payment_transaction]'), @transaction_type), 0,
                     @total_amount, @transaction_type,@transaction_note, @order_number, @src_account, @tar_account, @trx_number_ref, @src_user_id);
 
-    -- ORDER MENU
+        -- ORDER MENU
     --     IF @transaction_type = 'ORM'
     --     BEGIN
     --         EXECUTE [Payment].[spTransferBookingTransaction]
@@ -310,36 +309,35 @@ BEGIN
     --             ,@total_amount
     --     END
 
-    -- REFUND
-    IF @transaction_type = 'RF'
-    BEGIN
-        EXECUTE [Payment].[spRefundTransaction]
+        -- REFUND
+        IF @transaction_type = 'RF'
+        BEGIN
+            EXECUTE [Payment].[spRefundTransaction]
                 @trx_number_ref,
                 default
-    END
+        END
 
-    SELECT @tar_user_id = usac_user_id
-      FROM Payment.user_accounts
-     WHERE usac_account_number = @tar_account;
+        SELECT @tar_user_id = usac_user_id
+          FROM Payment.user_accounts
+         WHERE usac_account_number = @tar_account;
 
         -- insert debet transaction
-    INSERT INTO [Payment].[payment_transaction](
-                patr_trx_number, patr_debet, patr_credit, patr_type, patr_note,
-                patr_order_number, patr_source_id, patr_target_id, patr_trx_number_ref, patr_user_id)
-        VALUES (Payment.fnFormatedTransactionId(IDENT_CURRENT('Payment.[payment_transaction]'), @transaction_type),
+        INSERT INTO [Payment].[payment_transaction](
+                    patr_trx_number, patr_debet, patr_credit, patr_type, patr_note,
+                    patr_order_number, patr_source_id, patr_target_id, patr_trx_number_ref, patr_user_id)
+            VALUES (Payment.fnFormatedTransactionId(IDENT_CURRENT('Payment.[payment_transaction]'), @transaction_type),
                     @total_amount, 0, @transaction_type, @transaction_note, @order_number, @src_account, @tar_account, @trx_number_ref, @tar_user_id);
 
 
-		-- REPAYMENT
--- 		IF @transaction_type = 'RPY'
--- 		BEGIN
--- 			EXECUTE [Payment].[spTopUpTransaction]
--- 				 @source_account = @src_account
--- 				,@target_account = @tar_account
+            -- REPAYMENT
+    -- 		IF @transaction_type = 'RPY'
+    -- 		BEGIN
+    -- 			EXECUTE [Payment].[spTopUpTransaction]
+    -- 				 @source_account = @src_account
+    -- 				,@target_account = @tar_account
     -- 				,@expense = @total_amount
--- 		END
-
--- 		SELECT patr_id FROM inserted;
+    -- 		END
+    -- 		SELECT patr_id FROM inserted;
     END
 END
 GO
@@ -487,9 +485,9 @@ AS
 BEGIN
     SET NOCOUNT ON;
     IF NOT UPDATE(hotel_rating_star)
-  BEGIN
-    UPDATE Hotel.Hotels
-    SET hotel_modified_date = GETDATE()
+    BEGIN
+        UPDATE Hotel.Hotels
+        SET hotel_modified_date = GETDATE()
         FROM inserted
         WHERE Hotels.hotel_id = inserted.hotel_id
     END
@@ -552,7 +550,7 @@ BEGIN
     BEGIN
         PRINT('User does not exist or you do not have permission');
         RETURN;
-  END
+    END
 
     INSERT INTO Hotel.Hotel_Reviews (hore_user_review, hore_rating, hore_created_on, hore_user_id, hore_hotel_id)
     SELECT hore_user_review, hore_rating, hore_created_on, hore_user_id, hore_hotel_id
@@ -978,7 +976,7 @@ BEGIN
   )
 END;
 GO
-GO
+
 -- =============================================
 -- Author	  :	alip
 -- Create date: 14 Maret 2023
@@ -994,3 +992,4 @@ BEGIN
     SET prit_modified_date = GETDATE()
     WHERE prit_id IN (SELECT prit_id FROM inserted)
 END;
+GO

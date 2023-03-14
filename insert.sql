@@ -543,13 +543,13 @@ INSERT INTO Hotel.Hotel_Reviews (hore_user_review, hore_rating, hore_created_on,
 VALUES
 ('Pelayanan yang sangat baik', 5, GETDATE(), 6, 5);
 INSERT INTO Hotel.Hotel_Reviews (hore_user_review, hore_rating, hore_created_on, hore_user_id, hore_hotel_id)
-VALUES 
+VALUES
 ('Hotel yang cocok untuk perjalanan bisnis', 5, GETDATE(), 10, 5);
 INSERT INTO Hotel.Hotel_Reviews (hore_user_review, hore_rating, hore_created_on, hore_user_id, hore_hotel_id)
-VALUES 
+VALUES
 ('Saya suka kolam renangnya yang besar', 4, GETDATE(), 11, 5);
 INSERT INTO Hotel.Hotel_Reviews (hore_user_review, hore_rating, hore_created_on, hore_user_id, hore_hotel_id)
-VALUES 
+VALUES
 ('Hotelnya direkomendasikan untuk liburan keluarga', 5, GETDATE(), 15, 5);
 
 
@@ -653,7 +653,8 @@ FROM Hotel.Facility_Photos
 
 OPEN curFacilityPhotos
 
-FETCH NEXT FROM curFacilityPhotos INTO @fapho_id, @fapho_faci_id
+INSERT INTO Hotel.Facility_Photos (fapho_thumbnail_filename, fapho_photo_filename, fapho_primary, fapho_url, fapho_modified_date, fapho_faci_id)
+VALUES ('thumbnail7.jpg', 'photo7.jpg', 1, 'https://example.com/thumbnail7', GETDATE(), 3);
 
 WHILE @@FETCH_STATUS = 0
 BEGIN
@@ -862,7 +863,7 @@ SET IDENTITY_INSERT Booking.special_offer_coupons OFF
 
 INSERT INTO Booking.user_breakfast (usbr_borde_id, usbr_modified_date, usbr_total_vacant)
 VALUES
-    (1, '2022-11-27',1),
+    (1,'2022-11-27',1),
     (2,'2022-11-27',  2),
     (3,'2022-11-27',  3),
     (4,'2022-11-27',  2),

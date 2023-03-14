@@ -139,7 +139,7 @@ GO
 -- Create date: 9 Januari 2023
 -- Description:	Stored procedure for updating payment_transaction (UNUSED)
 -- =============================================
-CREATE PROCEDURE Payment.spUpdatePaymentTransaction 
+CREATE PROCEDURE Payment.spUpdatePaymentTransaction
 	-- Add the parameters for the stored procedure here
 	@id int
 	,@trx_number nvarchar(55)
@@ -760,9 +760,9 @@ CREATE OR ALTER PROC [Payment].[spCalculationTranferBooking]
                 -- D = debet
                 -- PG = payment / payment_gateway
                 IF (@user_payment_method IN ('D', 'CR', 'PG'))
-                    BEGIN
-                    IF @user_payment_method = 'D' OR @user_payment_method = 'PG'
                 BEGIN
+                    IF @user_payment_method = 'D' OR @user_payment_method = 'PG'
+                    BEGIN
                         -- check if payment option is 'Down Payment'
                         IF (@payment_option = 'DP' AND (@user_current_saldo - @total_down_payment) < 0)
                             ROLLBACK -- TODO : Tambahkan feature untuk pemberitahuan bahwa saldo kurang utk dp!
@@ -770,7 +770,7 @@ CREATE OR ALTER PROC [Payment].[spCalculationTranferBooking]
                         -- check if payment options is 'Paid'
                         IF (@payment_option = 'P' AND (@user_current_saldo - @total_amount) < 0)
                             ROLLBACK -- TODO : Tambahkan feature untuk pemberitahuan bahwa saldo kurang!
-                END
+                    END
 
                     -- change total_amount if transaction is 'Down Payment'
                     SET @total_amount = @total_down_payment IF @payment_option = 'DP'
@@ -1107,56 +1107,6 @@ BEGIN
 	--insert to booking_orders
 	select SCOPE_IDENTITY();
 
-END
-GO
-
--- =====================================================
--- Author:		Gabriel
--- Create date: 14 March 2023
--- Description:	Procedure for insert booking_order_detail
--- ======================================================
-
-CREATE OR ALTER procedure booking.sp_insert_booking_order_detail
-	@borde_boor_id int,
-	@borde_faci_id int,
-	@borde_checkin datetime,
-	@borde_checkout datetime,
-	@borde_discount smallmoney=NULL
-AS
-BEGIN
-	SET XACT_ABORT ON
-	DECLARE @faci_price money = (select faci_low_price from Hotel.facilities where faci_id=@borde_faci_id)
-	DECLARE @faci_tax smallmoney = (select faci_tax_rate from Hotel.facilities where faci_id=@borde_faci_id)
-
-	-- insert borde
-	INSERT INTO Booking.booking_order_detail
-	(
-		borde_boor_id,
-		borde_faci_id,
-		borde_checkin,
-		borde_checkout,
-		borde_price,
-		borde_adults,
-		borde_kids,
-		borde_extra,
-		borde_discount,
-		borde_tax
-	)
-    VALUES
-	(
-		@borde_boor_id,
-		@borde_faci_id,
-		@borde_checkin,
-		@borde_checkout,
-		@faci_price,
-		0,--bordeAdults
-		0,--bordeKids
-		0,--bordeExtra
-		0,--bordeDiscount,
-		@faci_tax
-	);
-	-- get borde_id for insertion into booking_order_detail_extra
-    select SCOPE_IDENTITY();
 END
 GO
 

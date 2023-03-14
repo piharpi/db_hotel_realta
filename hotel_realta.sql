@@ -708,11 +708,11 @@ CREATE TABLE purchasing.vendor_product(
 
 CREATE TABLE purchasing.stock_photo(
   spho_id INT IDENTITY(1,1),
-  spho_thumbnail_filename NVARCHAR(50) NOT NULL,
-  spho_photo_filename NVARCHAR(50) NOT NULL,
-  spho_primary BIT NOT NULL DEFAULT 0,
-  spho_url NVARCHAR(255) NOT NULL,
-  spho_stock_id INT NOT NULL,
+  spho_thumbnail_filename NVARCHAR(255),
+  spho_photo_filename NVARCHAR(255),
+  spho_primary BIT DEFAULT 0,
+  spho_url NVARCHAR(255),
+  spho_stock_id INT,
 
   CONSTRAINT pk_spho_id PRIMARY KEY (spho_id),
   CONSTRAINT fk_spho_stock_id FOREIGN KEY (spho_stock_id) 

@@ -424,10 +424,10 @@ begin
 		IF @PodeReceivedQty > 0 and @poheStatus = 4 
 			and @PodeReceivedQty > @OldpodeReceivedQty 
 			and @PodeQyt > @PodeReceivedQty
-			and (@PodeReceivedQty + @PodeRejectQty) = @PodeQyt
+			--and (@PodeReceivedQty + @PodeRejectQty) = @PodeQyt
 		Begin
 		-- loop insert statement procedure Here
-			While @i <= @PodeReceivedQty
+			While @i <= (@PodeReceivedQty - @OldpodeReceivedQty)
 			Begin
 				INSERT INTO purchasing.stock_detail (stod_stock_id, stod_barcode_number,
 				 stod_pohe_id) select pode_stock_id, 
@@ -435,10 +435,9 @@ begin
 				pode_pohe_id from Purchasing.purchase_order_detail where pode_id = @PodeId;
 				set @i = @i +1;
 			End
+			-- declare stock id
+			select @stockID=pode_stock_id from Purchasing.purchase_order_detail where pode_id = @PodeId;
 			begin
-				-- declare stock id
-				select @stockID=pode_stock_id from Purchasing.purchase_order_detail where pode_id = @PodeId;
-
 				-- update after insert statement
 				update Purchasing.stocks
 					set 
@@ -470,12 +469,10 @@ create or alter procedure [Purchasing].[spUpdateStockDetail]
 (
 	-- Add the parameters for the stored procedure here
 	@stodId int,
-	@stodStockId int, 
-	@stodStatus nchar,
-	@stodNotes text,
+	@stodStatus nchar(2),
+	@stodNotes nvarchar(1025),
 	@stodFaciId int
 ) as
-	declare @updateStatus int;
 	declare @stockID int;
 begin
 	begin try
@@ -483,13 +480,13 @@ begin
 			-- updates statement 1 for procedure here
 			begin
 				UPDATE purchasing.stock_detail SET 
-                stod_stock_id=@stodStockId, stod_status=@stodStatus, 
+				stod_status=@stodStatus, 
                 stod_notes=@stodNotes, stod_faci_id=@stodFaciId 
                 WHERE stod_id=@stodId;
 			end
+				select @stockID=stod_stock_id from Purchasing.stock_detail where stod_id = @stodId;
 
 			begin
-				select @stockID=stod_stock_id from Purchasing.stock_detail where stod_id = @stodId;
 				-- updates statement 2 for procedure here
 				update Purchasing.stocks
 					set 

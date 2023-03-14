@@ -598,7 +598,8 @@ SET IDENTITY_INSERT Booking.special_offers OFF
 
 
 SET IDENTITY_INSERT Booking.booking_orders ON
-INSERT INTO Booking.booking_orders (boor_id,boor_order_number, 	boor_order_date, 	boor_total_room,boor_total_ammount,boor_down_payment,boor_pay_type,boor_is_paid,boor_type,boor_user_id,boor_hotel_id)
+INSERT INTO Booking.booking_orders (boor_id,boor_order_number, 	boor_order_date, boor_total_room, boor_total_ammount, boor_down_payment,
+                                    boor_pay_type,boor_is_paid,boor_type,boor_user_id,boor_hotel_id)
 VALUES (1, 'BO#20221127-0001', '2023-01-27', 3,500000,200000,'D', 'DP', 'T', 1, 1),
        (2, 'BO#20221127-0002', '2023-01-27', 4,300000,0,'C', 'P', 'C', 2, 2),
        (3, 'BO#20221127-0003', '2023-01-27', 4,300000,200000,'D', 'DP', 'T', 4, 3),
@@ -794,10 +795,18 @@ SET IDENTITY_INSERT Payment.user_accounts OFF
 -- SET IDENTITY_INSERT Payment.payment_transaction ON
 -- DISABLE TRIGGER [Payment].[CalculateUserAccountCredit] ON [Payment].[payment_transaction];
 
+-- pay_type 'debet'
 EXECUTE [Payment].[spCreateTransferBooking]
        'BO#20221127-0001'
        ,'431-2388-93'
        ,1
+GO
+
+-- pay_type 'cash',  ignored
+EXECUTE [Payment].[spCreateTransferBooking]
+       'BO#20221127-0002'
+       ,'123-2993-32'
+       ,2
 GO
 -- INSERT
 --   INTO Payment.payment_transaction(patr_debet, patr_credit, patr_type, patr_note, patr_modified_date,

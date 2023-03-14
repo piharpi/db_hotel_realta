@@ -501,12 +501,13 @@ BEGIN
     WHERE hotel_id IN (SELECT hotel_id FROM inserted)
   END
 END;
+GO
 
--- =============================================
+-- ============================================================
 -- Author:		Gabi 
 -- Create date: GetDate()
 -- Description:	Trigger to update totalRoom,totalAmount in Booking_orders
--- =============================================
+-- ==============================================================
 
 CREATE OR ALTER TRIGGER Booking.TrToRoomAndTotalAmountUpdate
 ON booking.booking_order_detail
@@ -522,14 +523,14 @@ BEGIN
 			SELECT COUNT(d.borde_id)
 			FROM Booking.booking_order_detail d
 			WHERE borde_boor_id = boor_id
-  		),
+  		)
 	-- Update the boor_total_amount column for each affected boorId
-		boor_total_ammount=
-		(
-			SELECT SUM(d.borde_subtotal)
-			FROM Booking.booking_order_detail d
-			WHERE borde_boor_id=boor_id
-		)
+		--, boor_total_ammount=
+		-- (
+		-- 	SELECT SUM(d.borde_subtotal)
+		-- 	FROM Booking.booking_order_detail d
+		-- 	WHERE borde_boor_id=boor_id
+		-- )
   WHERE boor_id IN (
     SELECT borde_boor_id
     FROM inserted
@@ -538,3 +539,30 @@ BEGIN
     FROM deleted
   )
 END;
+GO
+
+-- ============================================================
+-- Author:		Gabi 
+-- Create date: GetDate()
+-- Description:	Trigger to exec sp insert to paymenttransaction table after insert booking_orders
+-- ==============================================================
+
+CREATE TRIGGER booking.TgPaymentBookingTransaction
+ON Booking.Booking_orders
+AFTER INSERT 
+AS 
+BEGIN
+    SET XACT_ABORT ON;
+	--check that paymend type is not cash. no sp exec needed
+	IF EXISTS(SELECT 1 FROM inserted WHERE boor_pay_type <> 'C')
+	BEGIN
+		DECLARE @boor_number int,
+				@boor_account_number nvarchar(50),
+				@boor_user_Id int
+
+		SELECT @boor_number=boor_order_number, @boor_account_number=boor_cardnumber,@boor_user_Id=boor_user_id from inserted
+		-- exec sp for payment
+		EXECUTE [Payment].[spCreateTransferBooking] @boor_number,@boor_account_number,@boor_user_id
+	END
+END
+GO

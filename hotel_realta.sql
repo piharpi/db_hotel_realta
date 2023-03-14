@@ -334,9 +334,9 @@ CREATE TABLE Hotel.Facility_Photos
   fapho_id INT IDENTITY(1,1) NOT NULL CONSTRAINT fapho_id_pk PRIMARY KEY, -- primary key column
   fapho_photo_filename nvarchar(150) NULL,
   fapho_thumbnail_filename nvarchar(150) NOT NULL,
-  fapho_original_filename nvarchar(150) NOT NULL,
-  fapho_file_size smallint NOT NULL,
-  fapho_file_type nvarchar(50) NOT NULL,
+  fapho_original_filename nvarchar(150) NULL,
+  fapho_file_size smallint NULL,
+  fapho_file_type nvarchar(50) NULL,
   fapho_primary BIT NULL CHECK(fapho_primary IN(0,1)),
   fapho_url nvarchar(255) NULL,
   fapho_modified_date datetime,

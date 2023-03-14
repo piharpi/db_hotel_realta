@@ -943,7 +943,7 @@ GO
 -- Author:		Gabi
 -- Create date: GetDate()
 -- Description:	Trigger to update totalRoom,totalAmount in Booking_orders
--- =============================================
+-- ==============================================================
 
 CREATE OR ALTER TRIGGER Booking.TrToRoomAndTotalAmountUpdate
 ON booking.booking_order_detail
@@ -959,14 +959,14 @@ BEGIN
 			SELECT COUNT(d.borde_id)
 			FROM Booking.booking_order_detail d
 			WHERE borde_boor_id = boor_id
-  		),
+  		)
 	-- Update the boor_total_amount column for each affected boorId
-		boor_total_ammount=
-		(
-			SELECT SUM(d.borde_subtotal)
-			FROM Booking.booking_order_detail d
-			WHERE borde_boor_id=boor_id
-		)
+		--, boor_total_ammount=
+		-- (
+		-- 	SELECT SUM(d.borde_subtotal)
+		-- 	FROM Booking.booking_order_detail d
+		-- 	WHERE borde_boor_id=boor_id
+		-- )
   WHERE boor_id IN (
     SELECT borde_boor_id
     FROM inserted
@@ -977,6 +977,31 @@ BEGIN
 END;
 GO
 
+-- ============================================================
+-- Author:		Gabi 
+-- Create date: GetDate()
+-- Description:	Trigger to exec sp insert to paymenttransaction table after insert booking_orders
+-- ==============================================================
+
+CREATE TRIGGER booking.TgPaymentBookingTransaction
+ON Booking.Booking_orders
+AFTER INSERT 
+AS 
+BEGIN
+    SET XACT_ABORT ON;
+	--check that paymend type is not cash. no sp exec needed
+	IF EXISTS(SELECT 1 FROM inserted WHERE boor_pay_type <> 'C')
+	BEGIN
+		DECLARE @boor_number nvarchar(50),
+				@boor_account_number nvarchar(50),
+				@boor_user_Id int
+
+		SELECT @boor_number=boor_order_number, @boor_account_number=boor_cardnumber,@boor_user_Id=boor_user_id from inserted
+		-- exec sp for payment
+		EXECUTE [Payment].[spCreateTransferBooking] @boor_number,@boor_account_number,@boor_user_id
+	END
+END;
+GO
 -- =============================================
 -- Author	  :	alip
 -- Create date: 14 Maret 2023
@@ -992,4 +1017,33 @@ BEGIN
     SET prit_modified_date = GETDATE()
     WHERE prit_id IN (SELECT prit_id FROM inserted)
 END;
+GO
+
+-- =============================================
+-- Author:		Gabi 
+-- Create date: March 14, 2023
+-- Description:	Trigger to update totalRoom in Booking_orders
+-- =============================================
+CREATE OR ALTER TRIGGER Booking.TgSumbordeExtra
+ON Booking.Booking_order_detail_extra
+AFTER INSERT, DELETE, UPDATE 
+AS
+BEGIN
+	SET XACT_ABORT ON;
+	UPDATE Booking.booking_order_detail
+		SET borde_extra =
+		(
+			SELECT SUM(e.boex_subtotal)
+			FROM Booking.booking_order_detail_extra e
+			WHERE e.boex_borde_id = borde_id
+		)
+	WHERE
+		borde_id IN (
+			SELECT boex_borde_id
+			FROM inserted
+			UNION
+			SELECT boex_borde_id
+			FROM deleted
+		)
+END
 GO

@@ -490,7 +490,7 @@ CREATE TABLE Booking.booking_orders(
 );
 
 CREATE TABLE Booking.booking_order_detail(
-	borde_boor_id INTEGER,
+	borde_boor_id INTEGER, 
 	borde_id INT IDENTITY (1,1) UNIQUE NOT NULL,
 	borde_checkin DATETIME NOT NULL, --di input user
 	borde_checkout DATETIME NOT NULL, -- di input user
@@ -500,7 +500,7 @@ CREATE TABLE Booking.booking_order_detail(
 	borde_extra MONEY, -- sum(boex_subtotal) dari borde_id yg sama
 	borde_discount SMALLMONEY, -- faci_discount+sum(spof_discount) -> lewat soco_id
 	borde_tax SMALLMONEY, -- ngambil default faci_tax_rate
-	borde_subtotal AS (borde_price+(borde_price*borde_tax))-(borde_price*borde_discount),
+	borde_subtotal AS borde_extra+((borde_price+(borde_price*borde_tax))-(borde_price*borde_discount)),
 	borde_faci_id INTEGER,
 	CONSTRAINT pk_borde_id_boor_id PRIMARY KEY (borde_id, borde_boor_id),
 	CONSTRAINT fk_border_boor_id FOREIGN KEY(borde_boor_id)	REFERENCES Booking.booking_orders(boor_id),

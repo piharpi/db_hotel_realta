@@ -1056,7 +1056,8 @@ CREATE OR ALTER procedure booking.sp_insert_booking_orders
 	@boor_user_id as int,
 	@boor_pay_type as nchar(2),
 	@boor_is_paid as nchar(2),
-	@boor_down_payment as money =0
+	@boor_down_payment as money =0,
+	@boor_cardnumber as NVARCHAR(50)=null
 AS
 BEGIN
 	-- declare abort on action
@@ -1091,7 +1092,8 @@ BEGIN
 			boor_pay_type,
 			boor_is_paid,
 			boor_type,
-			boor_member_type
+			boor_member_type,
+			boor_cardnumber
 		)
 		VALUES
 		(
@@ -1102,7 +1104,8 @@ BEGIN
 			@boor_pay_type,
 			@boor_is_paid,
 			@boor_type,
-			@member_type
+			@member_type,
+			@boor_cardnumber
 		);
 	--insert to booking_orders
 	select SCOPE_IDENTITY();

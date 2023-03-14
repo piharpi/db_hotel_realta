@@ -525,7 +525,7 @@ begin
 		print 'Generate Barcode Is Failed';
 		throw;
 	end catch 
-end
+end;
 go 
 
 -- =============================================
@@ -548,7 +548,7 @@ begin
 			-- updates statement 1 for procedure here
 			begin
 				UPDATE purchasing.stock_detail SET 
-				stod_stock_id=@stodStockId, stod_status=@stodStatus,
+				stod_status=@stodStatus,
 				stod_notes=@stodNotes, stod_faci_id=@stodFaciId
 				WHERE stod_id=@stodId;
 			end

@@ -80,6 +80,24 @@ DELETE Users.users;
 DELETE Users.user_profiles;
 DELETE Users.user_members;
 
+-- RESET IDENT MODULE Master
+DBCC CHECKIDENT ('Master.regions', RESEED, 1);
+GO
+DBCC CHECKIDENT ('Master.country', RESEED, 1);
+GO
+DBCC CHECKIDENT ('Master.provinces', RESEED, 1);
+GO
+DBCC CHECKIDENT ('Master.address', RESEED, 1);
+GO
+DBCC CHECKIDENT ('Master.price_items', RESEED, 1);
+GO
+DBCC CHECKIDENT ('Master.service_task', RESEED, 1);
+GO
+DBCC CHECKIDENT ('Master.category_group', RESEED, 1);
+GO
+DBCC CHECKIDENT ('Master.policy', RESEED, 1);
+GO
+
 -- DELETE MODULE Master
 DELETE Master.regions;
 DELETE Master.country;
@@ -99,39 +117,36 @@ DELETE Master.policy_category_group;
 --REGION
 SET IDENTITY_INSERT Master.Regions ON;
 INSERT INTO Master.Regions (region_code, region_name)
-VALUES ('1', 'Region 1'), ('2', 'Region 2'), ('3', 'Region 3'),
-	   ('4', 'Region 4'), ('5', 'Region 5'), ('6', 'Region 6'),
-	   ('7', 'Region 7'), ('8', 'Region 8'), ('9', 'Region 9'),
-	   ('10', 'Region 10'), ('11', 'Region 11'), ('12', 'Region 12'),
-	   ('13', 'Region 13'), ('14', 'Region 14'), ('15', 'Region 15'),
-	   ('16', 'Region 16'), ('17', 'Region 17'), ('18', 'Region 18'),
-	   ('19', 'Region 19'), ('20', 'Region 20');
+VALUES ('1','Asia'), ('2','Europe'), ('3','North America'), ('4','South America'), ('5','Africa')
 SET IDENTITY_INSERT Master.Regions OFF;
 -- SELECT*FROM Master.Regions
 -- ORDER by region_code ASC
 
 SET IDENTITY_INSERT Master.Country ON;
-INSERT INTO Master.Country (country_id, country_name, country_region_id)
-VALUES (1, 'France', 1), (2, 'Germany', 2), (3, 'Spain', 3),
-	   (4, 'Italy', 4), (5, 'United Kingdom', 5), (6, 'Netherlands', 6),
-	   (7, 'Belgium', 7), (8, 'Denmark', 8), (9, 'Sweden', 9),
-	   (10, 'Norway', 10), (11, 'China', 11), (12, 'Japan', 12),
-	   (13, 'South Korea', 13), (14, 'North Korea', 14), (15, 'India', 15),
-	   (16, 'Pakistan', 16), (17, 'Bangladesh', 17), (18, 'Nepal', 18),
-	   (19, 'Bhutan', 19), (20, 'Sri Lanka', 20);
+INSERT INTO Master.country (country_id, country_name, country_region_id) VALUES
+(1, 'Indonesia', 1), (2, 'Thailand', 1), (3, 'Japan', 1), (4, 'Germany', 2), (5, 'France', 2),
+(6, 'United States', 3), (7, 'Canada', 3), (8, 'Brazil', 4), (9, 'Argentina', 4), (10, 'South Africa', 5);
 SET IDENTITY_INSERT Master.Country OFF;
 -- SELECT*FROM Master.Country
 -- ORDER by country_id ASC
 
 SET IDENTITY_INSERT Master.Provinces ON;
-INSERT INTO Master.Provinces (prov_id, prov_name, prov_country_id)
-VALUES (1, 'Ontario', 1), (2, 'Quebec', 1), (3, 'British Columbia', 1),
-	   (4, 'Alberta', 1), (5, 'Manitoba', 1), (6, 'Saskatchewan', 1),
-	   (7, 'New Brunswick', 1), (8, 'Nova Scotia', 1), (9, 'Prince Edward Island', 1),
-	   (10, 'Newfoundland and Labrador', 1), (11, 'Hesse', 2), (12, 'Bavaria', 2),
-	   (13, 'Baden-Württemberg', 2), (14, 'North Rhine-Westphalia', 2), (15, 'Lower Saxony', 2),
-	   (16, 'Andalusia', 3), (17, 'Catalonia', 3), (18, 'Valencia', 3),
-	   (19, 'Galicia', 3), (20, 'Castilla y León', 3);
+INSERT INTO Master.provinces (prov_id, prov_name, prov_country_id) VALUES
+(1, 'Jakarta', 1),
+(2, 'Bali', 1),
+(3, 'Chiang Mai', 2),
+(4, 'Tokyo', 3),
+(5, 'Berlin', 4),
+(6, 'Paris', 5),
+(7, 'California', 6),
+(8, 'New York', 6),
+(9, 'Ontario', 7),
+(10, 'Sao Paulo', 8),
+(11, 'Buenos Aires', 9),
+(12, 'Cape Town', 10),
+(13, 'Durban', 10),
+(14, 'Gauteng', 10),
+(15, 'Nairobi', 3);
 SET IDENTITY_INSERT Master.Provinces OFF;
 
 -- SELECT*FROM Master.provinces
@@ -139,27 +154,22 @@ SET IDENTITY_INSERT Master.Provinces OFF;
 
 
 SET IDENTITY_INSERT Master.Address ON;
-INSERT INTO Master.Address (addr_id, addr_line1, addr_line2, addr_postal_code, addr_spatial_location, addr_prov_id)
-VALUES (1, '123 Main Street', '', 'A1AA1', geography::Point(43.65, -79.38, 4326), 1),
-	(2, '456 Maple Avenue', '', 'B2BB2', geography::Point(43.65, -79.38, 4326), 1),
-	(3, '789 Oak Boulevard', '', 'C3CC3', geography::Point(43.65, -79.38, 4326), 1),
-	(4, '321 Pine Street', '', 'D4DD4', geography::Point(43.65, -79.38, 4326), 1),
-	(5, '654 Cedar Road', '', 'E5EE5', geography::Point(43.65, -79.38, 4326), 1),
-	(6, '987 Spruce Lane', '', 'F6FF6', geography::Point(43.65, -79.38, 4326), 1),
-	(7, '246 Fir Avenue', '', 'G77G7', geography::Point(43.65, -79.38, 4326), 1),
-	(8, '369 Hemlock Drive', '', 'H8HH8', geography::Point(43.65, -79.38, 4326), 1),
-	(9, '159 Willow Way', '', 'I9II9', geography::Point(43.65, -79.38, 4326), 1),
-	(10, '753 Maple Street', '', 'J0JJ0', geography::Point(43.65, -79.38, 4326), 1),
-	(11, '1 Parliament Hill', '', 'K1KA6', geography::Point(45.42, -75.70, 4326), 2),
-	(12, '2 Sussex Drive', '', 'K1NK1', geography::Point(45.42, -75.70, 4326), 2),
-	(13, '3 Rideau Street', '', 'K1NJ9', geography::Point(45.42, -75.70, 4326), 2),
-	(14, '4 Wellington Street', '', 'K1PJ9', geography::Point(45.42, -75.70, 4326), 2),
-	(15, '5 Elgin Street', '', 'K1PK7', geography::Point(45.42, -75.70, 4326), 2),
-	(16, 'Avenida de la Constitución, 3', '', '41001', geography::Point(37.38, -6.00, 4326), 16),
-	(17, 'Plaza de Santo Domingo, 3', '', '41001', geography::Point(37.38, -6.00, 4326), 16),
-	(18, 'Calle de la Ribera, 15', '', '41001', geography::Point(37.38, -6.00, 4326), 16),
-	(19, 'Calle del Arenal, 12', '', '41001', geography::Point(37.38, -6.00, 4326), 16),
-	(20, 'Calle de la Ribera, 25', '', '41001', geography::Point(37.38, -6.00, 4326), 16);
+INSERT INTO Master.address (addr_id, addr_line1, addr_line2, addr_city, addr_postal_code, addr_spatial_location, addr_prov_id) VALUES
+(1, 'Jl. Sudirman No.1', NULL, 'Jakarta', '12345', 'POINT(-6.2146 106.8451)', 1),
+(2, 'Jl. Raya Kuta No.25', NULL, 'Bali', '54321', 'POINT(-8.7158 115.1702)', 2),
+(3, '123 Moo 4, Tambon San Sai Noi', NULL, 'Chiang Mai', '67890', 'POINT(18.8408 98.9611)', 3),
+(4, '1-1-1 Shibuya', NULL, 'Tokyo', '01234', 'POINT(35.6581 139.7414)', 4),
+(5, '10 Unter den Linden', NULL, 'Berlin', '23456', 'POINT(52.5166 13.3833)', 5),
+(6, '55 Rue du Faubourg Saint-Honoré', NULL, 'Paris', '34567', 'POINT(48.8714 2.3074)', 6),
+(7, '123 Main St', NULL, 'Los Angeles', '45678', 'POINT(34.0522 -118.2437)', 7),
+(8, '456 Park Ave', NULL, 'New York', '56789', 'POINT(40.7711 -73.9742)', 8),
+(9, '789 King St W', NULL, 'Toronto', '67890', 'POINT(43.6468 -79.3933)', 9),
+(10, '123 Avenida Paulista', NULL, 'Sao Paulo', '78901', 'POINT(-23.5674 -46.6476)', 10),
+(11, '456 Calle Florida', NULL, 'Buenos Aires', '89012', 'POINT(-34.6037 -58.3816)', 11),
+(12, '123 Long St', NULL, 'Cape Town', '90123', 'POINT(-33.9189 18.4232)', 12),
+(13, '456 Durban Rd', NULL, 'Durban', '01234', 'POINT(-29.8587 31.0218)', 13),
+(14, '789 Oxford Rd', NULL, 'Johannesburg', '12345', 'POINT(-26.2041 28.0473)', 14),
+(15, '123 Uhuru Hwy', NULL, 'Nairobi', '23456', 'POINT(-1.2921 36.8219)', 15);
 SET IDENTITY_INSERT Master.Address OFF;
 -- SELECT*FROM Master.Address
 -- ORDER BY addr_id ASC
@@ -183,28 +193,62 @@ SET IDENTITY_INSERT Master.category_group OFF;
 
 --POLICY
 SET IDENTITY_INSERT Master.policy ON;
-insert into master.policy (poli_id, poli_name, poli_description)
-values
-(1,'Pembatalan Gratis', 'Kebijakan pembatalan gratis yang memberikan kemudahan bagi tamu untuk membatalkan reservasi mereka hingga 24 jam sebelum tanggal check-in tanpa dikenakan biaya apapun'),
-(2,'Check-in Awal', 'Kebijakan check-in awal yang memberikan kemudahan bagi tamu untuk melakukan check-in lebih awal dari waktu yang ditentukan, dengan biaya tambahan yang telah ditentukan'),
-(3,'Check-out Terlambat', 'Kebijakan check-out terlambat yang memberikan kemudahan bagi tamu untuk melakukan check-out lebih lambat dari waktu yang ditentukan, dengan biaya tambahan yang telah ditentukan'),
-(4,'Fasilitas Anak-anak', 'Kebijakan fasilitas anak-anak yang memberikan kemudahan bagi tamu yang membawa anak-anak dengan fasilitas yang disesuaikan dengan kebutuhan anak-anak, seperti kamar yang lebih luas dan fasilitas bermain');
+INSERT INTO Master.policy (poli_id,poli_name, poli_description)
+VALUES
+('1','Early Check-In Policy', 'Policy related to early check-in requests'),
+('2','Late Check-Out Policy', 'Policy related to late check-out requests'),
+('3','Extra Person Policy', 'Policy related to additional guests in the room'),
+('4','Parking Policy', 'Policy related to parking facilities'),
+('5','Room Service Policy', 'Policy related to room service requests');
 SET IDENTITY_INSERT Master.policy OFF;
 -- SELECT*FROM Master.policy
 -- ORDER BY poli_id ASC
 
 --PRICE_ITEM
 SET IDENTITY_INSERT Master.price_items ON;
-insert into master.price_items (prit_id, prit_name, prit_price, prit_description, prit_type, prit_modified_date)
-values
-(1, 'Kue Kering', 12000, 'Kue kering dengan beragam rasa yang enak dan lezat', 'SNACK', '2022-01-01'),
-(2, 'Kamar Standar', 500000, 'Kamar standar dengan fasilitas yang cukup lengkap', 'FACILITY', '2022-01-01'),
-(3, 'Aqua', 10000, 'Minuman bersoda dengan rasa jeruk yang segar', 'SOFTDRINK', '2022-01-01'),
-(4, 'Nasi Goreng', 35000, 'Nasi goreng dengan bahan-bahan yang berkualitas dan rasa yang nikmat', 'FOOD', '2022-01-01'),
-(5, 'Massage', 80000, 'Layanan massage yang dapat membantu mengurangi stres dan merelaksasi tubuh', 'SERVICE', '2022-01-01');
+
+INSERT INTO Master.price_items (prit_id, prit_name, prit_price, prit_description, prit_type, prit_icon_url)
+VALUES
+  (1, 'Minuman Soda', 15000, 'Minuman soda dingin dalam kaleng', 'SOFTDRINK', 'https://example.com/soda.png'),
+  (2, 'Coklat Panas', 25000, 'Coklat panas dengan marshmallow di atasnya', 'SNACK', 'https://example.com/chocolate.png'),
+  (3, 'Layanan Pijat Kepala', 120000, 'Layanan pijat kepala selama 30 menit', 'SERVICE', 'https://example.com/head-massage.png'),
+  (4, 'Makanan Ringan', 20000, 'Kemasan makanan ringan berisi keripik, kacang, dan kacang tanah', 'SNACK', 'https://example.com/snacks.png'),
+  (5, 'Kamar Mandi Bersih', 50000, 'Layanan kebersihan kamar mandi', 'SERVICE', 'https://example.com/clean-bathroom.png'),
+  (6, 'Sepatu Boot Bercahaya', 100000, 'Sepatu boot bercahaya untuk di malam hari', 'FACILITY', 'https://example.com/light-up-boots.png'),
+  (7, 'Paket Sarapan', 75000, 'Paket sarapan berisi roti panggang, telur, dan jus jeruk', 'FOOD', 'https://example.com/breakfast.png'),
+  (8, 'Layanan Laundry', 80000, 'Layanan laundry untuk satu set pakaian', 'SERVICE', 'https://example.com/laundry.png'),
+  (9, 'Sarapan Ala Inggris', 120000, 'Sarapan ala Inggris dengan telur dadar, sosis, dan kentang goreng', 'FOOD', 'https://example.com/english-breakfast.png'),
+  (10, 'Minuman Es', 20000, 'Minuman es yang menyegarkan dengan potongan buah-buahan', 'SOFTDRINK', 'https://example.com/iced-drink.png'),
+  (11, 'Pijat Badan', 200000, 'Layanan pijat badan selama 60 menit', 'SERVICE', 'https://example.com/full-body-massage.png'),
+  (12, 'Makanan Penutup', 35000, 'Pilihan berbagai makanan penutup lezat', 'FOOD', 'https://example.com/dessert.png'),
+  (13, 'Sepatu Pantai', 50000, 'Sepatu pantai yang nyaman dan anti selip', 'FACILITY', 'https://example.com/beach-shoes.png'),
+  (14, 'Layanan Kebersihan Kamar', 100000, 'Layanan kebersihan kamar untuk satu kali kunjungan', 'SERVICE', 'https://example.com/clean-room.png'),
+  (15, 'Minuman Kemasan', 10000, 'Berbagai pilihan minuman dalam kemasan praktis', 'SOFTDRINK', 'https://example.com/packaged-drink.png');
 SET IDENTITY_INSERT Master.price_items OFF;
 -- SELECT*FROM Master.price_items
 -- ORDER BY prit_id ASC
+
+--Policy_Category_Group
+INSERT INTO Master.policy_category_group (poca_poli_id, poca_cagro_id)
+VALUES
+(4, 1),
+(2, 2),
+(5, 2),
+(3, 3),
+(1, 4),
+(2, 4),
+(4, 4),
+(5, 4),
+(1, 5),
+(3, 5),
+(4, 5),
+(5, 5),
+(2, 6),
+(4, 6),
+(5, 6),
+(1, 7),
+(3, 7),
+(5, 7);
 
 --MEMBER
 insert into master.members (memb_name, memb_description)
@@ -564,33 +608,33 @@ VALUES
 
 
 --DATA 3
-INSERT INTO Hotel.Facilities 
+INSERT INTO Hotel.Facilities
 (faci_name, faci_description, faci_max_number, faci_measure_unit, faci_room_number, faci_startdate, faci_enddate, faci_low_price, faci_high_price, faci_rate_price, faci_expose_price, faci_discount, faci_tax_rate, faci_modified_date, faci_cagro_id, faci_hotel_id, faci_user_id)
-VALUES 
+VALUES
 ('Deluxe Room', 'Spacious room with modern amenities', 2, 'beds', 'D01', '2023-03-14', '2023-03-16', 1000000, 1500000, NULL, 1, 10, 10, GETDATE(), 1, 3, 9);
-INSERT INTO Hotel.Facilities 
+INSERT INTO Hotel.Facilities
 (faci_name, faci_description, faci_max_number, faci_measure_unit, faci_room_number, faci_startdate, faci_enddate, faci_low_price, faci_high_price, faci_rate_price, faci_expose_price, faci_discount, faci_tax_rate, faci_modified_date, faci_cagro_id, faci_hotel_id, faci_user_id)
-VALUES 
+VALUES
 ('Superior Room', 'Cozy room with city view', 2, 'beds', 'D02', '2023-03-14', '2023-03-16', 900000, 1200000, NULL, 1, NULL, NULL, GETDATE(), 1, 3, 9);
-INSERT INTO Hotel.Facilities 
+INSERT INTO Hotel.Facilities
 (faci_name, faci_description, faci_max_number, faci_measure_unit, faci_room_number, faci_startdate, faci_enddate, faci_low_price, faci_high_price, faci_rate_price, faci_expose_price, faci_discount, faci_tax_rate, faci_modified_date, faci_cagro_id, faci_hotel_id, faci_user_id)
-VALUES 
+VALUES
 ('Pool Villa', 'Private villa with pool access', 2, 'people', 'PV01', '2023-03-14', '2023-03-16', 3000000, 3500000, NULL, 1, NULL, NULL, GETDATE(), 1, 3, 9);
-INSERT INTO Hotel.Facilities 
+INSERT INTO Hotel.Facilities
 (faci_name, faci_description, faci_max_number, faci_measure_unit, faci_room_number, faci_startdate, faci_enddate, faci_low_price, faci_high_price, faci_rate_price, faci_expose_price, faci_discount, faci_tax_rate, faci_modified_date, faci_cagro_id, faci_hotel_id, faci_user_id)
-VALUES 
+VALUES
 ('Meeting Room 1', 'Suitable for small meetings', 20, 'people', 'M01', '2023-03-14', '2023-03-16', 1500000, 2000000, NULL, 1, NULL, NULL, GETDATE(), 3, 3, 9);
-INSERT INTO Hotel.Facilities 
+INSERT INTO Hotel.Facilities
 (faci_name, faci_description, faci_max_number, faci_measure_unit, faci_room_number, faci_startdate, faci_enddate, faci_low_price, faci_high_price, faci_rate_price, faci_expose_price, faci_discount, faci_tax_rate, faci_modified_date, faci_cagro_id, faci_hotel_id, faci_user_id)
-VALUES 
+VALUES
 ('Gym', 'Fully equipped gym with personal trainer', 50, 'people', 'G01', '2023-03-14', '2023-03-16', 750000, 1000000, NULL, 1, 20, 10, GETDATE(), 4, 3, 9);
-INSERT INTO Hotel.Facilities 
+INSERT INTO Hotel.Facilities
 (faci_name, faci_description, faci_max_number, faci_measure_unit, faci_room_number, faci_startdate, faci_enddate, faci_low_price, faci_high_price, faci_rate_price, faci_expose_price, faci_discount, faci_tax_rate, faci_modified_date, faci_cagro_id, faci_hotel_id, faci_user_id)
-VALUES 
+VALUES
 ('Sauna', 'Relaxing sauna for your wellness', 10, 'people', 'S01', '2023-03-14', '2023-03-16', 300000, 400000, NULL, 1, NULL, NULL, GETDATE(), 6, 3, 9);
-INSERT INTO Hotel.Facilities 
+INSERT INTO Hotel.Facilities
 (faci_name, faci_description, faci_max_number, faci_measure_unit, faci_room_number, faci_startdate, faci_enddate, faci_low_price, faci_high_price, faci_rate_price, faci_expose_price, faci_discount, faci_tax_rate, faci_modified_date, faci_cagro_id, faci_hotel_id, faci_user_id)
-VALUES 
+VALUES
 ('Ballroom', 'Elegant ballroom for your event', 100, 'people', 'B01', '2023-03-14', '2023-03-16', 10000000, 15000000, NULL, 1, 10, 10, GETDATE(), 7, 3, 9);
 
 
@@ -611,14 +655,15 @@ FROM Hotel.Facility_Photos
 
 OPEN curFacilityPhotos
 
-FETCH NEXT FROM curFacilityPhotos INTO @fapho_id, @fapho_faci_id
+INSERT INTO Hotel.Facility_Photos (fapho_thumbnail_filename, fapho_photo_filename, fapho_primary, fapho_url, fapho_modified_date, fapho_faci_id)
+VALUES ('thumbnail7.jpg', 'photo7.jpg', 1, 'https://example.com/thumbnail7', GETDATE(), 3);
 
 WHILE @@FETCH_STATUS = 0
 BEGIN
     UPDATE Hotel.Facility_Photos
     SET fapho_primary = 0
     WHERE fapho_id = @fapho_id AND fapho_faci_id = @fapho_faci_id
-    
+
     FETCH NEXT FROM curFacilityPhotos INTO @fapho_id, @fapho_faci_id
 END
 

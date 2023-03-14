@@ -61,7 +61,7 @@ CREATE TABLE Master.provinces (
   prov_id int IDENTITY (1, 1),
   prov_name nvarchar(85) NOT NULL,
   prov_country_id int CONSTRAINT pk_prov_id PRIMARY KEY(prov_id),
-  CONSTRAINT fk_prov_country_name FOREIGN KEY(prov_country_id) REFERENCES Master.country(country_id)
+  CONSTRAINT fk_prov_country_id FOREIGN KEY(prov_country_id) REFERENCES Master.country(country_id)
 	ON DELETE CASCADE
 	ON UPDATE CASCADE
 );
@@ -70,8 +70,9 @@ CREATE TABLE Master.address (
   addr_id int IDENTITY(1, 1),
   addr_line1 nvarchar(255) NOT NULL,
   addr_line2 nvarchar(255),
+  addr_city NVARCHAR(25) NOT NULL,
   addr_postal_code nvarchar(5),
-  addr_spatial_location geography,
+  addr_spatial_location NVARCHAR(100),
   addr_prov_id int,
   CONSTRAINT pk_addr_id PRIMARY KEY(addr_id),
   CONSTRAINT fk_addr_prov_id FOREIGN KEY(addr_prov_id) REFERENCES Master.provinces(prov_id)
@@ -114,6 +115,7 @@ CREATE TABLE Master.price_items (
   prit_price money NOT NULL,
   prit_description nvarchar(255),
   prit_type nvarchar(15) NOT NULL CHECK (prit_type IN ('SNACK', 'FACILITY', 'SOFTDRINK', 'FOOD', 'SERVICE')),
+  prit_icon_url NVARCHAR(255),
   prit_modified_date datetime,
   CONSTRAINT pk_prit_id PRIMARY KEY(prit_id)
 );
@@ -230,7 +232,7 @@ CREATE TABLE Hotel.Hotels
   -- END UPDATE
   hotel_rating_star numeric(2,1) NULL,
   hotel_phonenumber nvarchar(25) NOT NULL,
-  hotel_modified_date datetime NULL, 
+  hotel_modified_date datetime NULL,
   -- Primary Key
   hotel_addr_id INT NOT NULL,
   hotel_addr_description nvarchar(500) NULL,
@@ -332,9 +334,9 @@ CREATE TABLE Hotel.Facility_Photos
   fapho_id INT IDENTITY(1,1) NOT NULL CONSTRAINT fapho_id_pk PRIMARY KEY, -- primary key column
   fapho_photo_filename nvarchar(150) NULL,
   fapho_thumbnail_filename nvarchar(150) NOT NULL,
-  fapho_original_filename nvarchar(150) NOT NULL,
-  fapho_file_size smallint NOT NULL,
-  fapho_file_type nvarchar(50) NOT NULL,
+  fapho_original_filename nvarchar(150) NULL,
+  fapho_file_size smallint NULL,
+  fapho_file_type nvarchar(50) NULL,
   fapho_primary BIT NULL CHECK(fapho_primary IN(0,1)),
   fapho_url nvarchar(255) NULL,
   fapho_modified_date datetime,

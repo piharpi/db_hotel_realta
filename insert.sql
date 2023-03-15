@@ -814,23 +814,23 @@ VALUES (1,'BO#20221127-0001', '2023-01-27', 3,500000,200000,'D', 'DP', 'T', '431
 INSERT INTO Booking.booking_orders (boor_id,boor_order_number, 	boor_order_date, boor_total_room, boor_total_ammount, boor_down_payment,boor_pay_type,boor_is_paid,boor_type, boor_cardnumber, boor_user_id,boor_hotel_id)
 VALUES (2,'BO#20221127-0002', '2023-01-27', 4,300000,0,'CR', 'P', 'C', '123-2993-32',2, 2);
 INSERT INTO Booking.booking_orders (boor_id,boor_order_number, 	boor_order_date, boor_total_room, boor_total_ammount, boor_down_payment,boor_pay_type,boor_is_paid,boor_type, boor_cardnumber, boor_user_id,boor_hotel_id)
-VALUES (3,'BO#20221127-0004', '2023-01-27', 4,150000,50000,'PG', 'DP', 'C', '11-1111-1111', 8, 4);
+VALUES (3,'BO#20221127-0004', '2023-01-27', 4,150000,50000,'PG', 'DP', 'C', '11-1111-1111', 8, 3);
 SET IDENTITY_INSERT Booking.booking_orders OFF
 -- SELECT*FROM Booking.booking_orders
 
 
 SET IDENTITY_INSERT Booking.booking_order_detail ON
 INSERT INTO Booking.booking_order_detail (borde_boor_id, borde_id, borde_checkin, borde_checkout, borde_adults, borde_kids, borde_price, borde_extra, borde_discount, borde_tax, borde_faci_id)
-VALUES (1, 1, '2022-11-27', '2022-11-28', 2, 0, 100, 0, 0.1, 0.11, 5),
-       (1, 2, '2022-11-27', '2022-11-28', 2, 1, 120, 20, 0.2, 0.11, 6),
-       (2, 3, '2022-11-27', '2022-11-28', 3, 0, 150, 30, 0.2, 0.11, 7),
-       (2, 4, '2022-11-27', '2022-11-28', 2, 2, 200, 40, 0.2, 0.11, 5),
-       (3, 5, '2022-11-27', '2022-11-28', 1, 1, 250, 50, 0.2, 0.11, 5),
-       (3, 6, '2022-11-27', '2022-11-28', 4, 0, 300, 60, 0.2, 0.11, 5),
-       (1, 7, '2022-11-27', '2022-11-28', 2, 3, 350, 70, 0.2, 0.11, 6),
-       (2, 8, '2022-11-27', '2022-11-28', 3, 2, 400, 80, 0.2, 0.11, 8),
-       (3, 9, '2022-11-27', '2022-11-28', 1, 4, 450, 90, 0.2, 0.11, 6),
-       (2, 10, '2022-11-27', '2022-11-28', 4, 1, 500, 100, 0.2, 0.11, 6)
+VALUES (1, 1, '2022-11-27', '2022-11-28', 2, 0, 100, 0, 0.1, 0.11, 1),
+       (1, 2, '2022-11-27', '2022-11-28', 2, 1, 120, 20, 0.2, 0.11, 1),
+       (2, 3, '2022-11-27', '2022-11-28', 3, 0, 150, 30, 0.2, 0.11, 2),
+       (2, 4, '2022-11-27', '2022-11-28', 2, 2, 200, 40, 0.2, 0.11, 2),
+       (3, 5, '2022-11-27', '2022-11-28', 1, 1, 250, 50, 0.2, 0.11, 10),
+       (3, 6, '2022-11-27', '2022-11-28', 4, 0, 300, 60, 0.2, 0.11, 10),
+       (1, 7, '2022-11-27', '2022-11-28', 2, 3, 350, 70, 0.2, 0.11, 12),
+       (2, 8, '2022-11-27', '2022-11-28', 3, 2, 400, 80, 0.2, 0.11, 17),
+       (3, 9, '2022-11-27', '2022-11-28', 1, 4, 450, 90, 0.2, 0.11, 17),
+       (2, 10, '2022-11-27', '2022-11-28', 4, 1, 500, 100, 0.2, 0.11, 18)
 SET IDENTITY_INSERT Booking.booking_order_detail OFF
 -- SELECT*FROM Booking.booking_order_detail
 

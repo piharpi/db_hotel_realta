@@ -1056,7 +1056,7 @@ CREATE OR ALTER procedure booking.sp_insert_booking_orders
 	@boor_user_id as int,
 	@boor_pay_type as nchar(2),
 	@boor_is_paid as nchar(2),
-	@boor_down_payment as money =0,
+	@boor_down_payment as money =null,
 	@boor_cardnumber as NVARCHAR(50)=null
 AS
 BEGIN
@@ -1296,4 +1296,46 @@ BEGIN
         THROW;
     END CATCH
 END
+GO
 
+-- ============================================================
+-- Author:		DuoBoex
+-- Create date: 15 March 2023
+-- Description:	Procedure for search room using 
+--				hotelname/address,startdate/enddate/,peoplenumber
+-- =============================================================
+CREATE OR ALTER PROCEDURE booking.Search_hotel
+    @hotelNameAddress NVARCHAR(255) = NULL,
+    @startDate DATE = NULL,
+    @endDate DATE = NULL,
+    @maxNumber INT = NULL
+AS
+BEGIN
+    SELECT 
+        h.hotel_id HotelId,
+        h.hotel_name HotelName,
+        a.addr_city HotelCity,
+        a.addr_line1 HotelAddress,
+        h.hotel_rating_star HotelRatingStar,
+        f.faci_id FaciId,
+        f.faci_name FaciName,
+        f.faci_startdate FaciStartdate, 
+        f.faci_enddate FaciEnddate,
+        f.faci_max_number FaciMaxNumber,
+        fp.fapho_url FaciPhotoUrl
+    FROM Hotel.Hotels h
+    JOIN Hotel.Facilities f ON h.hotel_id= f.faci_hotel_id
+    JOIN Master.address a on h.hotel_addr_id=a.addr_id
+    JOIN Hotel.Facility_Photos fp on f.faci_id=fp.fapho_faci_id
+    WHERE 
+        fp.fapho_primary=1 
+        AND
+        f.faci_cagro_id=1 
+        AND
+        f.faci_id NOT IN (SELECT bd.borde_faci_id FROM Booking.booking_order_detail bd)
+        AND
+        (h.hotel_name LIKE '%' + @hotelNameAddress + '%' OR a.addr_line1 LIKE '%' + @hotelNameAddress + '%' OR a.addr_city LIKE '%' + @hotelNameAddress + '%')
+        AND 
+        (@startDate IS NULL OR @endDate IS NULL OR (f.faci_startdate <= @endDate AND f.faci_enddate >= @startDate))
+        AND (@maxNumber IS NULL OR f.faci_max_number >= @maxNumber)
+END

@@ -1348,32 +1348,40 @@ GO
 -- Description:	Procedure for search room using 
 --				hotelname/address,startdate/enddate/,peoplenumber
 -- =============================================================
-CREATE OR ALTER  PROCEDURE [Booking].[sp_search_hotelsandfaci]
-	@hotel_id AS int
+CREATE OR ALTER  PROCEDURE [Booking].[sp_get_faci]
+    @hotel_id AS int
 AS
 BEGIN
-	SELECT
-		f.faci_id AS FaciId,
-		f.faci_name AS FaciName,
-		h.hotel_id AS HotelId,
-		h.hotel_name AS HotelName,
-		h.hotel_description AS HotelDescription,
-		CASE f.faci_expose_price
-			WHEN 1 THEN faci_low_price
-			WHEN 2 THEN faci_rate_price
-			WHEN 3 THEN faci_high_price
-			END AS FaciPrice,
-		f.faci_discount AS FaciDiscount,
-		f.faci_tax_rate AS FaciTax
-	FROM
-		Hotel.facilities f
-		FULL JOIN Hotel.hotels h ON f.faci_hotel_id=hotel_id
-	WHERE
-		f.faci_cagro_id=1
-		AND
-		f.faci_hotel_id=@hotel_id
-		AND
-		f.faci_id not in (SELECT bd.borde_faci_id
-		from Booking.booking_order_detail bd)
+    SELECT
+        h.hotel_id AS HotelId,
+        h.hotel_name AS HotelName,
+        h.hotel_rating_star AS HotelRatingStar,
+        h.hotel_description AS HotelDescription,
+        a.addr_line1 AS HotelAddress,
+        a.addr_city AS HotelCity,
+        f.faci_id AS FaciId,
+        f.faci_name AS FaciName,
+        CASE f.faci_expose_price
+            WHEN 1 THEN faci_low_price
+            WHEN 2 THEN faci_rate_price
+            WHEN 3 THEN faci_high_price
+            END AS FaciPrice,
+        f.faci_discount AS FaciDiscount,
+        f.faci_tax_rate AS FaciTax,
+        fp.fapho_url as FaciPhotoUrl
+    FROM
+        Hotel.facilities f
+        JOIN Hotel.hotels h ON f.faci_hotel_id=hotel_id
+        JOIN Master.address a on h.hotel_addr_id = a.addr_id
+        JOIN Hotel.Facility_Photos fp on f.faci_id=fp.fapho_faci_id
+    WHERE
+        f.faci_cagro_id=1
+        AND
+        fp.fapho_primary=1
+        AND
+        f.faci_hotel_id=@hotel_id
+        AND
+        f.faci_id not in (SELECT bd.borde_faci_id
+        from Booking.booking_order_detail bd)
 END
-GO
+GO 

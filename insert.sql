@@ -838,14 +838,14 @@ SET IDENTITY_INSERT Booking.booking_order_detail OFF
 SET IDENTITY_INSERT Booking.booking_order_detail_extra ON
 INSERT INTO Booking.booking_order_detail_extra (boex_id, boex_price, boex_qty, boex_measure_unit, boex_borde_id, boex_prit_id)
 VALUES (1, 10, 2, 'people', 1, 1),
-       (2, 15, 3, 'unit', 2, 2),
-       (3, 20, 4, 'kg', 3, 3),
-       (4, 25, 5, 'people', 4, 4),
-       (5, 30, 6, 'unit', 5, 5),
-       (6, 35, 7, 'kg', 6, 5),
-       (7, 40, 8, 'people', 7, 3),
-       (8, 45, 9, 'unit', 8, 4),
-       (9, 50, 10, 'kg', 9, 3),
+       (2, 15, 3, 'unit', 1, 1),
+       (3, 20, 4, 'kg', 2, 3),
+       (4, 25, 5, 'people', 2, 4),
+       (5, 30, 6, 'unit', 2, 5),
+       (6, 35, 7, 'kg', 3, 5),
+       (7, 40, 8, 'people', 4, 3),
+       (8, 45, 9, 'unit', 5, 4),
+       (9, 50, 10, 'kg', 5, 3),
        (10, 55, 11, 'people', 10, 2)
 SET IDENTITY_INSERT Booking.booking_order_detail_extra OFF
 -- SELECT*FROM Booking.booking_order_detail_extra

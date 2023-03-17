@@ -1305,7 +1305,7 @@ GO
 --				hotelname/address,startdate/enddate/,peoplenumber
 -- =============================================================
 CREATE OR ALTER PROCEDURE booking.search_hotelsandfaci
-	@hotelNameAddress NVARCHAR(255) = NULL,
+	@hotelNameAddress NVARCHAR(255) = '',
 	@startDate DATE = NULL,
 	@endDate DATE = NULL,
 	@maxNumber INT = NULL

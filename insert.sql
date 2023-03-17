@@ -821,16 +821,16 @@ SET IDENTITY_INSERT Booking.booking_orders OFF
 
 SET IDENTITY_INSERT Booking.booking_order_detail ON
 INSERT INTO Booking.booking_order_detail (borde_boor_id, borde_id, borde_checkin, borde_checkout, borde_adults, borde_kids, borde_price, borde_extra, borde_discount, borde_tax, borde_faci_id)
-VALUES (1, 1, '2022-11-27', '2022-11-28', 2, 0, 100, 0, 0.1, 0.11, 1),
-       (1, 2, '2022-11-27', '2022-11-28', 2, 1, 120, 20, 0.2, 0.11, 1),
-       (2, 3, '2022-11-27', '2022-11-28', 3, 0, 150, 30, 0.2, 0.11, 2),
-       (2, 4, '2022-11-27', '2022-11-28', 2, 2, 200, 40, 0.2, 0.11, 2),
-       (3, 5, '2022-11-27', '2022-11-28', 1, 1, 250, 50, 0.2, 0.11, 10),
-       (3, 6, '2022-11-27', '2022-11-28', 4, 0, 300, 60, 0.2, 0.11, 10),
-       (1, 7, '2022-11-27', '2022-11-28', 2, 3, 350, 70, 0.2, 0.11, 12),
-       (2, 8, '2022-11-27', '2022-11-28', 3, 2, 400, 80, 0.2, 0.11, 17),
-       (3, 9, '2022-11-27', '2022-11-28', 1, 4, 450, 90, 0.2, 0.11, 17),
-       (2, 10, '2022-11-27', '2022-11-28', 4, 1, 500, 100, 0.2, 0.11, 18)
+VALUES (1, 1, '2022-11-27', '2022-11-28', 2, 0, 200000, 0, 0.1, 0.11, 1),
+       (1, 2, '2022-11-27', '2022-11-28', 2, 1, 200000, 20, 0.2, 0.11, 1),
+       (1, 7, '2022-11-27', '2022-11-28', 2, 3, 100000, 70, 0.2, 0.11, 12),
+       (2, 3, '2022-11-27', '2022-11-28', 3, 0, 100000, 30, 0.2, 0.11, 2),
+       (2, 4, '2022-11-27', '2022-11-28', 2, 2, 100000, 40, 0.2, 0.11, 2),
+       (2, 8, '2022-11-27', '2022-11-28', 3, 2, 50000, 80, 0.2, 0.11, 17),
+       (2, 10, '2022-11-27', '2022-11-28', 4, 1,50000, 100, 0.2, 0.11, 18),
+       (3, 5, '2022-11-27', '2022-11-28', 1, 1, 50000, 50, 0.2, 0.11, 10),
+       (3, 6, '2022-11-27', '2022-11-28', 4, 0, 50000, 60, 0.2, 0.11, 10),
+       (3, 9, '2022-11-27', '2022-11-28', 1, 4, 50000, 90, 0.2, 0.11, 17)
 SET IDENTITY_INSERT Booking.booking_order_detail OFF
 -- SELECT*FROM Booking.booking_order_detail
 
@@ -849,6 +849,8 @@ VALUES (1, 10, 2, 'people', 1, 1),
        (10, 55, 11, 'people', 10, 2)
 SET IDENTITY_INSERT Booking.booking_order_detail_extra OFF
 -- SELECT*FROM Booking.booking_order_detail_extra
+;DISABLE TRIGGER Booking.TgPaymentBookingTransaction ON Booking.booking_orders;
+
 
 SET IDENTITY_INSERT Booking.special_offer_coupons ON
 INSERT INTO Booking.special_offer_coupons (soco_id, soco_borde_id, soco_spof_id)

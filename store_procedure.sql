@@ -1361,6 +1361,7 @@ BEGIN
         a.addr_city AS HotelCity,
         f.faci_id AS FaciId,
         f.faci_name AS FaciName,
+		f.faci_max_number AS FaciMaxNumber,
         CASE f.faci_expose_price
             WHEN 1 THEN faci_low_price
             WHEN 2 THEN faci_rate_price

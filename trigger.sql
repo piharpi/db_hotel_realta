@@ -280,7 +280,8 @@ BEGIN
             OR @transaction_type = 'RPY'
             OR @transaction_type = 'TP')
     BEGIN
-        IF (@transaction_type = 'RF' OR @transaction_type = 'RPY')
+
+        IF (@transaction_type = 'RF')
         BEGIN
             SELECT TOP 1 @src_account = patr_target_id,
                        @tar_account = patr_source_id,
@@ -289,6 +290,13 @@ BEGIN
              WHERE patr_order_number = @order_number AND patr_user_id = @src_user_id;
 
                SET @order_number = null;
+        END
+
+        IF (@transaction_type = 'RPY')
+        BEGIN
+            SELECT TOP 1 @trx_number = patr_trx_number
+              FROM Payment.payment_transaction
+             WHERE patr_order_number = @order_number AND patr_user_id = @src_user_id;
         END
 
         -- 	TOP UP
@@ -329,14 +337,15 @@ BEGIN
                 @total_amount OUTPUT
         END
 
-            -- REPAYMENT
-    -- 		IF @transaction_type = 'RPY'
-    -- 		BEGIN
-    -- 			EXECUTE [Payment].[spTopUpTransaction]
-    -- 				 @source_account = @src_account
-    -- 				,@target_account = @tar_account
-    -- 				,@expense = @total_amount
-    -- 		END
+        -- REPAYMENT
+        IF @transaction_type = 'RPY'
+        BEGIN
+            EXECUTE [Payment].[spRepaymentTransaction]
+                @src_account,
+                @tar_account,
+                @order_number,
+                @total_amount OUTPUT
+        END
 
         SELECT @src_user_id = usac_user_id
           FROM Payment.user_accounts

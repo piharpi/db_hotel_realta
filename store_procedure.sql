@@ -468,65 +468,64 @@ GO
 -- Create date: 3 March 2023
 -- Description:	Store Procedure Generate Barcode
 -- =============================================
-create or alter  procedure Purchasing.GenerateBarcode
+CREATE OR ALTER PROCEDURE Purchasing.GenerateBarcode
 (
 -- Add the parameters for the stored procedure here
-	@PodeId int,
-	@PodeQyt int,
-	@PodeReceivedQty int,
-	@PodeRejectQty int
-) as
-	declare @i int = 1;
-	declare @stockID int;
-	declare @poheStatus int;
-	declare @OldpodeReceivedQty decimal;
-begin
+	@PodeId INT,
+	@PodeQyt INT,
+	@PodeReceivedQty INT,
+	@PodeRejectQty INT
+) AS
+	DECLARE @i INT = 1;
+	DECLARE @stockID INT;
+	DECLARE @OldpodeReceivedQty DECIMAL;
+BEGIN
 	-- Declare status Purchasing.purchase_order_header and declare Purchasing.purchase_order_detail
-	select @poheStatus=po.pohe_status, @OldpodeReceivedQty=FLOOR(pd.pode_received_qty) from Purchasing.purchase_order_detail pd 
-	inner join Purchasing.purchase_order_header po on pd.pode_pohe_id=po.pohe_id
-	where pd.pode_id = @PodeId
-	begin try
-		begin transaction
-		-- Generate must check this all condition
-		IF @PodeReceivedQty > 0 and @poheStatus = 4 
-			and @PodeReceivedQty > @OldpodeReceivedQty 
-			and @PodeQyt > @PodeReceivedQty
-			--and (@PodeReceivedQty + @PodeRejectQty) = @PodeQyt
-		Begin
-		-- loop insert statement procedure Here
-			While @i <= (@PodeReceivedQty - @OldpodeReceivedQty)
-			Begin
-				INSERT INTO purchasing.stock_detail (stod_stock_id, stod_barcode_number,
-				 stod_pohe_id) select pode_stock_id, 
-				CONCAT('BC' ,  substring(replace(convert(nvarchar(100), NEWID()), '-', ''), 1, 10) ),
-				pode_pohe_id from Purchasing.purchase_order_detail where pode_id = @PodeId;
-				set @i = @i +1;
-			End
-			-- declare stock id
-			select @stockID=pode_stock_id from Purchasing.purchase_order_detail where pode_id = @PodeId;
-			begin
-				-- update after insert statement
-				update Purchasing.stocks
-					set 
-						stock_quantity = (select count(stod_id) 
-							from Purchasing.stock_detail where stod_stock_id =@stockID),
-						stock_used = (select count(case when stod_status = N'2' then 1 else null end) 
-							from Purchasing.stock_detail where stod_stock_id =@stockID),
-						stock_scrap = (select count(case when stod_status = N'3' then 1 else null end) 
-							from Purchasing.stock_detail where stod_stock_id =@stockID)
-					where stock_id = @stockID;
-			end
-		End
-		Print 'Generate Barcode successfully';
-		commit transaction
-	end try
-	begin catch
-		rollback;
-		print 'Generate Barcode Is Failed';
-		throw;
-	end catch 
-end;
-go 
+	SELECT @OldpodeReceivedQty=FLOOR(pode_received_qty) FROM Purchasing.purchase_order_detail 
+	WHERE pode_id = @PodeId;
+
+	SELECT @stockID=pode_stock_id FROM Purchasing.purchase_order_detail WHERE pode_id = @PodeId;
+
+	---- Generate must check this all condition
+	IF @PodeReceivedQty > 0
+	BEGIN TRY
+		BEGIN TRANSACTION
+				-- loop insert statement procedure Here
+				-- loop if oldvalueRecived 
+				-- WHILE @i <= (@PodeReceivedQty -  @OldpodeReceivedQty)
+				WHILE @i <= @PodeReceivedQty
+				BEGIN
+					INSERT INTO purchasing.stock_detail (stod_stock_id, stod_barcode_number,
+					 stod_pohe_id) SELECT pode_stock_id, 
+					CONCAT('BC' ,  substring(replace(convert(NVARCHAR(100), NEWID()), '-', ''), 1, 10) ),
+					pode_pohe_id FROM Purchasing.purchase_order_detail WHERE pode_id = @PodeId;
+
+					SET @i = @i +1;
+				END
+
+				-- declare stock id
+				BEGIN
+					-- update after insert statement
+					UPDATE Purchasing.stocks
+						SET 
+							stock_quantity = (SELECT COUNT(stod_id) 
+								FROM Purchasing.stock_detail WHERE stod_stock_id =@stockID),
+							stock_used = (SELECT COUNT(CASE WHEN stod_status = N'2' THEN 1 ELSE NULL END) 
+								FROM Purchasing.stock_detail WHERE stod_stock_id =@stockID),
+							stock_scrap = (SELECT COUNT(CASE WHEN stod_status = N'3' THEN 1 ELSE NULL END) 
+								FROM Purchasing.stock_detail WHERE stod_stock_id =@stockID)
+						WHERE stock_id = @stockID;
+				END
+				PRINT 'Generate Barcode successfully';
+		COMMIT TRANSACTION
+	END TRY
+	BEGIN CATCH
+		ROLLBACK;
+			PRINT 'Generate Barcode Is Failed';
+		THROW;
+	END CATCH 
+END;
+GO 
 
 -- =============================================
 -- Author:		Muh Fadel marzuki

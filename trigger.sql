@@ -354,7 +354,7 @@ BEGIN
         -- insert credit transaction
         INSERT INTO [Payment].[payment_transaction](
                     patr_trx_number, patr_debet, patr_credit, patr_type, patr_note,
-                    patr_order_number, patr_source_id, patr_target_id, patr_trx_number_ref, patr_user_id)
+                    patr_order_number, patr_source_id, patr_target_id, patr_trx_number_ref, patr_user_id) OUTPUT inserted.patr_id
              VALUES (Payment.fnFormatedTransactionId(IDENT_CURRENT('Payment.[payment_transaction]'), @transaction_type), 0,
                     @total_amount, @transaction_type,@transaction_note, @order_number, @src_account, @tar_account, @trx_number, @src_user_id);
 
@@ -369,7 +369,7 @@ BEGIN
             VALUES (Payment.fnFormatedTransactionId(IDENT_CURRENT('Payment.[payment_transaction]'), @transaction_type),
                     @total_amount, 0, @transaction_type, @transaction_note, @order_number, @src_account, @tar_account, @trx_number, @tar_user_id);
 
-    -- 		SELECT patr_id FROM inserted;
+--     		SELECT @patr_id;
     END
 END
 GO

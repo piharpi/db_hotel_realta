@@ -850,17 +850,19 @@ CREATE OR ALTER PROC [Payment].[spCalculationTranferBooking]
                         -- check if payment options is 'Paid'
                         IF (@payment_option = 'P' AND (@user_current_saldo - @total_amount) < 0)
                             ROLLBACK -- TODO : Tambahkan feature untuk pemberitahuan bahwa saldo kurang!
+                    ELSE
+                    -- change total_amount if transaction is 'Down Payment'
+                        SET @total_amount = @total_down_payment IF @payment_option = 'DP'
+
+                        -- TODO : check apakah lunas atau tidak , jika lunas status paid jika tidak maka lainya!
+                        -- paying booking order from user account to realta hotel account
+                        EXECUTE [Payment].spTranferMoney
+                                @source_account
+                                ,@target_account
+                                ,@total_amount
                     END
 
-                    -- change total_amount if transaction is 'Down Payment'
-                    SET @total_amount = @total_down_payment IF @payment_option = 'DP'
 
-                    -- TODO : check apakah lunas atau tidak , jika lunas status paid jika tidak maka lainya!
-                    -- paying booking order from user account to realta hotel account
-                    EXECUTE [Payment].spTranferMoney
-                            @source_account
-                            ,@target_account
-                            ,@total_amount
                 END
                         -- IF (@@ROWCOUNT > 0)
 --                     BEGIN
@@ -919,23 +921,15 @@ CREATE OR ALTER PROC [Payment].[spRepaymentTransaction]
                         -- check if payment option is 'Down Payment'
                         IF (@payment_option != 'DP' OR (@user_current_saldo - @bill_total) < 0)
                             ROLLBACK -- TODO : Tambahkan feature untuk pemberitahuan bahwa saldo kurang utk dp!
+                    ELSE
+                        -- TODO : check apakah lunas atau tidak , jika lunas status paid jika tidak maka lainya!
+                        -- paying booking order from user account to realta hotel account
+                        EXECUTE [Payment].spTranferMoney
+                                @source_account
+                                ,@target_account
+                                ,@bill_total
                     END
-
-                    -- TODO : check apakah lunas atau tidak , jika lunas status paid jika tidak maka lainya!
-                    -- paying booking order from user account to realta hotel account
-                    EXECUTE [Payment].spTranferMoney
-                            @source_account
-                            ,@target_account
-                            ,@bill_total
                 END
-                        -- IF (@@ROWCOUNT > 0)
---                     BEGIN
---                            UPDATE [Booking].[booking_orders]
---                             SET boor_is_paid = 'P'
---                             WHERE boor_order_number = @order_number;
---
---                            SELECT 'SUCCESS' AS STATUS
---                     END
             COMMIT TRANSACTION
         END TRY
         BEGIN CATCH
@@ -992,14 +986,14 @@ CREATE OR ALTER PROC [Payment].[spCalculationTranferOrderMenu]
 
 --                         IF (@payment_option = 'P' AND (@user_current_saldo - @total_amount) < 0)
 --                             ROLLBACK -- TODO : Tambahkan feature untuk pemberitahuan bahwa saldo kurang!
+                    ELSE
+                        -- TODO : check apakah lunas atau tidak , jika lunas status paid jika tidak maka lainya!
+                        -- paying booking order from user account to realta hotel account
+                        EXECUTE [Payment].spTranferMoney
+                                @source_account
+                                ,@target_account
+                                ,@total_amount
                     END
-
-                    -- TODO : check apakah lunas atau tidak , jika lunas status paid jika tidak maka lainya!
-                    -- paying booking order from user account to realta hotel account
-                    EXECUTE [Payment].spTranferMoney
-                            @source_account
-                            ,@target_account
-                            ,@total_amount
                 END
             COMMIT TRANSACTION
         END TRY
@@ -1051,15 +1045,15 @@ BEGIN
                 BEGIN
                     IF @usac_current_saldo-@amount < 0
                         ROLLBACK
-                END
-
-                -- to fintech
-                IF (@target_usac_type = 'payment')
-                BEGIN
-                    EXECUTE [Payment].spTranferMoney
-                        @source_account
-                        ,@target_account
-                        ,@amount
+                ELSE
+                    -- to fintech
+                    IF (@target_usac_type = 'payment')
+                    BEGIN
+                        EXECUTE [Payment].spTranferMoney
+                            @source_account
+                            ,@target_account
+                            ,@amount
+                    END
                 END
             END
         COMMIT TRANSACTION

@@ -480,16 +480,16 @@ CREATE OR ALTER PROCEDURE Purchasing.GenerateBarcode
 	DECLARE @stockID INT;
 	DECLARE @OldpodeReceivedQty DECIMAL;
 BEGIN
-	-- Declare status Purchasing.purchase_order_header and declare Purchasing.purchase_order_detail
-	SELECT @OldpodeReceivedQty=FLOOR(pode_received_qty) FROM Purchasing.purchase_order_detail 
-	WHERE pode_id = @PodeId;
-
-	SELECT @stockID=pode_stock_id FROM Purchasing.purchase_order_detail WHERE pode_id = @PodeId;
-
-	---- Generate must check this all condition
-	IF @PodeReceivedQty > 0
 	BEGIN TRY
 		BEGIN TRANSACTION
+		-- Generate must check this all condition
+		-- Declare status Purchasing.purchase_order_header and declare Purchasing.purchase_order_detail
+		SELECT @OldpodeReceivedQty=FLOOR(pode_received_qty) FROM Purchasing.purchase_order_detail 
+		WHERE pode_id = @PodeId;
+
+		SELECT @stockID = pode_stock_id FROM Purchasing.purchase_order_detail WHERE pode_id = @PodeId;
+		IF @PodeReceivedQty > 0
+		BEGIN
 				-- loop insert statement procedure Here
 				-- loop if oldvalueRecived 
 				-- WHILE @i <= (@PodeReceivedQty -  @OldpodeReceivedQty)
@@ -517,6 +517,7 @@ BEGIN
 						WHERE stock_id = @stockID;
 				END
 				PRINT 'Generate Barcode successfully';
+			END
 		COMMIT TRANSACTION
 	END TRY
 	BEGIN CATCH

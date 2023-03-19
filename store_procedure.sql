@@ -589,9 +589,10 @@ CREATE OR ALTER FUNCTION Payment.fnGetAllPaymentType()
     RETURNS TABLE
      AS
         RETURN
-            SELECT en.entity_id EntityId,
-                   CONCAT(ba.bank_code, pg.paga_code) PaymentCode,
-                   CONCAT(bank_name, paga_name) PaymentName FROM Payment.entity en
+            SELECT en.entity_id Id,
+                   CONCAT(ba.bank_code, pg.paga_code) Code,
+                   CONCAT(bank_name, paga_name) Name
+            FROM Payment.entity en
             LEFT JOIN Payment.bank ba
                 ON en.entity_id = ba.bank_entity_id
             LEFT JOIN Payment.payment_gateway pg

@@ -583,6 +583,25 @@ GO
 -- =============================================
 -- Author:		Harpi
 -- Create date: 13 Februari 2023
+-- Description:	User Defined Function, getAllPaymentType
+-- =============================================
+CREATE OR ALTER FUNCTION Payment.fnGetAllPaymentType()
+    RETURNS TABLE
+     AS
+        RETURN
+            SELECT en.entity_id EntityId,
+                   CONCAT(ba.bank_code, pg.paga_code) PaymentCode,
+                   CONCAT(bank_name, paga_name) PaymentName FROM Payment.entity en
+            LEFT JOIN Payment.bank ba
+                ON en.entity_id = ba.bank_entity_id
+            LEFT JOIN Payment.payment_gateway pg
+                ON en.entity_id = pg.paga_entity_id
+            WHERE pg.paga_code IS NOT NULL OR ba.bank_code IS NOT NULL;
+GO
+
+-- =============================================
+-- Author:		Harpi
+-- Create date: 13 Februari 2023
 -- Description:	User Defined Function, getUserBalance
 -- =============================================
 CREATE OR ALTER FUNCTION Payment.fnGetUserBalance(@user_id INT)

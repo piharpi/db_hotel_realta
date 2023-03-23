@@ -583,15 +583,48 @@ GO
 -- =============================================
 -- Author:		Harpi
 -- Create date: 13 Februari 2023
+-- Description:	User Defined Function, getAllPaymentType
+-- =============================================
+CREATE OR ALTER FUNCTION Payment.fnGetAllPaymentType()
+    RETURNS TABLE
+     AS
+        RETURN
+            SELECT en.entity_id Id,
+                   CONCAT(ba.bank_code, pg.paga_code) Code,
+                   CONCAT(bank_name, paga_name) Name
+            FROM Payment.entity en
+            LEFT JOIN Payment.bank ba
+                ON en.entity_id = ba.bank_entity_id
+            LEFT JOIN Payment.payment_gateway pg
+                ON en.entity_id = pg.paga_entity_id
+            WHERE pg.paga_code IS NOT NULL OR ba.bank_code IS NOT NULL;
+GO
+
+-- =============================================
+-- Author:		Harpi
+-- Create date: 13 Februari 2023
 -- Description:	User Defined Function, getUserBalance
 -- =============================================
-CREATE FUNCTION Payment.fnGetUserBalance(@user_id INT)
+CREATE OR ALTER FUNCTION Payment.fnGetUserBalance(@user_id INT)
     RETURNS TABLE
     AS
         RETURN
-            SELECT usac_user_id, usac_type, usac_account_number, usac_saldo
-              FROM Payment.user_accounts
-             WHERE usac_user_id = @user_id
+            SELECT user_id,
+                   user_full_name,
+                   usac.usac_type,
+                   usac_account_number,
+                   usac_saldo,
+                   CONCAT(paga.paga_name, ba.bank_name) AS payment_name
+            FROM users.users
+            RIGHT JOIN payment.user_accounts usac
+            ON users.user_id = usac.usac_user_id
+            RIGHT JOIN payment.entity ent
+            ON usac.usac_entity_id = ent.entity_id
+            LEFT JOIN payment.payment_gateway paga
+            ON ent.entity_id = paga.paga_entity_id
+            LEFT JOIN Payment.bank ba
+            ON ba.bank_entity_id = ent.entity_id
+            WHERE usac_type IS NOT NULL AND usac_user_id = @user_id
 ;
 GO
 
@@ -635,8 +668,9 @@ GO
 -- Description:	Store Procedure for refund transfer
 -- =============================================
 CREATE OR ALTER PROCEDURE [Payment].[spRefundTransaction]
-    @trx_number_ref AS VARCHAR(50),
-    @refund_rate AS FLOAT
+    @trx_number AS VARCHAR(50),
+    @refund_rate AS FLOAT = 50,
+    @total_amount AS MONEY OUTPUT
     AS
     BEGIN
         BEGIN TRY
@@ -652,27 +686,59 @@ CREATE OR ALTER PROCEDURE [Payment].[spRefundTransaction]
                        @refund_age = DATEDIFF(day, patr_modified_date, GETDATE()),
                        @target_account = patr_source_id
                 FROM Payment.payment_transaction
-                WHERE patr_trx_number = @trx_number_ref
+                WHERE patr_trx_number = @trx_number
 
 --                 IF (@refund_amount > 0.0 AND @refund_age < 7)
 --                 BEGIN
-                    -- refund from realta bank account
-                    UPDATE Payment.user_accounts
-                       SET usac_saldo = usac_saldo - @refund_amount,
-                           usac_modified_date = GETDATE()
-                     WHERE usac_account_number = @source_account;
-
-                    -- to customer user account
-                    UPDATE Payment.user_accounts
-                       SET usac_saldo = usac_saldo + @refund_amount,
-                           usac_modified_date = GETDATE()
-                     WHERE usac_account_number = @target_account;
+                    -- refund from realta bank account to customer user account
+                    EXECUTE [Payment].spTranferMoney
+                            @source_account
+                            ,@target_account
+                            ,@refund_amount
+--
+                    SET @total_amount = @refund_amount;
 --                 END
             COMMIT TRANSACTION
         END TRY
         BEGIN CATCH
         END CATCH
     END
+GO
+
+-- =============================================
+-- Author:		Harpi
+-- Create date: 13 March 2023
+-- Description:	Store Procedure for create transfer repayment
+-- =============================================
+CREATE OR ALTER PROCEDURE [Payment].[spCreateTransferRepayment]
+       @boor_order_number VARCHAR(50)
+       ,@boor_card_number VARCHAR(50)
+       ,@boor_user_id INT
+AS
+BEGIN
+    INSERT
+      INTO Payment.payment_transaction(patr_type, patr_note, patr_order_number, patr_source_id, patr_target_id, patr_user_id)
+    VALUES ('RPY', 'Repayment', @boor_order_number, @boor_card_number, '131-3456-78', @boor_user_id);
+END
+GO
+
+-- =============================================
+-- Author:		Harpi
+-- Create date: 13 March 2023
+-- Description:	Store Procedure for create transfer booking
+-- =============================================
+CREATE OR ALTER PROCEDURE [Payment].[spCreateTransferTopUp]
+   @source_account VARCHAR(50)
+   ,@target_account VARCHAR(50)
+   ,@boor_user_id INT
+   ,@amount AS MONEY
+AS
+BEGIN
+    INSERT
+      INTO Payment.payment_transaction(patr_credit, patr_type, patr_note,
+                                      patr_source_id, patr_target_id, patr_user_id)
+    VALUES (@amount, 'TP', 'Top Up Note', @source_account, @target_account, @boor_user_id);
+END
 GO
 
 -- =============================================
@@ -691,6 +757,40 @@ BEGIN
     VALUES ('TRB', 'Transfer Booking Note', @boor_order_number, @boor_card_number, '131-3456-78', @boor_user_id);
 END
 GO
+
+-- =============================================
+-- Author:		Harpi
+-- Create date: 13 March 2023
+-- Description:	Store Procedure for create transfer orderMenu
+-- =============================================
+CREATE PROCEDURE [Payment].[spCreateTransferOrderMenu]
+       @orme_order_number VARCHAR(50)
+       ,@orme_card_number VARCHAR(50)
+       ,@orme_user_id INT
+AS
+BEGIN
+    INSERT
+      INTO Payment.payment_transaction(patr_type, patr_note, patr_order_number, patr_source_id, patr_target_id, patr_user_id)
+    VALUES ('ORM', 'Transfer Order Menu Note', @orme_order_number, @orme_card_number, '131-3456-78', @orme_user_id);
+END
+GO
+
+-- =============================================
+-- Author:		Harpi
+-- Create date: 13 March 2023
+-- Description:	Store Procedure for create transfer refund money
+-- =============================================
+CREATE OR ALTER PROCEDURE [Payment].[spCreateTransferRefund]
+       @boor_order_number VARCHAR(50)
+       ,@boor_user_id INT
+AS
+BEGIN
+    INSERT
+      INTO Payment.payment_transaction(patr_type, patr_note, patr_order_number, patr_user_id)
+    VALUES ('RF', '*Refund Booking Order', @boor_order_number, @boor_user_id);
+END
+GO
+
 
 -- =============================================
 -- Author:		Harpi
@@ -770,17 +870,19 @@ CREATE OR ALTER PROC [Payment].[spCalculationTranferBooking]
                         -- check if payment options is 'Paid'
                         IF (@payment_option = 'P' AND (@user_current_saldo - @total_amount) < 0)
                             ROLLBACK -- TODO : Tambahkan feature untuk pemberitahuan bahwa saldo kurang!
+                    ELSE
+                    -- change total_amount if transaction is 'Down Payment'
+                        SET @total_amount = @total_down_payment IF @payment_option = 'DP'
+
+                        -- TODO : check apakah lunas atau tidak , jika lunas status paid jika tidak maka lainya!
+                        -- paying booking order from user account to realta hotel account
+                        EXECUTE [Payment].spTranferMoney
+                                @source_account
+                                ,@target_account
+                                ,@total_amount
                     END
 
-                    -- change total_amount if transaction is 'Down Payment'
-                    SET @total_amount = @total_down_payment IF @payment_option = 'DP'
 
-                    -- TODO : check apakah lunas atau tidak , jika lunas status paid jika tidak maka lainya!
-                    -- paying booking order from user account to realta hotel account
-                    EXECUTE [Payment].spTranferMoney
-                            @source_account
-                            ,@target_account
-                            ,@total_amount
                 END
                         -- IF (@@ROWCOUNT > 0)
 --                     BEGIN
@@ -790,6 +892,129 @@ CREATE OR ALTER PROC [Payment].[spCalculationTranferBooking]
 --
 --                            SELECT 'SUCCESS' AS STATUS
 --                     END
+            COMMIT TRANSACTION
+        END TRY
+        BEGIN CATCH
+            ROLLBACK
+        END CATCH
+    END
+GO
+
+-- =============================================
+-- Author:		Harpi
+-- Create date: 8 January 2023
+-- Description:	Store Procedure for transfer repayment transaction
+-- =============================================
+CREATE OR ALTER PROC [Payment].[spRepaymentTransaction]
+    @source_account AS NVARCHAR(50),
+    @target_account AS NVARCHAR(50),
+    @order_number AS NVARCHAR(50),
+    @bill_total AS MONEY OUTPUT
+    AS
+    BEGIN
+        SET NOCOUNT ON;
+        BEGIN TRY
+            BEGIN TRANSACTION
+                DECLARE @user_payment_method varchar(10);
+                DECLARE @user_current_saldo AS MONEY;
+                DECLARE @payment_option AS NCHAR(2);
+
+                SELECT @bill_total = (boor_total_ammount - boor_down_payment),
+                       @payment_option = TRIM(boor_is_paid),
+                       @user_payment_method = TRIM(boor_pay_type)
+                FROM Booking.booking_orders
+                WHERE boor_order_number = @order_number
+
+                -- set value @user_current_saldo
+                SELECT @user_current_saldo = usac_saldo
+                  FROM Payment.user_accounts
+                 WHERE usac_account_number = @source_account
+
+                -- check if the payment method is 'cash' just ignore it
+                -- CR = credit_card
+                -- D = debet
+                -- PG = payment / payment_gateway
+                IF (@user_payment_method IN ('D', 'CR', 'PG'))
+                BEGIN
+                    IF @user_payment_method = 'D' OR @user_payment_method = 'PG'
+                    BEGIN
+                        -- check if payment option is 'Down Payment'
+                        IF (@payment_option != 'DP' OR (@user_current_saldo - @bill_total) < 0)
+                            ROLLBACK -- TODO : Tambahkan feature untuk pemberitahuan bahwa saldo kurang utk dp!
+                    ELSE
+                        -- TODO : check apakah lunas atau tidak , jika lunas status paid jika tidak maka lainya!
+                        -- paying booking order from user account to realta hotel account
+                        EXECUTE [Payment].spTranferMoney
+                                @source_account
+                                ,@target_account
+                                ,@bill_total
+                    END
+                END
+            COMMIT TRANSACTION
+        END TRY
+        BEGIN CATCH
+            ROLLBACK
+        END CATCH
+    END
+GO
+
+-- =============================================
+-- Author:		Harpi
+-- Create date: 8 January 2023
+-- Description:	Store Procedure for transfer booking transaction
+-- =============================================
+CREATE OR ALTER PROC [Payment].[spCalculationTranferOrderMenu]
+    @source_account AS NVARCHAR(50),
+    @target_account AS NVARCHAR(50),
+    @order_number AS NVARCHAR(50),
+    @total_amount AS MONEY OUTPUT
+    AS
+    BEGIN
+        SET NOCOUNT ON;
+        BEGIN TRY
+            BEGIN TRANSACTION
+                DECLARE @user_payment_method varchar(10);
+                DECLARE @user_current_saldo AS MONEY;
+                DECLARE @payment_option AS NCHAR(2);
+
+                SELECT @total_amount = orme_total_amount,
+                       @payment_option = TRIM(orme_is_paid),
+                       @user_payment_method = orme_pay_type
+                FROM Resto.order_menus
+                WHERE orme_order_number = @order_number
+
+                -- set value @user_current_saldo
+                SELECT @user_current_saldo = usac_saldo
+                  FROM Payment.user_accounts
+                 WHERE usac_account_number = @source_account
+
+                -- check if the payment method is 'cash' just ignore it
+                -- CR = credit_card
+                -- D = debet
+                -- PG = payment / payment_gateway
+                IF (@user_payment_method IN ('D', 'CR', 'PG'))
+                BEGIN
+                    IF @user_payment_method = 'D' OR @user_payment_method = 'PG'
+                    BEGIN
+                        -- check if payment option is 'Down Payment'
+--                         IF (@payment_option = 'DP' AND (@user_current_saldo - @total_down_payment) < 0)
+--                             ROLLBACK -- TODO : Tambahkan feature untuk pemberitahuan bahwa saldo kurang utk dp!
+
+                        -- check if payment options is 'Paid'
+                       IF ((@user_current_saldo - @total_amount) < 0)
+                            ROLLBACK
+
+--                         IF (@payment_option = 'P' AND (@user_current_saldo - @total_amount) < 0)
+--                             ROLLBACK -- TODO : Tambahkan feature untuk pemberitahuan bahwa saldo kurang!
+                    ELSE
+                        -- TODO : check apakah lunas atau tidak , jika lunas status paid jika tidak maka lainya!
+                        -- paying booking order from user account to realta hotel account
+                        EXECUTE [Payment].spTranferMoney
+                                @source_account
+                                ,@target_account
+                                ,@total_amount
+                    END
+                END
             COMMIT TRANSACTION
         END TRY
         BEGIN CATCH
@@ -823,7 +1048,8 @@ BEGIN
         BEGIN TRANSACTION
 
             -- set value @source_usac_type
-            SELECT @source_usac_type = usac_type, @usac_current_saldo = usac_saldo
+            SELECT @source_usac_type = usac_type,
+                   @usac_current_saldo = usac_saldo
               FROM Payment.user_accounts
              WHERE usac_account_number = @source_account
 
@@ -839,21 +1065,16 @@ BEGIN
                 BEGIN
                     IF @usac_current_saldo-@amount < 0
                         ROLLBACK
+                ELSE
+                    -- to fintech
+                    IF (@target_usac_type = 'payment')
+                    BEGIN
+                        EXECUTE [Payment].spTranferMoney
+                            @source_account
+                            ,@target_account
+                            ,@amount
+                    END
                 END
-
-                UPDATE Payment.user_accounts
-                   SET usac_saldo = usac_saldo - @amount,
-                       usac_modified_date = GETDATE()
-                 WHERE usac_account_number = @source_account;
-            END
-
-            -- to fintech
-            IF (@target_usac_type = 'payment')
-            BEGIN
-                UPDATE Payment.user_accounts
-                   SET usac_saldo = usac_saldo + @amount,
-                       usac_modified_date = GETDATE()
-                 WHERE usac_account_number = @target_account;
             END
         COMMIT TRANSACTION
     END TRY

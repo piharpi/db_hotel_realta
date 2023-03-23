@@ -633,7 +633,7 @@ CREATE TABLE Payment.bank(
 	bank_entity_id int NOT NULL,
 	bank_code nvarchar(10) UNIQUE NOT NULL,
 	bank_name nvarchar(55) UNIQUE NOT NULL,
-	bank_modified_date datetime
+	bank_modified_date datetime DEFAULT GETDATE(),
 	CONSTRAINT PK_PaymentBankEntityId PRIMARY KEY(bank_entity_id),
 	CONSTRAINT FK_PaymentBankEntityId FOREIGN KEY(bank_entity_id) 
 		REFERENCES Payment.Entity (entity_id)
@@ -645,7 +645,7 @@ CREATE TABLE Payment.payment_gateway(
 	paga_entity_id int NOT NULL,
 	paga_code nvarchar(10) UNIQUE NOT NULL,
 	paga_name nvarchar(55) UNIQUE NOT NULL,
-	paga_modified_date datetime,
+	paga_modified_date datetime DEFAULT GETDATE(),
 	CONSTRAINT PK_PaymentGatewayEntityId PRIMARY KEY(paga_entity_id),
 	CONSTRAINT FK_PaymentGatewayEntityId FOREIGN KEY(paga_entity_id)
 		REFERENCES Payment.Entity (entity_id)
@@ -662,11 +662,11 @@ CREATE TABLE Payment.user_accounts(
 	usac_type nvarchar(15),
 	usac_expmonth tinyint DEFAULT NULL,
 	usac_expyear smallint DEFAULT NULL,
-	usac_modified_date datetime,
+	usac_modified_date datetime DEFAULT GETDATE(),
 	CONSTRAINT CK_PaymentUserAccountsType CHECK (usac_type IN ('debet', 'credit_card', 'payment')),
 	CONSTRAINT PK_PaymentUserAccountsEntityId PRIMARY KEY(usac_user_id, usac_id),
 	CONSTRAINT FK_PaymentUserAccountsEntityPaymentGateway_Bank FOREIGN KEY(usac_entity_id)
-		REFERENCES Payment.Entity(entity_id)
+		REFERENCES Payment.Entity (entity_id)
 		ON UPDATE CASCADE
 		ON DELETE CASCADE,
 	CONSTRAINT FK_PaymentUserAccountsUserId FOREIGN KEY(usac_user_id)
@@ -678,8 +678,8 @@ CREATE TABLE Payment.user_accounts(
 CREATE TABLE Payment.payment_transaction(
     patr_id int IDENTITY(1,1) PRIMARY KEY,
 	patr_trx_number nvarchar(55) UNIQUE,
-	patr_debet money default(0),
-	patr_credit money default(0),
+	patr_debet money default(0.0),
+	patr_credit money default(0.0),
 	patr_type nchar(3) NOT NULL,
 	patr_note nvarchar(255),
 	patr_modified_date datetime DEFAULT(GETDATE()),
@@ -693,10 +693,10 @@ CREATE TABLE Payment.payment_transaction(
 		REFERENCES Users.Users (user_id)
 		ON UPDATE CASCADE
 		ON DELETE SET NULL,
-	CONSTRAINT FK_PaymentPaymentTransactionSourceId FOREIGN KEY (patr_source_id)
-		REFERENCES Payment.User_Accounts(usac_account_number),
-	CONSTRAINT FK_PaymentPaymentTransactionTargetId FOREIGN KEY (patr_target_id)
-		REFERENCES Payment.User_Accounts(usac_account_number)
+-- 	CONSTRAINT FK_PaymentPaymentTransactionSourceId FOREIGN KEY (patr_source_id)
+-- 		REFERENCES Payment.User_Accounts(usac_account_number) ON DELETE NO ACTION ON UPDATE NO ACTION,
+-- 	CONSTRAINT FK_PaymentPaymentTransactionTargetId FOREIGN KEY (patr_target_id)
+-- 		REFERENCES Payment.User_Accounts(usac_account_number) ON DELETE NO ACTION ON UPDATE NO ACTION
 );
 
 -- CREATE UNIQUE INDEX UQ_PaymentTransaction_patr_trx_number_ref

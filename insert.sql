@@ -762,12 +762,13 @@ SET IDENTITY_INSERT Booking.special_offers OFF
 
 
 SET IDENTITY_INSERT Booking.booking_orders ON
-INSERT INTO Booking.booking_orders (boor_id,boor_order_number, 	boor_order_date, boor_total_room,boor_total_ammount,boor_down_payment,boor_pay_type,boor_is_paid,boor_type,boor_carnumber,boor_user_id,boor_hotel_id)
+INSERT INTO Booking.booking_orders (boor_id,boor_order_number, 	boor_order_date, boor_total_room, boor_total_ammount, boor_down_payment,
+                                    boor_pay_type,boor_is_paid,boor_type, boor_cardnumber, boor_user_id,boor_hotel_id)
 VALUES (1, 'BO#20221127-0001', '2023-01-27', 3,500000,200000,'D', 'DP', 'T', '431-2388-93', 1, 1),
-       (2, 'BO#20221127-0002', '2023-01-27', 4,300000,0,'C', 'P', 'C','123-2993-32', 2, 2),
-       (3, 'BO#20221127-0003', '2023-01-27', 4,300000,200000,'D', 'DP', 'T','992-1923-39', 4, 3),
-       (4, 'BO#20221127-0004', '2023-01-27', 4,150000,50000,'PG', 'DP', 'C','571-2939-23', 8, 4),
-       (5, 'BO#20221127-0005', '2023-01-27', 4,500000,0,'D', 'P', 'C','571-2939-23', 7, 5)
+       (2, 'BO#20221127-0002', '2023-01-27', 4,300000,0,'C', 'P', 'C', '123-2993-32',2, 2),
+       (3, 'BO#20221127-0003', '2023-01-27', 4,300000,200000,'D', 'DP', 'T', '087363155421',4, 3),
+       (4, 'BO#20221127-0004', '2023-01-27', 4,150000,50000,'PG', 'DP', 'C', '11-1111-1111', 8, 4),
+       (5, 'BO#20221127-0005', '2023-01-27', 4,500000,2000,'C', 'P', 'C', '571-2939-23', 7, 5)
 SET IDENTITY_INSERT Booking.booking_orders OFF
 -- SELECT*FROM Booking.booking_orders
 
